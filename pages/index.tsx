@@ -47,7 +47,7 @@ export default function IndexPage() {
 	return (
 		<DefaultLayout>
 			<div className="flex flex-col h-full max-w-[1280px] mx-auto px-4">
-				<section className="flex flex-col md:flex-row-reverse items-center justify-center gap-4 py-[0px] md:py-[20px] pb-[24px]">
+				<section className="flex flex-col md:flex-row-reverse items-center justify-center gap-4 py-[0px] md:py-[20px] pb-[24px] relative z-10">
 					<div className="pt-[20px] block md:hidden">
 						<NextImage src="/images/banner.png" width={215} height={215} alt="banner" />
 					</div>
