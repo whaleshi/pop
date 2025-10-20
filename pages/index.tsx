@@ -46,50 +46,22 @@ export default function IndexPage() {
 
 	return (
 		<DefaultLayout>
-			<div className="flex flex-col h-full">
-				<section className="flex flex-col items-center justify-center gap-4 py-[0px] md:py-[20px] pb-[24px]"
-					style={{ background: "linear-gradient(180deg, #FFF 30%, #F5F6F9 100%)" }}
-				>
-					<div className="h-[120px] hidden md:block">
-						<NextImage
-							src={currentBanner === 0 ? "/images/banner.png" : "/images/banner1.png"}
-							alt="banner"
-							width={480}
-							height={120}
-							priority
-							unoptimized
-							className="select-none"
-							style={{
-								width: '480px',
-								height: '120px',
-								objectFit: 'contain',
-								imageRendering: 'auto'
-							}}
-						/>
+			<div className="flex flex-col h-full max-w-[1280px] mx-auto px-4">
+				<section className="flex flex-col md:flex-row-reverse items-center justify-center gap-4 py-[0px] md:py-[20px] pb-[24px]">
+					<div className="pt-[20px] block md:hidden">
+						<NextImage src="/images/banner.png" width={215} height={215} alt="banner" />
 					</div>
-					<div className="h-[160px] block md:hidden">
-						<NextImage
-							src={currentBanner === 0 ? "/images/bannerH5.png" : "/images/banner1H5.png"}
-							alt="banner"
-							width={360}
-							height={160}
-							priority
-							unoptimized
-							className="select-none"
-							style={{
-								width: '360px',
-								height: '160px',
-								objectFit: 'contain',
-								imageRendering: 'auto'
-							}}
-						/>
+					<div className="hidden md:block pt-[150px] w-[464px] h-[464px] shrink-0">
+						<NextImage src="/images/banner.png" width={464} height={464} alt="banner" />
 					</div>
-					<div className="w-full flex gap-[8px] md:hidden px-[16px]">
-						<Button fullWidth variant="faded" className="h-[48px] border-[#EBEBEF] bg-[#fff] rounded-[16px] text-[15px] text-[#101010]" onPress={() => { window.open(siteConfig.links.work, '_blank') }}>运行机制</Button>
-						<Button fullWidth className="h-[48px] bg-[#24232A] rounded-[16px] text-[15px] text-[#fff]" onPress={() => router.push("/create")}>创建代币</Button>
+					<div className="w-full md:pt-[180px]">
+						<div className="text-[26px] md:text-[50px] text-[#fff] text-center md:text-left font-bold mt-[10px] md:pt-[50px]">An innovation launchpad<br /> built on <span className="text-[#ABF909]">Pop Chain</span></div>
+						<div className="text-[16px] md:text-[26px] text-[#AAAAAA] mt-[20px] md:mt-[30px] text-center md:text-left">Create your own Memecoin for just <span className="text-[#ABF909]">$2</span></div>
+						<div className="w-full md:w-[230px] px-[30px] md:px-[0] mt-[50px]">
+							<Button fullWidth className="h-[44px] rounded-[8px] md:rounded-full text-[16px] text-[#000000]">Coming soon</Button>
+						</div>
 					</div>
 				</section>
-				<HomeList />
 			</div>
 		</DefaultLayout>
 	);

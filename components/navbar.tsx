@@ -144,11 +144,11 @@ export const Navbar = () => {
 
 	return (
 		<>
-			<HeroUINavbar maxWidth="full" position="static" className="fixed top-0 left-0 right-0 z-50" classNames={{ wrapper: "px-4 h-[56px] md:h-[64px]" }}>
+			<HeroUINavbar maxWidth="xl" position="static" className="fixed top-0 left-0 right-0 z-50 bg-[#000000]" classNames={{ wrapper: "px-4 h-[56px] md:h-[64px] bg-[#000000]" }}>
 				<NextLink className="flex justify-start items-center logo-container" href="/">
-					<LogoIcon />
+					<NextImage src='/images/logo.png' alt='logo' width={97} height={28} />
 				</NextLink>
-				<div className="text-[14px] text-[#141414] hidden md:flex items-center gap-[16px] pl-[24px]">
+				{/* <div className="text-[14px] text-[#141414] hidden md:flex items-center gap-[16px] pl-[24px]">
 					<NextLink href="/" className="hover:opacity-80 transition-opacity">首页</NextLink>
 					<button
 						className="hover:opacity-80 transition-opacity cursor-pointer"
@@ -159,47 +159,12 @@ export const Navbar = () => {
 					<NextLink href={siteConfig.links.work} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">运行机制</NextLink>
 					<NextLink href={siteConfig.links.x} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">X</NextLink>
 					<NextLink href={siteConfig.links.tg} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">Telegram</NextLink>
-				</div>
+				</div> */}
 
 				<NavbarContent justify="end" className="gap-[12px]">
-					<div className="hidden md:block relative" ref={searchRef}>
-						<Input
-							classNames={{
-								inputWrapper: "w-[375px] h-[40px] border-[#EBEBEF] bg-[#F5F6F9] border-1",
-								input: "text-[13px] text-[#24232A] placeholder:text-[#94989F] uppercase tracking-[-0.07px]",
-							}}
-							name="amount"
-							placeholder="搜索CA或Ticker或名字"
-							variant="bordered"
-							value={searchValue}
-							onValueChange={handleSearchChange}
-							onFocus={handleSearchFocus}
-							startContent={<SearchInputIcon className="shrink-0" />}
-						/>
-						{isSearchDropdownOpen && (
-							<div className="absolute top-[48px] w-[375px] h-[320px] bg-[#fff] rounded-[16px] border-[1px] border-[#EBEBEF] p-[16px] pt-[8px] z-50 overflow-y-auto"
-								style={{ boxShadow: "0 4px 12px 0 rgba(0, 0, 0, 0.05)" }}
-							>
-								{searchLoading && debouncedSearch ? (
-									<TokenListSkeleton count={5} />
-								) : searchResults && searchResults.length > 0 ? (
-									<div>
-										{searchResults.map((item: any, index: number) => (
-											<div key={`navbar-search-${index}`} onClick={handleSearchResultClick}>
-												<TokenItem item={item} border />
-											</div>
-										))}
-									</div>
-								) : debouncedSearch && (
-									<div className="h-full flex flex-col items-center justify-center">
-										<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
-										<div className="text-[14px] text-[#717075]">暂无搜索结果</div>
-									</div>
-								)}
-							</div>
-						)}
-					</div>
-					{
+					<NextImage src='/images/x.png' alt='x' width={32} height={32} />
+					<NextImage src='/images/tg.png' alt='tg' width={32} height={32} />
+					{/* {
 						isLoggedIn ? <Button className="h-[36px] md:h-[40px] bg-[#F5F6F9] text-[13px] text-[#24232A] rounded-[12px]" variant="flat" onPress={handleWalletClick}>
 							<WalletIcon />{shortenAddress(address!)}
 						</Button> : <Button className="h-[36px] md:h-[40px] bg-[#F5F6F9] text-[13px] text-[#24232A] rounded-[12px]" variant="flat" onPress={newLogin}>
@@ -211,7 +176,7 @@ export const Navbar = () => {
 						<MenuCloseIcon className="cursor-pointer block md:hidden" onClick={() => { router.back(); }} />
 					) : (
 						<MenuIcon className="cursor-pointer block md:hidden" onClick={() => { router.push('/user'); }} />
-					)}
+					)} */}
 				</NavbarContent>
 			</HeroUINavbar>
 			<Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton isDismissable={false}>

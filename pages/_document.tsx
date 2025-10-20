@@ -9,7 +9,7 @@ export default function Document() {
 			<Head />
 			<body
 				className={clsx(
-					"min-h-screen bg-[#fff] font-sans antialiased",
+					"min-h-screen bg-[#000000] font-sans antialiased",
 					fontSans.variable,
 				)}
 			>

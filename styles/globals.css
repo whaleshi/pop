@@ -44,13 +44,18 @@ body {
     --rv-button-normal-font-size: 15px;
 }
 
+html,
+body {
+    background: #000000;
+}
+
 /* NProgress 进度条自定义样式 */
 #nprogress {
     pointer-events: none;
 }
 
 #nprogress .bar {
-    background: linear-gradient(90deg, #FFE900, #FFED33, #FFF266) !important;
+    background: linear-gradient(90deg, #ffe900, #ffed33, #fff266) !important;
     position: fixed;
     z-index: 9999;
     top: 0;
@@ -66,7 +71,10 @@ body {
     right: 0px;
     width: 100px;
     height: 100%;
-    box-shadow: 0 0 10px rgba(255, 233, 0, 0.8), 0 0 5px rgba(255, 233, 0, 0.8);
+    box-shadow:
+        0 0 10px rgba(255, 233, 0, 0.8),
+        0 0 5px rgba(255, 233, 0, 0.8);
     opacity: 1;
     transform: rotate(3deg) translate(0px, -4px);
 }
+

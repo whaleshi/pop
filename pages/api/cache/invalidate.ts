@@ -15,10 +15,7 @@ type ErrorResponse = {
     error: string;
 };
 
-export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<InvalidateResponse | ErrorResponse>
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<InvalidateResponse | ErrorResponse>) {
     if (req.method !== "POST") {
         res.setHeader("Allow", ["POST"]);
         return res.status(405).json({
@@ -36,7 +33,7 @@ export default async function handler(
         if (type === "tokens") {
             // 刷新所有代币相关缓存
             deletedItems = CacheUtils.invalidateTokenCache();
-            patterns = ['token:count', 'token:addresses', 'token:contract:data', 'token:list'];
+            patterns = ["token:count", "token:addresses", "token:contract:data", "token:list"];
         } else if (pattern && typeof pattern === "string") {
             // 刷新指定模式的缓存
             deletedItems = CacheUtils.deletePattern(pattern);

@@ -49,22 +49,13 @@ export default function App({ Component, pageProps }: AppProps) {
 		};
 	}, [router]);
 
-	// 预加载关键页面
+	// 路由保护 - 只允许访问首页
 	useEffect(() => {
-		// 延迟预加载，避免影响初始页面加载性能
-		const timer = setTimeout(() => {
-			// 预加载关键页面
-			router.prefetch('/create');
-			router.prefetch('/user');
-			router.prefetch('/search');
+		if (router.pathname !== '/') {
+			router.replace('/');
+		}
+	}, [router.pathname, router]);
 
-			// 预加载动态路由的一般模式
-			// 注意：具体的token地址无法预先知道，所以这里只能预加载路由组件
-			router.prefetch('/token/[addr]');
-		}, 2000); // 2秒后开始预加载
-
-		return () => clearTimeout(timer);
-	}, [router]);
 
 	return (
 		<>
