@@ -56,7 +56,7 @@ export default function IndexPage() {
 					</div>
 					<div className="w-full md:pt-[180px]">
 						<div className="text-[26px] md:text-[50px] text-[#fff] text-center md:text-left font-bold mt-[10px] md:pt-[50px]">An innovation launchpad<br /> built on <span className="text-[#ABF909]">Pop Chain</span></div>
-						<div className="text-[16px] md:text-[26px] text-[#AAAAAA] mt-[20px] md:mt-[30px] text-center md:text-left">Create your own Memecoin for just <span className="text-[#ABF909]">$2</span></div>
+						<div className="text-[16px] md:text-[26px] text-[#AAAAAA] mt-[20px] md:mt-[30px] text-center md:text-left">Everyone can deploy a token with one click</div>
 						<div className="w-full md:w-[230px] px-[30px] md:px-[0] mt-[50px]">
 							<Button fullWidth className="h-[44px] rounded-[8px] md:rounded-full text-[16px] text-[#000000]">Coming soon</Button>
 						</div>
