@@ -162,8 +162,12 @@ export const Navbar = () => {
 				</div> */}
 
 				<NavbarContent justify="end" className="gap-[12px]">
-					<NextImage src='/images/x.png' alt='x' width={32} height={32} />
-					<NextImage src='/images/tg.png' alt='tg' width={32} height={32} />
+					<NextLink href={siteConfig.links.x} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+						<NextImage src='/images/x.png' alt='x' width={32} height={32} />
+					</NextLink>
+					<NextLink href={siteConfig.links.tg} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+						<NextImage src='/images/tg.png' alt='tg' width={32} height={32} />
+					</NextLink>
 					{/* {
 						isLoggedIn ? <Button className="h-[36px] md:h-[40px] bg-[#F5F6F9] text-[13px] text-[#24232A] rounded-[12px]" variant="flat" onPress={handleWalletClick}>
 							<WalletIcon />{shortenAddress(address!)}
