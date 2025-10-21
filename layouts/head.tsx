@@ -26,7 +26,7 @@ export const Head = () => {
 						property="og:image"
 						content=""
 					/>
-					<meta property="og:url" content="https://nihao.com" />
+					<meta property="og:url" content="https://popme.fun" />
 					<meta property="og:site_name" content={siteConfig.name} />
 
 					{/* Twitter */}
@@ -37,8 +37,8 @@ export const Head = () => {
 						name="twitter:image"
 						content=""
 					/>
-					<meta name="twitter:site" content="@nihaocrypto" />
-					<meta name="twitter:creator" content="@nihaocrypto" />
+					<meta name="twitter:site" content="@popmefun" />
+					<meta name="twitter:creator" content="@popmefun" />
 				</>
 			}
 

@@ -32,11 +32,11 @@ export default function Share({ isOpen, onClose, info }: ShareProps) {
 								<div className="text-[17px] text-[#24232A] mt-[10px]">{info?.symbol?.toUpperCase() || '--'}</div>
 								<div className="text-[13px] text-[#94989F] mt-[4px]">{info?.name || '--'}</div>
 								<Button fullWidth className="h-[44px] bg-[#24232A] text-[15px] text-[#FFF] rounded-[16px] mt-[20px]" onPress={() => {
-									const text = `我在 @nihaocrypto 发现了 $${info?.symbol?.toUpperCase()} 快来一起交易吧 👉 https://nihao.com/token/${info?.mint}`;
+									const text = `我在 发现了 $${info?.symbol?.toUpperCase()} 快来一起交易吧 👉 https://popmefun.com/token/${info?.mint}`;
 									const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 									window.open(url, "_blank");
 								}}>分享到 X</Button>
-								<Button fullWidth className="h-[44px] bg-[#EBEBEF] text-[15px] text-[#24232A] rounded-[16px] mt-[12px]" onPress={() => { copy(`https://nihao.com/token/${info?.mint}` || '') }}>复制链接</Button>
+								<Button fullWidth className="h-[44px] bg-[#EBEBEF] text-[15px] text-[#24232A] rounded-[16px] mt-[12px]" onPress={() => { copy(`https://popmefun.com/token/${info?.mint}` || '') }}>复制链接</Button>
 							</ModalBody>
 						</>
 					)}
