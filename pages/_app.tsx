@@ -62,13 +62,9 @@ export default function App({ Component, pageProps }: AppProps) {
 			<Head>
 				{/* 预加载关键图片 */}
 				<link rel="preload" href="/images/logo.png" as="image" />
-				<link rel="preload" href="/images/bnb.png" as="image" />
 				<link rel="preload" href="/images/nothing.png" as="image" />
 				<link rel="preload" href="/images/default.png" as="image" />
 				<link rel="preload" href="/images/banner.png" as="image" />
-				<link rel="preload" href="/images/banner1.png" as="image" />
-				<link rel="preload" href="/images/bannerH5.png" as="image" />
-				<link rel="preload" href="/images/banner1H5.png" as="image" />
 			</Head>
 			{/* <PrivyProviders> */}
 			<QueryProvider>
