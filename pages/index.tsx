@@ -8,40 +8,40 @@ import { siteConfig } from "@/config/site";
 import { useQuery } from "@tanstack/react-query";
 
 export default function IndexPage() {
-	const router = useRouter();
-	const [currentBanner, setCurrentBanner] = useState(0);
+	// const router = useRouter();
+	// const [currentBanner, setCurrentBanner] = useState(0);
 
-	// 获取缓存状态
-	const { data: cacheStats } = useQuery({
-		queryKey: ["cache-stats"],
-		queryFn: async () => {
-			const response = await fetch('/api/cache/stats');
-			const result = await response.json();
-			return result.success ? result.data : null;
-		},
-		refetchInterval: 10000, // 每10秒刷新一次
-		staleTime: 5000, // 5秒内认为数据是新鲜的
-	});
+	// // 获取缓存状态
+	// const { data: cacheStats } = useQuery({
+	// 	queryKey: ["cache-stats"],
+	// 	queryFn: async () => {
+	// 		const response = await fetch('/api/cache/stats');
+	// 		const result = await response.json();
+	// 		return result.success ? result.data : null;
+	// 	},
+	// 	refetchInterval: 10000, // 每10秒刷新一次
+	// 	staleTime: 5000, // 5秒内认为数据是新鲜的
+	// });
 
-	// 3秒切换banner图片
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setCurrentBanner(prev => prev === 0 ? 1 : 0);
-		}, 3000);
-		return () => clearInterval(interval);
-	}, []);
+	// // 3秒切换banner图片
+	// useEffect(() => {
+	// 	const interval = setInterval(() => {
+	// 		setCurrentBanner(prev => prev === 0 ? 1 : 0);
+	// 	}, 3000);
+	// 	return () => clearInterval(interval);
+	// }, []);
 
-	// 开发环境下显示缓存状态
-	useEffect(() => {
-		if (process.env.NODE_ENV === 'development' && cacheStats) {
-			console.log('=== 缓存状态 ===');
-			console.log('缓存项数量:', cacheStats.totalItems);
-			console.log('过期项数量:', cacheStats.expiredItems);
-			console.log('内存使用:', cacheStats.memoryUsage);
-			console.log('运行时间:', cacheStats.uptime);
-			console.log('================');
-		}
-	}, [cacheStats]);
+	// // 开发环境下显示缓存状态
+	// useEffect(() => {
+	// 	if (process.env.NODE_ENV === 'development' && cacheStats) {
+	// 		console.log('=== 缓存状态 ===');
+	// 		console.log('缓存项数量:', cacheStats.totalItems);
+	// 		console.log('过期项数量:', cacheStats.expiredItems);
+	// 		console.log('内存使用:', cacheStats.memoryUsage);
+	// 		console.log('运行时间:', cacheStats.uptime);
+	// 		console.log('================');
+	// 	}
+	// }, [cacheStats]);
 
 
 	return (
