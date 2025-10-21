@@ -24,7 +24,7 @@ export const Head = () => {
 					<meta property="og:description" content={siteConfig.description} />
 					<meta
 						property="og:image"
-						content="https://newgame.mypinata.cloud/ipfs/bafkreif63azrbr62habc3yb4ra2udp25zpcv5cesu654r3zxtfrwberjde"
+						content=""
 					/>
 					<meta property="og:url" content="https://nihao.com" />
 					<meta property="og:site_name" content={siteConfig.name} />
@@ -35,7 +35,7 @@ export const Head = () => {
 					<meta name="twitter:description" content={siteConfig.description} />
 					<meta
 						name="twitter:image"
-						content="https://newgame.mypinata.cloud/ipfs/bafkreif63azrbr62habc3yb4ra2udp25zpcv5cesu654r3zxtfrwberjde"
+						content=""
 					/>
 					<meta name="twitter:site" content="@nihaocrypto" />
 					<meta name="twitter:creator" content="@nihaocrypto" />
