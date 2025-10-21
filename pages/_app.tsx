@@ -60,7 +60,6 @@ export default function App({ Component, pageProps }: AppProps) {
 	return (
 		<>
 			<Head>
-				{/* 预加载关键图片 */}
 				<link rel="preload" href="/images/logo.png" as="image" />
 				<link rel="preload" href="/images/nothing.png" as="image" />
 				<link rel="preload" href="/images/default.png" as="image" />
