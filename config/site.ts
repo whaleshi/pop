@@ -5,7 +5,7 @@ export const siteConfig = {
     description: "An innovation launchpad built on Pop Chain",
     links: {
         x: "https://x.com/popmefun",
-        tg: "",
+        tg: "https://t.me/popmefun",
         work: "",
     },
 };
