@@ -88,21 +88,18 @@ export const HomeList = () => {
 
 	// 优化骨架屏显示逻辑 - 只有在真正加载且无数据时才显示
 	const showSkeleton = currentLoading && !currentData;
-	const showSkeleton1 = newLoading && !newData;
-	const showSkeleton2 = trendingLoading && !trendingData;
-	const showSkeleton3 = listedLoading && !listedData;
 
 	return (
 		<>
-			<div className="bg-[#F5F6F9] h-full block md:hidden">
-				<div className="h-[60px] flex items-center justify-between px-[16px]">
+			<div className="bg-[#000000] h-full">
+				<div className="h-[60px] flex items-center justify-between">
 					<div className="text-[17px] flex gap-[16px] items-center">
 						{tabs.map((tab) => (
 							<div
 								key={tab.key}
 								className={`cursor-pointer transition-all duration-200 ${activeTab === tab.key
-									? 'text-[#24232A] font-bold'
-									: 'text-[#94989F] font-medium hover:text-[#24232A]'
+									? 'text-[#FFFFFF] font-bold'
+									: 'text-[#AAAAAA] font-medium hover:text-[#FFFFFF]'
 									}`}
 								onClick={() => handleTabClick(tab.key)}
 							>
@@ -110,19 +107,22 @@ export const HomeList = () => {
 							</div>
 						))}
 					</div>
-					<div className="h-[28px] bg-[#EBEBEF] rounded-[12px] pl-[6px] pr-[8px] text-[13px] text-[#94989F] flex items-center gap-[4px] cursor-pointer" onClick={handleSearchClick}>
+					{/* <div className="h-[28px] bg-[#EBEBEF] rounded-[12px] pl-[6px] pr-[8px] text-[13px] text-[#94989F] flex items-center gap-[4px] cursor-pointer" onClick={handleSearchClick}>
 						<SearchIcon /><span className="pt-[2px]">搜索</span>
-					</div>
+					</div> */}
+					<div className="bg-[#0E0E0E] rounded-[10px] w-[200px] h-[40px] cursor-pointer flex items-center px-[12px] text-[16px] text-[#AAAAAA] gap-[10px]"><SearchIcon />Search</div>
 				</div>
-				<div className="px-[16px]">
+				<div className="">
 					{showSkeleton ? (
 						<TokenListSkeleton count={20} />
 					) : (
 						<div className="pb-[20px]">
 							{currentData && currentData.length > 0 ? (
-								currentData.map((item: any, index: number) => (
-									<TokenItem key={index} item={item} />
-								))
+								<div className="flex flex-col gap-[12px] md:grid md:grid-cols-3 md:gap-[12px]">
+									{currentData.map((item: any, index: number) => (
+										<TokenItem key={index} item={item} />
+									))}
+								</div>
 							) : (
 								<div className="flex flex-col items-center mt-[120px]">
 									<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
@@ -132,74 +132,6 @@ export const HomeList = () => {
 						</div>
 					)}
 				</div>
-			</div>
-			<div className="bg-[#F5F6F9] flex-1 hidden md:block px-[24px] pt-[20px] max-h-[calc(100vh-224px)]">
-				<div className="flex gap-[12px] h-full">
-					<div className="flex-1 h-full">
-						<div className="text-[#24232A] cursor-pointer text-[16px] pl-[16px] mb-[8px]">新创建</div>
-						<div className="h-[calc(100%-40px)] overflow-y-auto">
-							{showSkeleton1 ? (
-								<TokenListSkeleton count={20} />
-							) : (
-								<div>
-									{newData && newData.length > 0 ? (
-										newData.map((item: any, index: number) => (
-											<TokenItem key={`new-${index}`} item={item} />
-										))
-									) : (
-										<div className="flex flex-col items-center mt-[120px]">
-											<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
-											<div className="text-[14px] text-[#717075]">暂无结果</div>
-										</div>
-									)}
-								</div>
-							)}
-						</div>
-					</div>
-					<div className="flex-1 h-full">
-						<div className="text-[#24232A] cursor-pointer text-[16px] pl-[16px] mb-[8px]">飙升</div>
-						<div className="h-[calc(100%-40px)] overflow-y-auto">
-							{showSkeleton2 ? (
-								<TokenListSkeleton count={20} />
-							) : (
-								<div>
-									{trendingData && trendingData.length > 0 ? (
-										trendingData.map((item: any, index: number) => (
-											<TokenItem key={`trending-${index}`} item={item} />
-										))
-									) : (
-										<div className="flex flex-col items-center mt-[120px]">
-											<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
-											<div className="text-[14px] text-[#717075]">暂无结果</div>
-										</div>
-									)}
-								</div>
-							)}
-						</div>
-					</div>
-					<div className="flex-1 h-full">
-						<div className="text-[#24232A] cursor-pointer text-[16px] pl-[16px] mb-[8px]">已开盘</div>
-						<div className="h-[calc(100%-40px)] overflow-y-auto">
-							{showSkeleton3 ? (
-								<TokenListSkeleton count={20} />
-							) : (
-								<div>
-									{listedData && listedData.length > 0 ? (
-										listedData.map((item: any, index: number) => (
-											<TokenItem key={`listed-${index}`} item={item} />
-										))
-									) : (
-										<div className="flex flex-col items-center mt-[120px]">
-											<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
-											<div className="text-[14px] text-[#717075]">暂无结果</div>
-										</div>
-									)}
-								</div>
-							)}
-						</div>
-					</div>
-				</div>
-
 			</div>
 		</>
 	)

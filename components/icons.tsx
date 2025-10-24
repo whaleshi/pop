@@ -15,9 +15,9 @@ export const MenuCloseIcon = (props: IconSvgProps) => (
 );
 
 export const SearchIcon = (props: IconSvgProps) => (
-	<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" {...props}>
-		<circle cx="6" cy="6" r="4.25" stroke="#94989F" strokeWidth="1.5" />
-		<path d="M10.4697 11.5303C10.7626 11.8232 11.2374 11.8232 11.5303 11.5303C11.8232 11.2374 11.8232 10.7626 11.5303 10.4697L11 11L10.4697 11.5303ZM11 11L11.5303 10.4697L9.53033 8.46967L9 9L8.46967 9.53033L10.4697 11.5303L11 11Z" fill="#94989F" />
+	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" {...props}>
+		<circle cx="8" cy="8" r="5.5" stroke="#FFFFFF" strokeWidth="1.5" />
+		<path d="M13.9596 15.3738C14.2837 15.6979 14.8498 15.6979 15.1738 15.3738C15.4979 15.0498 15.4979 14.4837 15.1738 14.1596L14.6667 14.6667L13.9596 15.3738ZM14.6667 14.6667L15.1738 14.1596L12.7071 11.6929L12 12.4L11.2929 13.1071L13.9596 15.3738L14.6667 14.6667Z" fill="#FFFFFF" />
 	</svg>
 );
 

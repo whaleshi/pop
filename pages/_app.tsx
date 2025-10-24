@@ -49,13 +49,6 @@ export default function App({ Component, pageProps }: AppProps) {
 		};
 	}, [router]);
 
-	// 路由保护 - 只允许访问首页
-	useEffect(() => {
-		if (router.pathname !== '/') {
-			router.replace('/');
-		}
-	}, [router.pathname, router]);
-
 
 	return (
 		<>
