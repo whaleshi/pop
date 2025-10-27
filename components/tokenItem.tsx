@@ -23,18 +23,6 @@ export const TokenItem = ({ border = false, item }: TokenItemProps) => {
 		}
 	};
 
-	// 计算进度条百分比（基于市值，可以根据需要调整）
-	const getProgressPercentage = () => {
-		const marketCap = item?.price_usd_f * 1e9;
-		if (!marketCap) return 0;
-		
-		// 假设最大市值为1亿美元，可以根据实际情况调整
-		const maxMarketCap = 100000000;
-		const percentage = Math.min((marketCap / maxMarketCap) * 100, 100);
-		return percentage;
-	};
-
-	const progressPercentage = getProgressPercentage();
 	const priceChangeDisplay = formatPriceChange(item?.price_change_24h_f);
 
 	return (
@@ -57,7 +45,7 @@ export const TokenItem = ({ border = false, item }: TokenItemProps) => {
 			<div className="absolute bottom-0 left-0 w-full h-[3px] bg-[#ffffff08]">
 				<div 
 					className="h-full bg-gradient-to-r from-[#9AED2D] to-[#7ED321] transition-all duration-1000 ease-out"
-					style={{ width: `${progressPercentage}%` }}
+					style={{ width: `${item?.progress}%` }}
 				/>
 			</div>
 		</div>

@@ -231,7 +231,7 @@ export const CacheKeys = {
 export const CacheTTL = {
     TOKEN_COUNT: 10, // 代币总数：10秒（缩短以快速响应新代币）
     TOKEN_LIST: 30, // 代币列表：30秒（缩短以显示新代币）
-    TOKEN_DETAIL: 300, // 代币详情：5分钟
+    TOKEN_DETAIL: 10, // 代币详情：10秒
     TOKEN_METADATA: 86400 * 365, // 代币元数据：1年（永久）
     CONTRACT_DATA: 10, // 合约原始数据：10秒（缩短以快速更新）
     TOKEN_ADDRESSES: 30, // 代币地址列表：30秒（缩短以包含新代币）

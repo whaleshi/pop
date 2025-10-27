@@ -84,7 +84,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 			}
 
 			if (_bignumber(inputAmount).gt(tokenBalance)) {
-				return `代币余额不足，当前余额: ${formatBigNumber(tokenBalance)} ${info?.symbol?.toUpperCase() || 'Token'}`;
+				return `代币余额不足，当前余额: ${formatBigNumber(tokenBalance)} ${info?.metadata?.symbol?.toUpperCase() || 'Token'}`;
 			}
 		}
 
@@ -140,9 +140,9 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 	};
 
 	const { data: estimatedOutput } = useQuery({
-		queryKey: ['estimateOutput', info?.mint, inputAmount, isBuy],
+		queryKey: ['estimateOutput', info?.address, inputAmount, isBuy],
 		queryFn: async () => {
-			if (!inputAmount || !info?.mint || parseFloat(inputAmount) <= 0) {
+			if (!inputAmount || !info?.address || parseFloat(inputAmount) <= 0) {
 				return '0';
 			}
 
@@ -152,13 +152,13 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 
 				if (isBuy) {
 					// 调用 tryBuy 获取预期代币输出
-					const result = await readOnlyContract.tryBuy(info?.mint, ethers.parseEther(inputAmount));
+					const result = await readOnlyContract.tryBuy(info?.address, ethers.parseEther(inputAmount));
 					const tokenAmountOut = result[0];
 					return ethers.formatEther(tokenAmountOut);
 				} else {
 					// 调用 trySell 获取预期ETH输出
 					const sellAmount = ethers.parseEther(inputAmount);
-					const result = await readOnlyContract.trySell(info?.mint, sellAmount);
+					const result = await readOnlyContract.trySell(info?.address, sellAmount);
 					return ethers.formatEther(result);
 				}
 			} catch (error) {
@@ -166,7 +166,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 				return '0';
 			}
 		},
-		enabled: !!(inputAmount && info?.mint && parseFloat(inputAmount) > 0),
+		enabled: !!(inputAmount && info?.address && parseFloat(inputAmount) > 0),
 		refetchInterval: 3000, // 每3秒刷新一次
 		staleTime: 2000,
 		retry: 1,
@@ -291,7 +291,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 
 				// 交易成功处理
 				toast.success('买入成功！', {
-					description: `成功买入 ${outputAmount} ${info?.symbol?.toUpperCase()}`
+					description: `成功买入 ${outputAmount} ${info?.metadata?.symbol?.toUpperCase()}`
 				});
 
 				// 清空输入
@@ -373,7 +373,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 
 				// 交易成功处理
 				toast.success('卖出成功！', {
-					description: `成功卖出 ${formatBigNumber(amount)} ${info?.symbol?.toUpperCase()}，获得 ${outputAmount} POP`
+					description: `成功卖出 ${formatBigNumber(amount)} ${info?.metadata?.symbol?.toUpperCase()}，获得 ${outputAmount} POP`
 				});
 
 				// 清空输入
@@ -450,9 +450,9 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 					endContent={<div className="shrink-0 h-[32px] rounded-[20px] bg-[#333] flex items-center px-[4px] pr-[6px] gap-[4px]">
 						{
 							isBuy ? <MyAvatar src={'/images/pop.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" /> :
-								<MyAvatar src={info?.image_url || '/images/default.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" />
+								<MyAvatar src={info?.metadata?.image || '/images/default.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" />
 						}
-						<div className="text-[15px] text-[#fff]">{isBuy ? 'POP' : info?.symbol?.toUpperCase() || '--'}</div>
+						<div className="text-[15px] text-[#fff]">{isBuy ? 'POP' : info?.metadata?.symbol?.toUpperCase() || '--'}</div>
 					</div>}
 				/>
 				<div className="flex gap-[8px] mt-[12px]">
@@ -472,7 +472,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 				<div className="text-[14px] text-[#fff] flex items-center justify-end gap-[3px] mt-[12px]">
 					<span className="text-[#AAAAAA]">余额:</span>
 					{
-						isBuy ? <>{formatBigNumber(balance)} POP</> : <>{formatBigNumber(tokenBalance!)} {info?.symbol?.toUpperCase() || '--'}</>
+						isBuy ? <>{formatBigNumber(balance)} POP</> : <>{formatBigNumber(tokenBalance!)} {info?.metadata?.symbol?.toUpperCase() || '--'}</>
 					}
 					{
 						isBuy && <span className="text-[#9AED2D] cursor-pointer hover:text-[#7ED321] transition-colors" onClick={() => {
@@ -490,7 +490,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 						<span className="text-[#AAAAAA]">预计收到</span>
 						<div>
 							<span className="text-[#fff] mr-[4px] font-medium">{outputAmount || '0.0'}</span>
-							<span className="text-[#AAAAAA]">{selectedTab === 'buy' ? info?.symbol?.toUpperCase() : 'POP'}</span>
+							<span className="text-[#AAAAAA]">{selectedTab === 'buy' ? info?.metadata?.symbol?.toUpperCase() : 'POP'}</span>
 						</div>
 					</div>
 					<div className="flex items-center justify-between mt-[12px]">
@@ -504,7 +504,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 				<Button
 					fullWidth
 					className={`h-[52px] text-[16px] text-[#fff] mt-[24px] font-medium rounded-[16px] transition-all duration-200 ${selectedTab === 'buy' ? 'bg-[#9AED2D] hover:bg-[#7ED321] text-[#000]' : 'bg-[#FF4C4C] hover:bg-[#FF3333]'}`}
-					onPress={() => { handleClick(info?.mint, inputAmount) }}
+					onPress={() => { handleClick(info?.address, inputAmount) }}
 					isLoading={isLoading}
 					isDisabled={isLoading || !inputAmount || parseFloat(inputAmount) <= 0}
 				>

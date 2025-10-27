@@ -29,9 +29,9 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 
 	// 获取代币余额
 	const { data: tokenBalance } = useQuery({
-		queryKey: ['tokenBalance', info?.mint, address],
+		queryKey: ['tokenBalance', info?.address, address],
 		queryFn: async () => {
-			if (!info?.mint || !address) {
+			if (!info?.address || !address) {
 				return '0';
 			}
 
@@ -44,7 +44,7 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 					stateMutability: "view",
 					type: "function",
 				}];
-				const contract = new ethers.Contract(info.mint, balanceOfABI, provider);
+				const contract = new ethers.Contract(info?.address, balanceOfABI, provider);
 				const tokenBal = await contract.balanceOf(address);
 				return ethers.formatEther(tokenBal);
 			} catch (error) {
@@ -52,7 +52,7 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 				return '0';
 			}
 		},
-		enabled: !!(info?.mint && address),
+		enabled: !!(info?.address && address),
 		refetchInterval: 3000, // 每3秒刷新一次
 		staleTime: 2000,
 		retry: 1,
@@ -60,7 +60,7 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 
 	return (
 		<div className="flex-1 w-full px-[16px] md:px-[0px]">
-			<div className="w-full h-full flex items-end pb-[30px] md:hidden">
+			<div className="w-full h-full flex items-end md:hidden">
 				<div className="flex gap-[12px] w-full">
 					{
 						parseFloat(tokenBalance!) > 0 && <Button fullWidth className="bg-[#FF4C4C] h-[48px] rounded-[16px] text-[15px] text-[#fff]" onPress={() => handleOpenTrade('sell')}>卖出</Button>
@@ -73,12 +73,18 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 				<Trade info={info} tokenBalance={tokenBalance} initialTab={initialTab} />
 			</div>
 			<Drawer isOpen={isOpen} placement="bottom" onOpenChange={onOpenChange} hideCloseButton>
-				<DrawerContent>
+				<DrawerContent
+					style={{
+						borderRadius: "24px 24px 0 0",
+						border: "2px solid #333",
+						background: "#1A1A1A"
+					}}
+				>
 					{(onClose) => (
 						<>
 							<DrawerHeader className="text-center relative p-0 pt-[8px]">
-								<div className="h-[48px] flex items-center justify-center w-full">交易</div>
-								<CloseIcon className="absolute right-[16px] top-[20px]" onClick={onClose} />
+								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">交易</div>
+								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</DrawerHeader>
 							<DrawerBody className="px-[16px] pb-[30px]">
 								<Trade info={info} tokenBalance={tokenBalance} initialTab={initialTab} />

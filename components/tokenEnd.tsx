@@ -36,16 +36,16 @@ export const TokenEnd = ({ info }: TokenProps) => {
 	return (
 		<div className="flex-1 w-full px-[16px] md:px-[0px] flex flex-col items-center pt-[8px] relative">
 			<div className="flex flex-col items-center w-full md:gap-[12px]">
-				<MyAvatar src={info?.image_url || '/images/default.png'} alt="icon" className="w-[80px] h-[80px] rounded-[16px]" />
+				<MyAvatar src={info?.metadata?.image || '/images/default.png'} alt="icon" className="w-[80px] h-[80px] rounded-[16px]" />
 				<div className="md:flex md:flex-col md:gap-[2px]">
-					<div className="text-[#101010] mt-[16px] md:mt-[0px] text-[20px] font-bold flex items-center justify-center gap-[4px] md:justify-start">{info?.symbol?.toUpperCase() || '--'} </div>
-					<div className="text-[#95989F] mt-[2px] md:mt-[0px] text-[13px] text-center">{info?.name || '--'}</div>
+					<div className="text-[#101010] mt-[16px] md:mt-[0px] text-[20px] font-bold flex items-center justify-center gap-[4px] md:justify-start">{info?.metadata?.symbol?.toUpperCase() || '--'} </div>
+					<div className="text-[#95989F] mt-[2px] md:mt-[0px] text-[13px] text-center">{info?.metadata?.name || '--'}</div>
 				</div>
 			</div>
 			<div className="w-full flex items-center justify-center gap-[4px] mt-[12px]">
 				<div className="border-[1px] border-[rgba(255,233,0,0.35)] bg-[rgba(255,233,0,0.15)] rounded-[12px] h-[28px] text-[12px] px-[8px] text-[#24232A] flex items-center gap-[4px]">
-					{shortenAddress(info?.mint || '')}
-					<CopyIcon className="cursor-pointer" onClick={() => copy(info?.mint || '')} />
+					{shortenAddress(info?.address || '')}
+					<CopyIcon className="cursor-pointer" onClick={() => copy(info?.address || '')} />
 				</div>
 				{
 					info?.metadata?.x && <div
@@ -99,22 +99,22 @@ export const TokenEnd = ({ info }: TokenProps) => {
 			</div>
 			<div className="w-full mt-[16px] md:mt-[24px] flex flex-col md:grid md:grid-cols-2 gap-[12px]">
 				<Button fullWidth className="h-[48px] rounded-[16px] bg-[#FFB218] text-[14px] text-[#fff]"
-					onPress={() => { window.open(`https://web3.binance.com/zh-CN/token/bsc/${info?.mint}`, "_blank"); }}
+					onPress={() => { window.open(`https://web3.binance.com/zh-CN/token/bsc/${info?.address}`, "_blank"); }}
 				>
 					<Image src="/images/bian.png" alt="Binance" width={16} height={16} disableSkeleton radius='none' />Binance Wallet
 				</Button>
 				<Button fullWidth className="h-[48px] rounded-[16px] bg-[#24232A] text-[14px] text-[#fff]"
-					onPress={() => { window.open(`https://web3.okx.com/zh-hant/token/bsc/${info?.mint}`, "_blank"); }}
+					onPress={() => { window.open(`https://web3.okx.com/zh-hant/token/bsc/${info?.address}`, "_blank"); }}
 				>
 					<Image src="/images/okx.png" alt="OKX" width={16} height={16} disableSkeleton radius='none' />OKX Wallet
 				</Button>
 				<Button fullWidth className="h-[48px] rounded-[16px] bg-[#64CB83] text-[14px] text-[#fff]"
-					onPress={() => { window.open(`https://gmgn.ai/bsc/token/${info?.mint}`, "_blank"); }}
+					onPress={() => { window.open(`https://gmgn.ai/bsc/token/${info?.address}`, "_blank"); }}
 				>
 					<Image src="/images/gmgn.png" alt="GMGN" width={16} height={16} disableSkeleton radius='none' />GMGN
 				</Button>
 				<Button fullWidth className="h-[48px] rounded-[16px] bg-[#3AC9D2] text-[14px] text-[#fff]"
-					onPress={() => { window.open(`https://pancakeswap.finance/swap?outputCurrency=${info?.mint}&inputCurrency=BNB`, "_blank"); }}
+					onPress={() => { window.open(`https://pancakeswap.finance/swap?outputCurrency=${info?.address}&inputCurrency=BNB`, "_blank"); }}
 				>
 					<Image src="/images/pancake.png" alt="Pancake" width={16} height={16} disableSkeleton radius='none' />Pancake Swap
 				</Button>

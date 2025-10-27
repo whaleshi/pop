@@ -27,7 +27,7 @@ export const CHAINS_CONFIG = {
             name: "Local Development",
             symbol: "ETH",
             explorerUrl: "http://localhost:3000", // 本地区块浏览器或占位符
-            rpcUrl: "http://192.168.1.73:8545",
+            rpcUrl: "http://47.254.247.214:8545",
             factoryContract: "0x86c64DA12DA5C7d1C4Ccd484A833ac32E675B2c2",
         },
     },
@@ -51,8 +51,8 @@ export const TRANSACTION_CONFIG = {
 } as const;
 
 // Multicall3 合约地址 (通用地址，大多数链都支持)
-export const MULTICALL3_ADDRESS = "0xcA11bde05977b3631167028862bE2a173976CA11";
-
+export const MULTICALL3_ADDRESS = "0xbd64A7c53c825655e83718805e8b747B3387ee95";
+// 0xcA11bde05977b3631167028862bE2a173976CA11
 // Multicall3 ABI
 export const MULTICALL3_ABI = [
     {

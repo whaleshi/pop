@@ -57,7 +57,7 @@ export const localNetwork = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ["http://192.168.1.73:8545"],
+      http: ["http://47.254.247.214:8545"],
     },
   },
   testnet: true,

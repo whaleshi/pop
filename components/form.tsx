@@ -4,9 +4,7 @@ import { useRouter } from "next/router";
 import MyAvatar from "@/components/avatarImage"
 import pinFileToIPFS from "@/utils/pinata";
 import { toast } from "sonner";
-import { useAccount } from 'wagmi';
-import { writeContract, getBalance, estimateGas, getGasPrice, readContract } from "@wagmi/core";
-import { config } from "@/config/wagmi";
+import { useAccount, useWalletClient, usePublicClient } from 'wagmi';
 import { ethers } from "ethers";
 import FactoryABI from "@/constant/TokenFactory.abi.json";
 import { CONTRACT_CONFIG, DEFAULT_CHAIN_ID } from "@/config/chains";
@@ -179,7 +177,33 @@ export default function CreateForm() {
 
 	// Wagmi hooks
 	const { address, isConnected } = useAccount();
+	const { data: walletClient } = useWalletClient();
+	const publicClient = usePublicClient();
+	const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
+	const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
 
+
+	// 初始化 provider 和 signer
+	useEffect(() => {
+		const initializeProvider = async () => {
+			if (walletClient && publicClient) {
+				try {
+					// 使用 walletClient 的 transport 创建 provider
+					const ethersProvider = new ethers.BrowserProvider(walletClient.transport);
+					const ethersSigner = await ethersProvider.getSigner();
+
+					setProvider(ethersProvider);
+					setSigner(ethersSigner);
+				} catch (error) {
+					console.error("Failed to initialize provider:", error);
+				}
+			}
+		};
+
+		if (isConnected && walletClient) {
+			initializeProvider();
+		}
+	}, [walletClient, publicClient, isConnected]);
 
 	useEffect(() => {
 		if (!avatarFile) {
@@ -280,7 +304,7 @@ export default function CreateForm() {
 	// 创建代币合约调用
 	const createToken = async (metadataHash: string) => {
 		try {
-			if (!address) {
+			if (!address || !signer || !provider) {
 				throw new Error("Wallet not connected");
 			}
 			const salt = "0x" + randomBytes(32).toString("hex");
@@ -289,78 +313,91 @@ export default function CreateForm() {
 			const hasPreBuy = amountVal && parseFloat(amountVal) > 0;
 			const preBuyAmount = hasPreBuy ? ethers.parseEther(amountVal) : BigInt(0);
 
+			const contract = new ethers.Contract(factoryAddr, FactoryABI, signer);
+
 			// 估算 gas
 			let gasLimit;
 			try {
-				const estimatedGas = await estimateGas(config, {
-					to: factoryAddr as `0x${string}`,
-					data: `0x`, // wagmi 会自动处理函数调用数据
-					value: hasPreBuy ? preBuyAmount : undefined,
-				});
-				gasLimit = (estimatedGas * BigInt(120)) / BigInt(100); // +20% buffer
+				if (hasPreBuy) {
+					const estimatedGas = await contract.createTokenAndBuy.estimateGas(
+						nameVal,
+						ticker,
+						metadataHash,
+						salt,
+						preBuyAmount,
+						{ value: preBuyAmount }
+					);
+					gasLimit = estimatedGas + (estimatedGas * BigInt(50)) / BigInt(100); // +50% buffer
+				} else {
+					const estimatedGas = await contract.createToken.estimateGas(
+						nameVal,
+						ticker,
+						metadataHash,
+						salt
+					);
+					gasLimit = estimatedGas + (estimatedGas * BigInt(50)) / BigInt(100); // +50% buffer
+				}
 				console.log("预估 Gas Limit:", gasLimit.toString());
 			} catch (e) {
 				console.warn("Gas 估算失败:", e);
-				gasLimit = undefined;
 			}
 
 			// 获取 gas price
-			const gasPrice = await getGasPrice(config);
-			const newGasPrice = gasPrice
-				? gasPrice + (gasPrice * BigInt(5)) / BigInt(100)
-				: undefined; // +5%
+			const gasPrice = (await provider.getFeeData()).gasPrice;
+			const newGasPrice = gasPrice ? gasPrice + (gasPrice * BigInt(5)) / BigInt(100) : null;
 
 			console.log("Gas Price:", {
 				original: gasPrice?.toString(),
 				new: newGasPrice?.toString(),
 			});
 
-			let txHash;
+			const txOptions = {} as any;
+			if (gasLimit) txOptions.gasLimit = gasLimit;
+			if (newGasPrice) txOptions.gasPrice = newGasPrice;
+
+			let txResult;
 			try {
 				if (hasPreBuy) {
 					// 调用 createTokenAndBuy
-					txHash = await writeContract(config, {
-						address: factoryAddr as `0x${string}`,
-						abi: FactoryABI,
-						functionName: 'createTokenAndBuy',
-						args: [nameVal, ticker, metadataHash, salt, preBuyAmount],
-						value: preBuyAmount,
-						gas: gasLimit,
-						gasPrice: newGasPrice,
-					});
+					txOptions.value = preBuyAmount;
+					txResult = await contract.createTokenAndBuy(
+						nameVal,
+						ticker,
+						metadataHash,
+						salt,
+						preBuyAmount,
+						txOptions
+					);
+					console.log("createTokenAndBuy 交易已发送:", txResult.hash);
 				} else {
 					// 调用 createToken
-					txHash = await writeContract(config, {
-						address: factoryAddr as `0x${string}`,
-						abi: FactoryABI,
-						functionName: 'createToken',
-						args: [nameVal, ticker, metadataHash, salt],
-						gas: gasLimit,
-						gasPrice: newGasPrice,
-					});
+					txResult = await contract.createToken(
+						nameVal,
+						ticker,
+						metadataHash,
+						salt,
+						txOptions
+					);
+					console.log("createToken 交易已发送:", txResult.hash);
 				}
+
+				toast.success('交易已提交', {
+					description: `交易哈希: ${txResult.hash.slice(0, 10)}...${txResult.hash.slice(-6)}`
+				});
 			} catch (error: any) {
 				// 检查用户拒绝交易
-				if (
-					error?.code === 4001 ||
-					error?.message?.toLowerCase().includes("user rejected") ||
-					error?.cause?.message?.toLowerCase().includes("user rejected")
-				) {
+				if (error.code === 'ACTION_REJECTED') {
 					return null;
 				}
 				throw error;
 			}
 
 			// 等待交易确认
-			// 注意：wagmi的writeContract已经等待交易被挖掘，所以不需要额外的wait
+			const receipt = await txResult.wait();
+			console.log("交易已确认:", receipt);
 
-			// 使用 readContract 获取新创建的代币地址
-			const tokenAddress = await readContract(config, {
-				address: factoryAddr as `0x${string}`,
-				abi: FactoryABI,
-				functionName: 'predictTokenAddress',
-				args: [salt],
-			});
+			// 使用 predictTokenAddress 获取新创建的代币地址
+			const tokenAddress = await contract.predictTokenAddress(salt);
 
 			return tokenAddress;
 		} catch (error) {
@@ -609,7 +646,7 @@ export default function CreateForm() {
 				/>
 				<Button
 					className={[
-						"w-full h-[48px] text-[14px] mb-[30px] f600 full rounded-[12px]",
+						"w-full h-[48px] text-[14px] f600 full rounded-[12px]",
 						readyToSubmit ? "bg-[#abf909] text-[#000] hover:bg-[#9AED2D]" : "bg-[rgba(148,152,159,0.65)] text-[#FFF]",
 					].join(" ")}
 					type="submit"

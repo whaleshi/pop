@@ -13,7 +13,6 @@ interface TokenProps {
 
 export const TokenAbout = ({ info }: TokenProps) => {
 	const [isShareOpen, setIsShareOpen] = useState(false);
-	const [isAuthOpen, setIsAuthOpen] = useState(false);
 	const { copy } = useClipboard();
 
 	// 格式化价格变化显示
@@ -33,18 +32,6 @@ export const TokenAbout = ({ info }: TokenProps) => {
 
 	const priceChangeDisplay = formatPriceChange(info?.price_change_24h_f);
 
-	// 计算市值进度条百分比
-	const getMarketCapProgress = () => {
-		const marketCap = info?.price_usd_f * 1e9;
-		if (!marketCap) return 0;
-
-		// 假设目标市值为1亿美元
-		const targetMarketCap = 100000000;
-		const percentage = Math.min((marketCap / targetMarketCap) * 100, 100);
-		return percentage;
-	};
-
-	const marketCapProgress = getMarketCapProgress();
 	console.log(info)
 	return (
 		<div className="flex-1 w-full px-[16px] md:px-[0px] flex flex-col items-center pt-[8px] relative mb-[50px]">
@@ -59,13 +46,13 @@ export const TokenAbout = ({ info }: TokenProps) => {
 			{/* 市值进度条 */}
 			<div className="w-full mt-[20px] p-[16px] bg-[#1A1A1A] rounded-[16px] border border-[#333]">
 				<div className="flex justify-between items-center mb-[12px]">
-					<span className="text-[14px] text-[#AAAAAA] font-medium">Market Cap Progress</span>
-					<span className="text-[14px] text-[#9AED2D] font-bold">{marketCapProgress.toFixed(1)}%</span>
+					<span className="text-[14px] text-[#AAAAAA] font-medium">Progress</span>
+					<span className="text-[14px] text-[#9AED2D] font-bold">{info?.progress}%</span>
 				</div>
 				<div className="w-full h-[12px] bg-[#ffffff08] rounded-full overflow-hidden relative">
 					<div
 						className="h-full bg-gradient-to-r from-[#9AED2D] via-[#7ED321] to-[#6BCF1F] rounded-full transition-all duration-1500 ease-out relative shadow-lg"
-						style={{ width: `${marketCapProgress}%` }}
+						style={{ width: `${info?.progress}%` }}
 					>
 						{/* 内部光泽效果 */}
 						<div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/20 to-transparent rounded-full"></div>
@@ -78,21 +65,21 @@ export const TokenAbout = ({ info }: TokenProps) => {
 			</div>
 			<div className="w-full flex items-center justify-center md:justify-start gap-[8px] mt-[12px]">
 				<div className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] text-[12px] px-[10px] text-[#fff] flex items-center gap-[6px] hover:bg-[#2A2A2A] transition-colors">
-					{shortenAddress(info?.mint || '')}
-					<CopyIcon className="cursor-pointer hover:text-[#9AED2D] transition-colors" onClick={() => copy(info?.mint || '')} />
+					{shortenAddress(info?.address || '')}
+					<CopyIcon className="cursor-pointer hover:text-[#9AED2D] transition-colors" onClick={() => copy(info?.address || '')} />
 				</div>
 				{
 					info?.metadata?.x && <div
 						onClick={() => { window.open(info?.metadata?.x, "_blank"); }}
 						className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] px-[10px] flex items-center cursor-pointer hover:bg-[#2A2A2A] transition-colors">
-						<Image src="/images/x.png" alt="x" width={16} height={16} disableSkeleton radius='none' />
+						<Image src="/images/x.png" alt="x" width={20} height={20} disableSkeleton radius='none' />
 					</div>
 				}
 				{
 					info?.metadata?.telegram && <div
 						onClick={() => { window.open(info?.metadata?.telegram, "_blank"); }}
 						className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] px-[10px] flex items-center cursor-pointer hover:bg-[#2A2A2A] transition-colors">
-						<Image src="/images/tg.png" alt="tg" width={16} height={16} disableSkeleton radius='none' />
+						<Image src="/images/tg.png" alt="tg" width={20} height={20} disableSkeleton radius='none' />
 					</div>
 				}
 				{
@@ -106,7 +93,7 @@ export const TokenAbout = ({ info }: TokenProps) => {
 					<ShareIcon className="w-[16px]" />
 				</div>
 			</div>
-			<div className="text-[13px] text-[#AAAAAA] text-center md:text-left mt-[16px] w-full">{info?.description}</div>
+			<div className="text-[13px] text-[#AAAAAA] text-center md:text-left mt-[16px] w-full">{info?.metadata?.description}</div>
 			<div className="flex items-center gap-[12px] mt-[16px] w-full">
 				<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
 					<div className="text-[13px] text-[#AAAAAA]">价格</div>

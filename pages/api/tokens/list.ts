@@ -252,7 +252,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     }),
                 });
             }
-
             const addressResults = (await readContract(config, {
                 address: MULTICALL3_ADDRESS as `0x${string}`,
                 abi: MULTICALL3_ABI,

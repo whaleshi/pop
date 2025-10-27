@@ -51,7 +51,7 @@ export default function TokenPage() {
 				</div>
 				<div className="w-full flex-1 flex flex-col md:flex-row md:max-w-[800px] md:gap-[24px] relative md:pt-[80px]">
 					{
-						data?.is_on_x === 1 ? <TokenEnd info={data} /> : <>
+						data?.progressPercent === 100 ? <TokenEnd info={data} /> : <>
 							<TokenAbout info={data} />
 							<TokenTradeBox info={data} />
 						</>

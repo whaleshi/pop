@@ -154,7 +154,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     functionName: "tokensInfo",
                     data: results[1].returnData,
                 }) as any[];
-
                 tokenInfo = {
                     base: tokenInfoResult[0],
                     quote: tokenInfoResult[1],
