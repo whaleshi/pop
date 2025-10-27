@@ -30,20 +30,20 @@ export const SearchInputIcon = (props: IconSvgProps) => (
 
 export const BackIcon = (props: IconSvgProps) => (
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" {...props}>
-		<path d="M13 6L8.15127 12L13 18" stroke="#24232A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+		<path d="M13 6L8.15127 12L13 18" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
 	</svg>
 );
 
 export const ShareIcon = (props: IconSvgProps) => (
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" {...props}>
-		<path d="M7.5 9H7C4.79086 9 3 10.7909 3 13V17C3 19.2091 4.79086 21 7 21H17C19.2091 21 21 19.2091 21 17V13C21 10.7909 19.2091 9 17 9H16.5" stroke="#24232A" strokeWidth="2" strokeLinecap="round" />
-		<path d="M12 15V3M12 3L9 5.5M12 3L15 5.5" stroke="#24232A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+		<path d="M7.5 9H7C4.79086 9 3 10.7909 3 13V17C3 19.2091 4.79086 21 7 21H17C19.2091 21 21 19.2091 21 17V13C21 10.7909 19.2091 9 17 9H16.5" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+		<path d="M12 15V3M12 3L9 5.5M12 3L15 5.5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
 	</svg>
 );
 
 export const CopyIcon = (props: IconSvgProps) => (
 	<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none" {...props}>
-		<path d="M11.9375 3.9375C12.3517 3.9375 12.6875 4.27329 12.6875 4.6875V9.6875C12.6875 11.3444 11.3444 12.6875 9.6875 12.6875H4.6875C4.27329 12.6875 3.9375 12.3517 3.9375 11.9375V10.9375H8.6875C9.93014 10.9375 10.9375 9.93014 10.9375 8.6875V3.9375H11.9375ZM7.8125 1.3125C9.05514 1.3125 10.0625 2.31986 10.0625 3.5625V7.8125C10.0625 9.05514 9.05514 10.0625 7.8125 10.0625H3.5625C2.31986 10.0625 1.3125 9.05514 1.3125 7.8125V3.5625C1.3125 2.31986 2.31986 1.3125 3.5625 1.3125H7.8125Z" fill="#94989F" />
+		<path d="M11.9375 3.9375C12.3517 3.9375 12.6875 4.27329 12.6875 4.6875V9.6875C12.6875 11.3444 11.3444 12.6875 9.6875 12.6875H4.6875C4.27329 12.6875 3.9375 12.3517 3.9375 11.9375V10.9375H8.6875C9.93014 10.9375 10.9375 9.93014 10.9375 8.6875V3.9375H11.9375ZM7.8125 1.3125C9.05514 1.3125 10.0625 2.31986 10.0625 3.5625V7.8125C10.0625 9.05514 9.05514 10.0625 7.8125 10.0625H3.5625C2.31986 10.0625 1.3125 9.05514 1.3125 7.8125V3.5625C1.3125 2.31986 2.31986 1.3125 3.5625 1.3125H7.8125Z" fill="#fff" />
 	</svg>
 );
 

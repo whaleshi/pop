@@ -42,44 +42,44 @@ export const HomeList = () => {
 		refetchOnMount: false, // 组件挂载时不自动重新获取
 	});
 
-	// 飙升数据
-	const { data: trendingData, isLoading: trendingLoading, isFetching: trendingFetching } = useQuery({
-		queryKey: ["tokenList", "trending"],
-		queryFn: async () => {
-			const response = await fetch('/api/tokens/list?sort=trending&limit=50');
-			const data = await response.json();
-			return data.success ? data.data.tokens : [];
-		},
-		placeholderData: (prev) => prev,
-		staleTime: 5000, // 5秒内认为数据是新鲜的，避免频繁请求
-		gcTime: 300000, // 5分钟垃圾回收时间，保持缓存更久
-		refetchInterval: 3000, // 3秒刷新一次
-		refetchOnWindowFocus: false,
-		refetchOnMount: false, // 组件挂载时不自动重新获取
-	});
+	// // 飙升数据
+	// const { data: trendingData, isLoading: trendingLoading, isFetching: trendingFetching } = useQuery({
+	// 	queryKey: ["tokenList", "trending"],
+	// 	queryFn: async () => {
+	// 		const response = await fetch('/api/tokens/list?sort=trending&limit=50');
+	// 		const data = await response.json();
+	// 		return data.success ? data.data.tokens : [];
+	// 	},
+	// 	placeholderData: (prev) => prev,
+	// 	staleTime: 5000, // 5秒内认为数据是新鲜的，避免频繁请求
+	// 	gcTime: 300000, // 5分钟垃圾回收时间，保持缓存更久
+	// 	refetchInterval: 3000, // 3秒刷新一次
+	// 	refetchOnWindowFocus: false,
+	// 	refetchOnMount: false, // 组件挂载时不自动重新获取
+	// });
 
-	// 已开盘数据
-	const { data: listedData, isLoading: listedLoading, isFetching: listedFetching } = useQuery({
-		queryKey: ["tokenList", "launched"],
-		queryFn: async () => {
-			const response = await fetch('/api/tokens/list?sort=launched&limit=50');
-			const data = await response.json();
-			return data.success ? data.data.tokens : [];
-		},
-		placeholderData: (prev) => prev,
-		staleTime: 5000, // 5秒内认为数据是新鲜的，避免频繁请求
-		gcTime: 300000, // 5分钟垃圾回收时间，保持缓存更久
-		refetchInterval: 3000, // 3秒刷新一次
-		refetchOnWindowFocus: false,
-		refetchOnMount: false, // 组件挂载时不自动重新获取
-	});
+	// // 已开盘数据
+	// const { data: listedData, isLoading: listedLoading, isFetching: listedFetching } = useQuery({
+	// 	queryKey: ["tokenList", "launched"],
+	// 	queryFn: async () => {
+	// 		const response = await fetch('/api/tokens/list?sort=launched&limit=50');
+	// 		const data = await response.json();
+	// 		return data.success ? data.data.tokens : [];
+	// 	},
+	// 	placeholderData: (prev) => prev,
+	// 	staleTime: 5000, // 5秒内认为数据是新鲜的，避免频繁请求
+	// 	gcTime: 300000, // 5分钟垃圾回收时间，保持缓存更久
+	// 	refetchInterval: 3000, // 3秒刷新一次
+	// 	refetchOnWindowFocus: false,
+	// 	refetchOnMount: false, // 组件挂载时不自动重新获取
+	// });
 
 	// 根据当前选中的标签获取对应的数据
 	const getCurrentData = () => {
 		switch (activeTab) {
 			case '1': return { data: newData, isLoading: newLoading, isFetching: newFetching };
-			case '2': return { data: trendingData, isLoading: trendingLoading, isFetching: trendingFetching };
-			case '3': return { data: listedData, isLoading: listedLoading, isFetching: listedFetching };
+			// case '2': return { data: trendingData, isLoading: trendingLoading, isFetching: trendingFetching };
+			// case '3': return { data: listedData, isLoading: listedLoading, isFetching: listedFetching };
 			default: return { data: newData, isLoading: newLoading, isFetching: newFetching };
 		}
 	};
@@ -110,7 +110,7 @@ export const HomeList = () => {
 					{/* <div className="h-[28px] bg-[#EBEBEF] rounded-[12px] pl-[6px] pr-[8px] text-[13px] text-[#94989F] flex items-center gap-[4px] cursor-pointer" onClick={handleSearchClick}>
 						<SearchIcon /><span className="pt-[2px]">搜索</span>
 					</div> */}
-					<div className="bg-[#0E0E0E] rounded-[10px] w-[200px] h-[40px] cursor-pointer flex items-center px-[12px] text-[16px] text-[#AAAAAA] gap-[10px]"><SearchIcon />Search</div>
+					<div className="bg-[#1A1A1A] border border-[#333] rounded-[10px] w-[200px] h-[40px] cursor-pointer flex items-center px-[12px] text-[16px] text-[#AAAAAA] gap-[10px] hover:bg-[#2A2A2A] transition-colors" onClick={handleSearchClick}><SearchIcon />Search</div>
 				</div>
 				<div className="">
 					{showSkeleton ? (
@@ -126,7 +126,7 @@ export const HomeList = () => {
 							) : (
 								<div className="flex flex-col items-center mt-[120px]">
 									<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
-									<div className="text-[14px] text-[#717075]">暂无结果</div>
+									<div className="text-[14px] text-[#AAAAAA]">暂无结果</div>
 								</div>
 							)}
 						</div>

@@ -36,7 +36,7 @@ export default function TokenPage() {
 		return (
 			<DefaultLayout>
 				<div className="w-full h-full flex flex-col items-center justify-center">
-					<Image src="/images/loading.gif" width={90} height={90} alt="Loading..." />
+					<Image src="/images/loading.png" width={90} height={90} alt="Loading..." />
 				</div>
 			</DefaultLayout>
 		);
@@ -49,9 +49,6 @@ export default function TokenPage() {
 					<BackIcon className="cursor-pointer" onClick={() => router.push('/')} />
 					<ShareIcon className="cursor-pointer" onClick={() => setIsShareOpen(true)} />
 				</div>
-				<div className="w-full h-[200px] md:h-[500px] absolute top-0 left-0"
-					style={{ background: "linear-gradient(180deg, rgba(255, 233, 0, 0.15) 0%, rgba(255, 233, 0, 0.00) 100%)" }}
-				></div>
 				<div className="w-full flex-1 flex flex-col md:flex-row md:max-w-[800px] md:gap-[24px] relative md:pt-[80px]">
 					{
 						data?.is_on_x === 1 ? <TokenEnd info={data} /> : <>

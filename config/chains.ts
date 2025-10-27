@@ -1,34 +1,34 @@
-import { bsc, bscTestnet } from "wagmi/chains";
+import { popchainTestnet, popchainMainnet, localNetwork } from "./net";
 const isProd = process.env.NEXT_PUBLIC_APP_ENV === "production";
 export const CHAINS_CONFIG = {
     // 默认链 - 修改这里即可切换整个应用的默认网络
-    DEFAULT_CHAIN: isProd ? bsc : bsc,
+    DEFAULT_CHAIN: localNetwork,
 
     // 支持的链列表 - 按优先级排序
-    SUPPORTED_CHAINS: [bsc, bscTestnet, bsc],
+    SUPPORTED_CHAINS: [popchainMainnet, popchainTestnet, localNetwork],
 
     // 链相关配置
     CHAIN_CONFIG: {
-        [97]: {
-            name: "BNB Smart Chain Testnet",
-            symbol: "tBNB",
-            explorerUrl: "https://testnet.bscscan.com",
-            rpcUrl: "https://delicate-old-breeze.bsc-testnet.quiknode.pro/4e8edc72f64856f8e8fa3377a81c9f3a1f6b5dee/",
-            factoryContract: "0xc855D67921359dc2852656A264f07F86c39320d1",
+        [7257]: {
+            name: "Popchain",
+            symbol: "POP",
+            explorerUrl: "https://scan.popchain.ai/",
+            rpcUrl: "https://rpc.popchain.ai",
+            factoryContract: "0x", // TODO: 需要部署后填入实际合约地址
         },
-        [56]: {
-            name: "BNB Smart Chain",
-            symbol: "BNB",
-            explorerUrl: "https://bscscan.com",
-            rpcUrl: "https://silent-few-meme.bsc.quiknode.pro/ee75800d48bd6244538a996a18a836a986e0add9/",
-            factoryContract: "0x2e611CCBc67B007a894b4276De89663df442fE56",
+        [72570]: {
+            name: "Popchain Testnet",
+            symbol: "POP",
+            explorerUrl: "https://popchaintest.cloud.blockscout.com/",
+            rpcUrl: "https://47.76.179.249:8545/",
+            factoryContract: "0x", // TODO: 需要部署后填入实际合约地址
         },
-        [196]: {
-            name: "X Layer Mainnet",
-            symbol: "OKB",
-            explorerUrl: "https://www.oklink.com/xlayer",
-            rpcUrl: "https://rpc.xlayer.tech",
-            factoryContract: "0x3c609DACA9867309b3170d109486f37EBaE0B6a6",
+        [31337]: {
+            name: "Local Development",
+            symbol: "ETH",
+            explorerUrl: "http://localhost:3000", // 本地区块浏览器或占位符
+            rpcUrl: "http://192.168.1.73:8545",
+            factoryContract: "0x86c64DA12DA5C7d1C4Ccd484A833ac32E675B2c2",
         },
     },
 } as const;

@@ -4,14 +4,16 @@ import { useRouter } from "next/router";
 import MyAvatar from "@/components/avatarImage"
 import pinFileToIPFS from "@/utils/pinata";
 import { toast } from "sonner";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { useAuthStore } from "@/stores/auth";
+import { useAccount } from 'wagmi';
+import { writeContract, getBalance, estimateGas, getGasPrice, readContract } from "@wagmi/core";
+import { config } from "@/config/wagmi";
 import { ethers } from "ethers";
-import FactoryABI from "@/constant/TokenManager.abi.json";
+import FactoryABI from "@/constant/TokenFactory.abi.json";
 import { CONTRACT_CONFIG, DEFAULT_CHAIN_ID } from "@/config/chains";
-import { getCheckData, getAddr, getLuckyToken } from "@/service/api";
+import { randomBytes } from "crypto";
 import { useIsMobile } from "@/utils/index";
 import CreateSuccess from "./createSuccess";
+import { FORM_STYLES, AVATAR_STYLES, ERROR_STYLES } from "@/constants/styles";
 
 
 const MAX_AVATAR_MB = 5;
@@ -20,7 +22,7 @@ const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 /** 与 HeroUI Input 保持一致的错误样式 */
 function FieldError({ message }: { message?: string | null }) {
 	if (!message) return null;
-	return <p className="text-[12px] text-danger mt-1 leading-[1.1]">{message}</p>;
+	return <p className={ERROR_STYLES.fieldError}>{message}</p>;
 }
 
 /** 头像字段：用“代理校验输入”确保优先校验头像 */
@@ -90,7 +92,7 @@ function AvatarField({
 				// 这个输入不提交业务数据，仅用于 required 校验顺序
 				tabIndex={-1}
 				aria-hidden="true"
-				className="sr-only absolute h-0 w-0 p-0 m-0"
+				className={AVATAR_STYLES.hiddenInput}
 				required={!!required}
 				// 有头像则通过，无头像则为空触发 invalid
 				value={valueUrl ? "1" : ""}
@@ -105,7 +107,7 @@ function AvatarField({
 				<label
 					id={labelId}
 					htmlFor={inputId}
-					className={["text-[14px] text-[#717075] font-bold", errorText && "text-[#f31260]"].join(" ")}
+					className={[`${FORM_STYLES.label.primary} font-bold`, errorText && AVATAR_STYLES.labelError].join(" ")}
 				>
 					图标
 					{required ? <span className="text-[#f31260] ml-[2px]">*</span> : null}
@@ -115,19 +117,17 @@ function AvatarField({
 			<div className="flex items-center" aria-labelledby={labelId}>
 				<div
 					ref={wrapperRef}
-					className={[
-						"relative w-[84px] h-[84px] shrink-0 rounded-full overflow-hidden border-[2px] border-[#F5F6F9]",
-					].join(" ")}
+					className={AVATAR_STYLES.wrapper}
 				>
 					<MyAvatar
 						src={valueUrl || "/images/default.png"}
 						alt="avatar"
-						className="w-[80px] h-[80px] border-1 border-[#F5F6F9]"
+						className={AVATAR_STYLES.avatar}
 						name={!valueUrl ? "Avatar" : undefined}
 					/>
 					{loading && (
-						<div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full">
-							<div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+						<div className={AVATAR_STYLES.loadingOverlay}>
+							<div className={AVATAR_STYLES.loadingSpinner}></div>
 						</div>
 					)}
 					{/* 真正的文件选择输入：不再 required，让代理来控制校验顺序 */}
@@ -137,7 +137,7 @@ function AvatarField({
 						name={name}
 						type="file"
 						accept={ACCEPTED_TYPES.join(",")}
-						className="opacity-0 w-full h-full absolute top-0 left-0 z-10 cursor-pointer"
+						className={AVATAR_STYLES.fileInput}
 						aria-label='uploadAvatar'
 						onChange={handleChange}
 						onInput={() => setError(null)}
@@ -177,37 +177,8 @@ export default function CreateForm() {
 
 
 
-	// Privy hooks
-	const { ready, authenticated } = usePrivy();
-	const { wallets } = useWallets();
-	// 使用自定义认证状态的地址，并找到对应的钱包对象
-	const { isLoggedIn, address } = useAuthStore();
-	const wallet = address ? wallets.find((w) => w.address?.toLowerCase() === address.toLowerCase()) : null;
-	const isConnected = ready && isLoggedIn && !!address;
-	const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
-	const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
-
-	// 初始化 provider 和 signer
-	useEffect(() => {
-		const initializeProvider = async () => {
-			if (wallet) {
-				try {
-					const ethereumProvider = await wallet.getEthereumProvider();
-					const ethersProvider = new ethers.BrowserProvider(ethereumProvider);
-					const ethersSigner = await ethersProvider.getSigner();
-
-					setProvider(ethersProvider);
-					setSigner(ethersSigner);
-				} catch (error) {
-					console.error("Failed to initialize provider:", error);
-				}
-			}
-		};
-
-		if (isConnected && wallet) {
-			initializeProvider();
-		}
-	}, [wallet, isConnected]);
+	// Wagmi hooks
+	const { address, isConnected } = useAccount();
 
 
 	useEffect(() => {
@@ -309,19 +280,10 @@ export default function CreateForm() {
 	// 创建代币合约调用
 	const createToken = async (metadataHash: string) => {
 		try {
-			if (!signer || !provider) {
-				throw new Error("Wallet not ready");
+			if (!address) {
+				throw new Error("Wallet not connected");
 			}
-			let salt = '';
-			try {
-				const res = await getLuckyToken({ contract_addr: factoryAddr });
-				salt = res.data.salt;
-			} catch (error) {
-				console.error("Get salt error:", error);
-				toast.error("获取创建参数失败，请稍后重试");
-				return;
-			}
-			const factoryContract = new ethers.Contract(factoryAddr, FactoryABI, signer);
+			const salt = "0x" + randomBytes(32).toString("hex");
 
 			// 检查是否有提前购买金额
 			const hasPreBuy = amountVal && parseFloat(amountVal) > 0;
@@ -330,45 +292,52 @@ export default function CreateForm() {
 			// 估算 gas
 			let gasLimit;
 			try {
-				let estimatedGas;
-				if (hasPreBuy) {
-					estimatedGas = await factoryContract.createTokenAndBuy.estimateGas(
-						nameVal, ticker, metadataHash, salt, preBuyAmount,
-						{ value: preBuyAmount }
-					);
-				} else {
-					estimatedGas = await factoryContract.createToken.estimateGas(nameVal, ticker, metadataHash, salt);
-				}
-				gasLimit = estimatedGas + (estimatedGas * BigInt(20)) / BigInt(100); // +20% buffer
+				const estimatedGas = await estimateGas(config, {
+					to: factoryAddr as `0x${string}`,
+					data: `0x`, // wagmi 会自动处理函数调用数据
+					value: hasPreBuy ? preBuyAmount : undefined,
+				});
+				gasLimit = (estimatedGas * BigInt(120)) / BigInt(100); // +20% buffer
+				console.log("预估 Gas Limit:", gasLimit.toString());
 			} catch (e) {
+				console.warn("Gas 估算失败:", e);
 				gasLimit = undefined;
 			}
-			// 调用创建代币合约
-			const gasPrice = (await provider.getFeeData()).gasPrice;
-			const newGasPrice = gasPrice ? gasPrice + (gasPrice * BigInt(5)) / BigInt(100) : null; // +5%
 
-			const txOptions: any = {};
-			if (gasLimit) txOptions.gasLimit = gasLimit;
-			if (newGasPrice) txOptions.gasPrice = newGasPrice;
-			let tx;
+			// 获取 gas price
+			const gasPrice = await getGasPrice(config);
+			const newGasPrice = gasPrice
+				? gasPrice + (gasPrice * BigInt(5)) / BigInt(100)
+				: undefined; // +5%
+
+			console.log("Gas Price:", {
+				original: gasPrice?.toString(),
+				new: newGasPrice?.toString(),
+			});
+
+			let txHash;
 			try {
 				if (hasPreBuy) {
-					tx = await factoryContract.createTokenAndBuy(
-						nameVal,
-						ticker,
-						metadataHash,
-						salt,
-						preBuyAmount,
-						{ ...txOptions, value: preBuyAmount }
-					);
+					// 调用 createTokenAndBuy
+					txHash = await writeContract(config, {
+						address: factoryAddr as `0x${string}`,
+						abi: FactoryABI,
+						functionName: 'createTokenAndBuy',
+						args: [nameVal, ticker, metadataHash, salt, preBuyAmount],
+						value: preBuyAmount,
+						gas: gasLimit,
+						gasPrice: newGasPrice,
+					});
 				} else {
-					tx = await factoryContract.createToken(
-						nameVal,
-						ticker,
-						metadataHash,
-						salt,
-						txOptions
-					);
+					// 调用 createToken
+					txHash = await writeContract(config, {
+						address: factoryAddr as `0x${string}`,
+						abi: FactoryABI,
+						functionName: 'createToken',
+						args: [nameVal, ticker, metadataHash, salt],
+						gas: gasLimit,
+						gasPrice: newGasPrice,
+					});
 				}
 			} catch (error: any) {
 				// 检查用户拒绝交易
@@ -377,21 +346,24 @@ export default function CreateForm() {
 					error?.message?.toLowerCase().includes("user rejected") ||
 					error?.cause?.message?.toLowerCase().includes("user rejected")
 				) {
-					// toast.error(t("Toast.text2"));
 					return null;
 				}
 				throw error;
 			}
 
-			await tx.wait();
+			// 等待交易确认
+			// 注意：wagmi的writeContract已经等待交易被挖掘，所以不需要额外的wait
 
-			// 计算新创建的代币地址 - 只需要 salt 参数
-			const readOnlyContract = new ethers.Contract(factoryAddr, FactoryABI, provider);
-			const tokenAddress = await readOnlyContract.predictTokenAddress(salt);
+			// 使用 readContract 获取新创建的代币地址
+			const tokenAddress = await readContract(config, {
+				address: factoryAddr as `0x${string}`,
+				abi: FactoryABI,
+				functionName: 'predictTokenAddress',
+				args: [salt],
+			});
 
 			return tokenAddress;
 		} catch (error) {
-			// toast.error(t("Toast.text4"));
 			throw error;
 		}
 	};
@@ -413,39 +385,13 @@ export default function CreateForm() {
 		}
 
 		// 检查网络连接
-		if (!signer || !provider) {
+		if (!isConnected) {
 			toast.error("钱包连接异常，请重新连接");
 			return;
 		}
 
 		try {
 			setCreateLoading(true);
-
-			// 0. 先调用 getCheckData 进行校验
-			try {
-				const checkResult = await getCheckData({
-					name: `${nameVal} ${ticker.toUpperCase()}`,
-					image: ipfsHash,
-				});
-				// 如果校验失败，显示错误信息
-				// 根据具体状态码显示不同的错误信息
-				if (checkResult?.data?.name_status === 2) {
-					toast.error("名称格式违规，请修改后重试");
-					return;
-				}
-				if (checkResult?.data?.text_status === 2) {
-					toast.error("Ticker格式违规，请修改后重试");
-					return;
-				}
-				if (checkResult?.data?.image_status === 2) {
-					toast.error("图片格式违规，请修改后重试");
-					return;
-				}
-			} catch (checkError) {
-				console.error("Check data error:", checkError);
-				toast.error("内容校验失败，请稍后重试");
-				return;
-			}
 
 			// 1. 上传最终的 JSON 元数据到 IPFS
 			const metadataHash = await uploadFile();
@@ -464,7 +410,7 @@ export default function CreateForm() {
 			setCreatedTokenAddress(tokenAddress as string);
 			setIsSuccessOpen(true);
 			toast.success('代币创建成功！');
-			
+
 			// 4. 失效相关缓存，确保新代币立即显示
 			try {
 				await fetch('/api/cache/invalidate', {
@@ -514,12 +460,12 @@ export default function CreateForm() {
 				{/* 基本信息 */}
 				<Input
 					classNames={{
-						inputWrapper: "h-[48px] border-[#F5F6F9] bg-[#F5F6F9] border-1",
-						input: "f600 text-[15px] text-[#24232A] placeholder:text-[#94989F]",
+						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
+						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
 					isRequired
 					errorMessage="请输入名称"
-					label={<span className="text-[14px] text-[#717075]">名称</span>}
+					label={<span className="text-[14px] text-[#AAAAAA]">名称</span>}
 					labelPlacement="outside-top"
 					name="name"
 					placeholder="请输入名称"
@@ -532,12 +478,12 @@ export default function CreateForm() {
 				{/* Ticker：强制大写 + 字距 + 验证 */}
 				<Input
 					classNames={{
-						inputWrapper: "h-[48px] border-[#F5F6F9] bg-[#F5F6F9] border-1",
-						input: "f600 text-[15px] text-[#24232A] placeholder:text-[#94989F] uppercase tracking-[-0.07px]",
+						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
+						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666] uppercase tracking-[-0.07px]",
 					}}
 					isRequired
 					errorMessage="请输入Ticker"
-					label={<span className="text-[14px] text-[#717075]">Ticker</span>}
+					label={<span className="text-[14px] text-[#AAAAAA]">Ticker</span>}
 					labelPlacement="outside-top"
 					name="ticker"
 					placeholder="请输入Ticker"
@@ -550,14 +496,14 @@ export default function CreateForm() {
 
 				<Textarea
 					classNames={{
-						inputWrapper: "border-[#F5F6F9] bg-[#F5F6F9] border-1",
-						input: "f600 text-[15px] text-[#24232A] placeholder:text-[#94989F]",
+						inputWrapper: "border-[#333] bg-[#1A1A1A] border-1",
+						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 						label: "pb-[8px]",
 					}}
 					label={
 						<div className="flex items-center gap-2">
-							<span className="text-[14px] text-[#717075]">描述</span>
-							<span className="text-[#94989F]">(可选)</span>
+							<span className="text-[14px] text-[#AAAAAA]">描述</span>
+							<span className="text-[#666]">(可选)</span>
 						</div>
 					}
 					labelPlacement="outside"
@@ -571,13 +517,13 @@ export default function CreateForm() {
 				/>
 				<Input
 					classNames={{
-						inputWrapper: "h-[48px] border-[#F5F6F9] bg-[#F5F6F9] border-1",
-						input: "f600 text-[15px] text-[#24232A] placeholder:text-[#94989F]",
+						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
+						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
 					label={
 						<div className="flex items-center gap-2">
-							<span className="text-[14px] text-[#717075]">提前买入</span>
-							<span className="text-[#94989F]">(可选)</span>
+							<span className="text-[14px] text-[#AAAAAA]">提前买入</span>
+							<span className="text-[#666]">(可选)</span>
 						</div>
 					}
 					labelPlacement="outside-top"
@@ -592,43 +538,24 @@ export default function CreateForm() {
 						// 只允许数字和小数点，并限制小数位数
 						if (value === '' || /^\d*\.?\d{0,6}$/.test(value)) {
 							const numValue = parseFloat(value);
-							// 限制最大值，比如不超过100 BNB
+							// 限制最大值，比如不超过100 POP
 							if (value === '' || numValue <= 100) {
 								setAmountVal(value);
 							}
 						}
 					}}
-					endContent={<span className="text-[15px] text-[#24232A]">BNB</span>}
+					endContent={<span className="text-[15px] text-[#fff]">POP</span>}
 				/>
-				{/* 预计可获得显示 */}
-				{amountVal && parseFloat(amountVal) > 0 && (
-					<div className="pb-[10px] -mt-[12px]">
-						<div className="flex items-center justify-between">
-							<span className="text-[14px] text-[#717075] mr-[8px]">预计可获得</span>
-							<div className="flex items-center gap-[8px]">
-								<span className="text-[16px] text-[#24232A] font-semibold">
-									{(() => {
-										const X = parseFloat(amountVal);
-										const result = (1066666667 * 0.98 * X) / (0.666666667 + X * 0.98);
-										const finalResult = Math.min(Math.floor(result), 800000000); // 最大8亿
-										return finalResult.toLocaleString();
-									})()}
-								</span>
-								<span className="text-[14px] text-[#94989F]">{ticker || "TOKEN"}</span>
-							</div>
-						</div>
-					</div>
-				)}
 				{/* 社交链接 */}
 				<Input
 					classNames={{
-						inputWrapper: "h-[48px] border-[#F5F6F9] bg-[#F5F6F9] border-1",
-						input: "f600 text-[15px] text-[#24232A] placeholder:text-[#94989F]",
+						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
+						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
 					label={
 						<div className="flex items-center gap-2">
-							<span className="text-[14px] text-[#717075]">X</span>
-							<span className="text-[#94989F]">(可选)</span>
+							<span className="text-[14px] text-[#AAAAAA]">X</span>
+							<span className="text-[#666]">(可选)</span>
 						</div>
 					}
 					labelPlacement="outside-top"
@@ -642,13 +569,13 @@ export default function CreateForm() {
 				/>
 				<Input
 					classNames={{
-						inputWrapper: "h-[48px] border-[#F5F6F9] bg-[#F5F6F9] border-1",
-						input: "f600 text-[15px] text-[#24232A] placeholder:text-[#94989F]",
+						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
+						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
 					label={
 						<div className="flex items-center gap-2">
-							<span className="text-[14px] text-[#717075]">Telegram</span>
-							<span className="text-[#94989F]">(可选)</span>
+							<span className="text-[14px] text-[#AAAAAA]">Telegram</span>
+							<span className="text-[#666]">(可选)</span>
 						</div>
 					}
 					labelPlacement="outside-top"
@@ -662,13 +589,13 @@ export default function CreateForm() {
 				/>
 				<Input
 					classNames={{
-						inputWrapper: "h-[48px] border-[#F5F6F9] bg-[#F5F6F9] border-1",
-						input: "f600 text-[15px] text-[#24232A] placeholder:text-[#94989F]",
+						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
+						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
 					label={
 						<div className="flex items-center gap-2">
-							<span className="text-[14px] text-[#717075]">网站</span>
-							<span className="text-[#94989F]">(可选)</span>
+							<span className="text-[14px] text-[#AAAAAA]">网站</span>
+							<span className="text-[#666]">(可选)</span>
 						</div>
 					}
 					labelPlacement="outside-top"
@@ -682,8 +609,8 @@ export default function CreateForm() {
 				/>
 				<Button
 					className={[
-						"w-full h-[44px] text-[14px] mb-[30px] f600 full rounded-[16px]",
-						readyToSubmit ? "bg-[#24232A] text-[#fff]" : "bg-[rgba(148,152,159,0.65)] text-[#FFF]",
+						"w-full h-[48px] text-[14px] mb-[30px] f600 full rounded-[12px]",
+						readyToSubmit ? "bg-[#abf909] text-[#000] hover:bg-[#9AED2D]" : "bg-[rgba(148,152,159,0.65)] text-[#FFF]",
 					].join(" ")}
 					type="submit"
 					aria-label='btn'

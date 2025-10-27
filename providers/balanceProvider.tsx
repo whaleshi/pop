@@ -1,7 +1,9 @@
 'use client';
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { useAuthStore } from "@/stores/auth";
+import { useAccount, useWalletClient, usePublicClient } from 'wagmi';
+import { useQuery } from "@tanstack/react-query";
+import { config } from "@/config/wagmi";
+import { getBalance } from '@wagmi/core';
 import { ethers } from "ethers";
 
 interface BalanceContextType {
@@ -13,72 +15,41 @@ interface BalanceContextType {
 const BalanceContext = createContext<BalanceContextType | undefined>(undefined);
 
 export function BalanceProvider({ children }: { children: ReactNode }) {
-	const { ready, authenticated, user } = usePrivy()
-	const { wallets } = useWallets();
-	const { isLoggedIn, address } = useAuthStore();
-	const [balance, setBalance] = useState<any>(0);
+	const { address, isConnected } = useAccount();
 	const [price, setPrice] = useState<any>(0);
-	const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
 
-	// 使用自定义认证状态的地址，并找到对应的钱包对象用于获取 provider
-	const wallet = address ? wallets.find(w => w.address?.toLowerCase() === address.toLowerCase()) : null;
-	const currentAddress = address;
-	const isConnected = ready && isLoggedIn && !!currentAddress;
-
-	// 初始化 provider
-	useEffect(() => {
-		const initializeProvider = async () => {
-			if (wallet) {
-				try {
-					const ethereumProvider = await wallet.getEthereumProvider();
-					const ethersProvider = new ethers.BrowserProvider(ethereumProvider);
-					setProvider(ethersProvider);
-				} catch (error) {
-					console.error('Failed to initialize provider:', error);
-				}
+	// 获取钱包余额
+	const { data: walletBalance, isLoading: balanceLoading } = useQuery({
+		queryKey: ['walletBalance', address],
+		queryFn: async () => {
+			if (!isConnected || !address) {
+				return null;
 			}
-		};
-
-		if (isConnected && wallet) {
-			initializeProvider();
-		}
-	}, [wallet, isConnected]);
-
-	// 获取余额
-	useEffect(() => {
-		const fetchBalance = async () => {
-			if (!provider || !currentAddress) {
-				setBalance(0);
-				return;
-			}
-
 			try {
-				const ethBalance = await provider.getBalance(currentAddress);
-				console.log(ethBalance)
-				const formatted = ethers.formatEther(ethBalance);
-				setBalance(formatted);
+				const balance = await getBalance(config, {
+					address: address as `0x${string}`,
+				});
+				return balance;
 			} catch (error) {
-				console.error('Failed to fetch balance:', error);
-				setBalance(0);
+				console.error('Failed to fetch wallet balance:', error);
+				return null;
 			}
-		};
+		},
+		enabled: !!(isConnected && address),
+		refetchInterval: 3000, // 每3秒刷新一次余额
+		staleTime: 2000,
+		retry: 2,
+	});
 
-		if (provider && currentAddress) {
-			fetchBalance();
-			// 每 10 秒更新一次余额
-			const interval = setInterval(fetchBalance, 10000);
-			return () => clearInterval(interval);
-		} else {
-			setBalance(0);
-		}
-	}, [provider, currentAddress]);
+	// 格式化余额
+	const balance = walletBalance ? Number(ethers.formatEther(walletBalance.value)) : 0;
 
 	return (
 		<BalanceContext.Provider
 			value={{
 				balance,
 				price,
-				symbol: 'BNB',
+				symbol: 'POP',
 			}}
 		>
 			{children}

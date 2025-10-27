@@ -6,7 +6,6 @@ import Share from "./share";
 import { shortenAddress } from "@/utils";
 import useClipboard from '@/hooks/useCopyToClipboard';
 import { formatBigNumber } from "@/utils/formatBigNumber";
-import Auth from "./auth";
 
 interface TokenProps {
 	info?: any;
@@ -39,7 +38,7 @@ export const TokenEnd = ({ info }: TokenProps) => {
 			<div className="flex flex-col items-center w-full md:gap-[12px]">
 				<MyAvatar src={info?.image_url || '/images/default.png'} alt="icon" className="w-[80px] h-[80px] rounded-[16px]" />
 				<div className="md:flex md:flex-col md:gap-[2px]">
-					<div className="text-[#101010] mt-[16px] md:mt-[0px] text-[20px] font-bold flex items-center justify-center gap-[4px] md:justify-start">{info?.symbol?.toUpperCase() || '--'} <GoldIcon className="cursor-pointer" onClick={() => setIsAuthOpen(true)} /></div>
+					<div className="text-[#101010] mt-[16px] md:mt-[0px] text-[20px] font-bold flex items-center justify-center gap-[4px] md:justify-start">{info?.symbol?.toUpperCase() || '--'} </div>
 					<div className="text-[#95989F] mt-[2px] md:mt-[0px] text-[13px] text-center">{info?.name || '--'}</div>
 				</div>
 			</div>
@@ -121,7 +120,6 @@ export const TokenEnd = ({ info }: TokenProps) => {
 				</Button>
 			</div>
 			<Share isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} info={info} />
-			<Auth isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} info={info} />
 		</div>
 	)
 }

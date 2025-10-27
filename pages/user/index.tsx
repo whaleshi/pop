@@ -2,25 +2,19 @@ import { WalletBox } from "@/components/wallet";
 import DefaultLayout from "@/layouts/default";
 import { Image, Button } from "@heroui/react";
 import { useRouter } from "next/router";
-import { useAuthStore } from "@/stores/auth";
-import { usePrivy } from "@privy-io/react-auth";
-// import usePrivyLogin from "@/hooks/usePrivyLogin";
+import { useAccount } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useEffect, useState } from "react";
 import { siteConfig } from "@/config/site";
 
 export default function User() {
 	const router = useRouter();
-	const { address, clearAuthState } = useAuthStore();
-	const { authenticated, logout } = usePrivy();
-	// const { toLogin } = usePrivyLogin();
+	const { address, isConnected } = useAccount();
+	const { openConnectModal } = useConnectModal();
 	const [isMdOrLarger, setIsMdOrLarger] = useState(true);
 
-	const newLogin = async () => {
-		if (authenticated) {
-			clearAuthState();
-			await logout();
-		}
-		// toLogin();
+	const handleConnect = () => {
+		openConnectModal?.();
 	}
 
 	// 打开外部链接
@@ -64,9 +58,9 @@ export default function User() {
 				{
 					address && <WalletBox />
 				}
-				<div className="border-[1.5px] border-[#F5F6F9] rounded-[16px] h-[52px] w-full px-[16px] text-[16px] text-[#141414] mt-[16px] flex items-center cursor-pointer" onClick={() => router.push("/create")}>创建代币</div>
-				<div className="border-[1.5px] border-[#F5F6F9] rounded-[16px] h-[52px] w-full px-[16px] text-[16px] text-[#141414] mt-[12px] flex items-center cursor-pointer" onClick={() => openExternalLink(siteConfig.links.work)}>运行机制</div>
-				<div className="border-[1.5px] border-[#F5F6F9] rounded-[16px] h-[52px] w-full px-[16px] text-[16px] text-[#141414] mt-[12px] flex items-center justify-between cursor-pointer">
+				<div className="border-[1.5px] border-[#333] rounded-[16px] h-[52px] w-full px-[16px] text-[16px] text-[#fff] mt-[16px] flex items-center cursor-pointer bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors" onClick={() => router.push("/create")}>创建代币</div>
+				<div className="border-[1.5px] border-[#333] rounded-[16px] h-[52px] w-full px-[16px] text-[16px] text-[#fff] mt-[12px] flex items-center cursor-pointer bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors" onClick={() => openExternalLink(siteConfig.links.work)}>运行机制</div>
+				<div className="border-[1.5px] border-[#333] rounded-[16px] h-[52px] w-full px-[16px] text-[16px] text-[#fff] mt-[12px] flex items-center justify-between cursor-pointer bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors">
 					加入社区
 					<div className="flex items-center gap-[8px]">
 						<Image
@@ -96,7 +90,7 @@ export default function User() {
 				<div className="flex-1"></div>
 				<div className="w-full pb-[30px]">
 					{
-						!address && <Button fullWidth className="h-[52px] w-full rounded-[16px] bg-[#24232A] text-[15px] text-[#fff]" onPress={newLogin}>连接钱包</Button>
+						!isConnected && <Button fullWidth className="h-[52px] w-full rounded-[16px] bg-[#abf909] text-[15px] text-[#000] hover:bg-[#9AED2D] transition-colors" onPress={handleConnect}>连接钱包</Button>
 					}
 				</div>
 			</section>

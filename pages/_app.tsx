@@ -1,15 +1,18 @@
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { useEffect } from "react";
+import '@rainbow-me/rainbowkit/styles.css';
 
 import { HeroUIProvider } from "@heroui/system";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { useRouter } from "next/router";
 import QueryProvider from '@/providers/queryProvider'
-import PrivyProviders from '@/providers/privyProvider'
 import { BalanceProvider } from '@/providers/balanceProvider'
 import { Toaster } from 'sonner';
 import NProgress from 'nprogress';
+import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
+import { WagmiProvider } from 'wagmi';
+import { config } from '@/config/wagmi';
 
 import { fontSans } from "@/config/fonts";
 import "@/styles/globals.css";
@@ -58,18 +61,20 @@ export default function App({ Component, pageProps }: AppProps) {
 				<link rel="preload" href="/images/default.png" as="image" />
 				<link rel="preload" href="/images/banner.png" as="image" />
 			</Head>
-			{/* <PrivyProviders> */}
-			<QueryProvider>
-				<BalanceProvider>
-					<HeroUIProvider navigate={router.push}>
-						<Toaster richColors position="top-center" />
-						<NextThemesProvider attribute="class" defaultTheme="light">
-							<Component {...pageProps} />
-						</NextThemesProvider>
-					</HeroUIProvider>
-				</BalanceProvider>
-			</QueryProvider>
-			{/* </PrivyProviders> */}
+			<WagmiProvider config={config}>
+				<QueryProvider>
+					<RainbowKitProvider theme={darkTheme()}>
+						<BalanceProvider>
+							<HeroUIProvider navigate={router.push}>
+								<Toaster richColors position="top-center" />
+								<NextThemesProvider attribute="class" defaultTheme="light">
+									<Component {...pageProps} />
+								</NextThemesProvider>
+							</HeroUIProvider>
+						</BalanceProvider>
+					</RainbowKitProvider>
+				</QueryProvider>
+			</WagmiProvider>
 		</>
 	);
 }

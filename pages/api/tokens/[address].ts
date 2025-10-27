@@ -3,8 +3,8 @@ import { readContract } from "@wagmi/core";
 import { encodeFunctionData, decodeFunctionResult } from "viem";
 import _bignumber from "bignumber.js";
 import { CONTRACT_CONFIG, MULTICALL3_ADDRESS, MULTICALL3_ABI, DEFAULT_CHAIN_ID } from "@/config/chains";
-import { config } from "@/wagmiConfig";
-import contractABI from "@/constant/TokenManager.abi.json";
+import { config } from "@/config/wagmi";
+import contractABI from "@/constant/TokenFactory.abi.json";
 import { globalCache, CacheKeys, CacheTTL } from "@/utils/cache";
 
 interface TokenInfo {
@@ -210,7 +210,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         // 获取元数据（带缓存）
         const metadataCacheKey = CacheKeys.TOKEN_METADATA(address);
         const cachedMetadata = globalCache.get<any>(metadataCacheKey);
-        
+
         if (cachedMetadata) {
             console.log(`Cache hit for metadata: ${address}`);
             tokenData.metadata = cachedMetadata;
@@ -243,7 +243,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                         x: metadata.x || "",
                         telegram: metadata.telegram || "",
                     };
-                    
+
                     tokenData.metadata = result;
                     // 缓存成功获取的元数据（永久）
                     globalCache.set(metadataCacheKey, result, CacheTTL.TOKEN_METADATA);

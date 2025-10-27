@@ -4,10 +4,9 @@ import { CloseIcon } from "./icons";
 import { useQuery } from "@tanstack/react-query";
 import { ethers } from "ethers";
 import { DEFAULT_CHAIN_CONFIG } from "@/config/chains";
-import { useAuthStore } from "@/stores/auth";
+import { useAccount } from 'wagmi';
 import { useState } from "react";
-import { usePrivy } from "@privy-io/react-auth";
-// import usePrivyLogin from "@/hooks/usePrivyLogin";
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 
 interface TokenProps {
 	info?: any;
@@ -15,36 +14,18 @@ interface TokenProps {
 
 export const TokenTradeBox = ({ info }: TokenProps) => {
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
-	const { address, clearAuthState } = useAuthStore();
+	const { address, isConnected } = useAccount();
+	const { openConnectModal } = useConnectModal();
 	const [initialTab, setInitialTab] = useState<'buy' | 'sell'>('buy');
 
-	const { authenticated, logout } = usePrivy();
-	// const { toLogin } = usePrivyLogin();
-
-	const newLogin = async () => {
-		if (authenticated) {
-			clearAuthState();
-			await logout();
-		}
-		// toLogin();
-	}
-
 	const handleOpenTrade = (tab: 'buy' | 'sell') => {
-		if (!address) {
-			newLogin();
+		if (!isConnected || !address) {
+			openConnectModal?.();
 			return;
 		}
 		setInitialTab(tab);
 		onOpen();
 	};
-
-	const balanceOfABI = [{
-		inputs: [{ internalType: "address", name: "account", type: "address" }],
-		name: "balanceOf",
-		outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-		stateMutability: "view",
-		type: "function",
-	}];
 
 	// 获取代币余额
 	const { data: tokenBalance } = useQuery({
@@ -56,6 +37,13 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 
 			try {
 				const provider = new ethers.JsonRpcProvider(DEFAULT_CHAIN_CONFIG.rpcUrl);
+				const balanceOfABI = [{
+					inputs: [{ internalType: "address", name: "account", type: "address" }],
+					name: "balanceOf",
+					outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+					stateMutability: "view",
+					type: "function",
+				}];
 				const contract = new ethers.Contract(info.mint, balanceOfABI, provider);
 				const tokenBal = await contract.balanceOf(address);
 				return ethers.formatEther(tokenBal);
@@ -77,11 +65,11 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 					{
 						parseFloat(tokenBalance!) > 0 && <Button fullWidth className="bg-[#FF4C4C] h-[48px] rounded-[16px] text-[15px] text-[#fff]" onPress={() => handleOpenTrade('sell')}>卖出</Button>
 					}
-					<Button fullWidth className="bg-[#00D935] h-[48px] rounded-[16px] text-[15px] text-[#fff]" onPress={() => handleOpenTrade('buy')}>买入</Button>
+					<Button fullWidth className="bg-[#9AED2D] h-[48px] rounded-[16px] text-[15px] text-[#000]" onPress={() => handleOpenTrade('buy')}>买入</Button>
 				</div>
 			</div>
-			<div className="hidden md:block border-[2px] border-[#F5F6F9] p-[16px] pt-[8px] bg-[#fff] rounded-[24px]">
-				<div className="h-[48px] text-[17px] text-[#24232A] flex items-center justify-center">交易</div>
+			<div className="hidden md:block border-[2px] border-[#333] p-[16px] pt-[8px] bg-[#1A1A1A] rounded-[24px]">
+				<div className="h-[48px] text-[17px] text-[#fff] flex items-center justify-center">交易</div>
 				<Trade info={info} tokenBalance={tokenBalance} initialTab={initialTab} />
 			</div>
 			<Drawer isOpen={isOpen} placement="bottom" onOpenChange={onOpenChange} hideCloseButton>

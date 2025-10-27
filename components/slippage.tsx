@@ -54,27 +54,27 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 			<Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()} hideCloseButton placement="center" size="sm"
 				style={{
 					borderRadius: "24px",
-					border: "2px solid #FFF",
-					background: "linear-gradient(180deg, #FFFDEB 0%, #FFF 70%)"
+					border: "2px solid #333",
+					background: "#1A1A1A"
 				}}
 			>
 				<ModalContent className="max-h-[80vh] overflow-y-auto">
 					{() => (
 						<>
 							<ModalHeader className="text-center relative p-0 pt-[8px]">
-								<div className="h-[48px] flex items-center justify-center w-full">设置滑点</div>
+								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">设置滑点</div>
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</ModalHeader>
 							<ModalBody className="px-[16px] pb-[16px]">
-								<div className="text-[13px] text-[#94989F]">设置交易中可接受的最大价格变动</div>
+								<div className="text-[13px] text-[#AAAAAA]">设置交易中可接受的最大价格变动</div>
 								<div className="flex items-center gap-[8px]">
 									{presetSlippages.map((preset) => (
 										<Button
 											key={preset}
 											fullWidth
-											className={`h-[40px] rounded-[16px] text-[14px] text-[#24232A] ${tempSlippage === preset && !customValue
-													? 'bg-[#FFE900]'
-													: 'bg-[#EBEBEF] hover:bg-[#E0E0E0]'
+											className={`h-[40px] rounded-[16px] text-[14px] transition-colors ${tempSlippage === preset && !customValue
+													? 'bg-[#9AED2D] text-[#000]'
+													: 'bg-[#333] text-[#fff] hover:bg-[#444]'
 												}`}
 											onPress={() => handlePresetClick(preset)}
 										>
@@ -84,15 +84,15 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 								</div>
 								<Input
 									classNames={{
-										inputWrapper: "h-[48px] border-[#F5F6F9] bg-[#F5F6F9] border-1 rounded-[16px]",
-										input: "text-[14px] text-[#24232A] placeholder:text-[#94989F] tracking-[-0.07px] text-center",
+										inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1 rounded-[16px]",
+										input: "text-[14px] text-[#fff] placeholder:text-[#666] tracking-[-0.07px] text-center",
 									}}
 									name="customSlippage"
 									placeholder="自定义 (0.1-50)"
 									variant="bordered"
 									value={customValue}
 									onChange={(e) => handleCustomInput(e.target.value)}
-									endContent={<span className="text-[14px] text-[#94989F]">%</span>}
+									endContent={<span className="text-[14px] text-[#AAAAAA]">%</span>}
 								/>
 								{customValue && (parseFloat(customValue) < 0.1 || parseFloat(customValue) > 50) && (
 									<div className="text-[#FF4C4C] text-[12px] text-center">
@@ -106,7 +106,7 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 								)}
 								<Button
 									fullWidth
-									className="h-[44px] bg-[#24232A] text-[15px] text-[#FFF] rounded-[16px] mt-[16px]"
+									className="h-[44px] bg-[#9AED2D] text-[15px] text-[#000] rounded-[16px] mt-[16px] hover:bg-[#7ED321] transition-colors"
 									onPress={handleConfirm}
 									isDisabled={customValue ? (parseFloat(customValue) < 0.1 || parseFloat(customValue) > 50) : false}
 								>

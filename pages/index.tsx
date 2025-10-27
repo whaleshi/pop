@@ -8,7 +8,7 @@ import { siteConfig } from "@/config/site";
 import { useQuery } from "@tanstack/react-query";
 
 export default function IndexPage() {
-	// const router = useRouter();
+	const router = useRouter();
 	// const [currentBanner, setCurrentBanner] = useState(0);
 
 	// // 获取缓存状态
@@ -65,7 +65,12 @@ export default function IndexPage() {
 						<div className="text-[26px] md:text-[50px] text-[#fff] text-center md:text-left font-bold">An innovation launchpad<br /> built on <span className="text-[#ABF909]">Pop Chain</span></div>
 						<div className="text-[16px] md:text-[26px] text-[#AAAAAA] mt-[20px] md:mt-[30px] text-center md:text-left">Everyone can deploy a token with one click</div>
 						<div className="w-full px-[30px] md:px-[0] mt-[50px] flex gap-[20px]">
-							<Button className="bg-[#fff] w-[200px] h-[50px] rounded-[8px] md:rounded-full text-[16px] text-[#000000]">Token Creation</Button>
+							<Button 
+								className="bg-[#fff] w-[200px] h-[50px] rounded-[8px] md:rounded-full text-[16px] text-[#000000]"
+								onPress={() => router.push('/create')}
+							>
+								Token Creation
+							</Button>
 							<Button className="bg-[transparent] border-[1px] border-[#1E1E1E] w-[200px] h-[50px] rounded-[8px] md:rounded-full text-[16px] text-[#fff]">Modus Operandi</Button>
 						</div>
 					</div>

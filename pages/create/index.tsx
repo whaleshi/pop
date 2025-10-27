@@ -15,9 +15,9 @@ export default function CreatePage() {
 			const isMd = window.matchMedia('(min-width: 768px)').matches;
 			setIsMdOrLarger(isMd);
 
-			if (isMd) {
-				router.replace('/');
-			}
+			// if (isMd) {
+			// 	router.replace('/');
+			// }
 		};
 
 		// 初始检查
@@ -33,19 +33,19 @@ export default function CreatePage() {
 	}, [router]);
 
 	// 如果屏幕尺寸小于 md，不渲染页面内容
-	if (isMdOrLarger) {
-		return null;
-	}
+	// if (isMdOrLarger) {
+	// 	return null;
+	// }
 
 	return (
 		<DefaultLayout>
 			<section className="flex flex-col items-center justify-center w-full px-[16px]">
-				<div className="h-[48px] w-full flex items-center md:hidden relative">
+				<div className="h-[48px] w-full flex items-center relative max-w-[450px] mx-auto">
 					<BackIcon className="cursor-pointer relative z-1" onClick={() => router.push('/')} />
-					<div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-[17px] text-[#24232A]">立即创建</div>
+					<div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-[17px] text-[#fff]">立即创建</div>
 				</div>
 			</section>
-			<CreateForm />
+			<div className="max-w-[450px] mx-auto"><CreateForm /></div>
 		</DefaultLayout>
 	);
 }

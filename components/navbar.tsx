@@ -4,9 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router"
 import { Image, Input } from "@heroui/react"
 import NextImage from "next/image"
-import { usePrivy } from "@privy-io/react-auth";
-// import usePrivyLogin from "@/hooks/usePrivyLogin";
-import { useAuthStore } from "@/stores/auth";
 import { shortenAddress, useIsMobile } from "@/utils";
 import { getCoinList } from "@/service/api";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +14,8 @@ import { TokenItem } from "./tokenItem";
 import CreateForm from "./form";
 import { WalletBox } from "./wallet";
 import { siteConfig } from "@/config/site";
+import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useAccount, useDisconnect } from 'wagmi';
 
 
 export const Navbar = () => {
@@ -29,24 +28,29 @@ export const Navbar = () => {
 	const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
 	const searchRef = useRef<HTMLDivElement>(null);
 
-	const { authenticated, logout } = usePrivy();
-	// const { toLogin } = usePrivyLogin();
-	const { isLoggedIn, address, clearAuthState, loginAccount } = useAuthStore();
 	const isMobile = useIsMobile();
 
-	const newLogin = async () => {
-		if (authenticated) {
-			clearAuthState();
-			await logout();
-		}
-		// toLogin();
-	}
+	const [mounted, setMounted] = useState(false);
+	const { openConnectModal } = useConnectModal();
+	const { address, isConnected } = useAccount();
+	const { disconnect } = useDisconnect();
+
 
 	const toLogout = async () => {
-		clearAuthState();
-		try { await logout(); } catch { }
-		onSecondModalOpenChange();
-		router.replace('/');
+		try {
+			// 断开钱包连接
+			disconnect();
+			// 关闭弹窗
+			onSecondModalOpenChange();
+			// 延迟一下确保状态更新
+			setTimeout(() => {
+				router.replace('/');
+			}, 100);
+		} catch (error) {
+			console.error('Logout error:', error);
+			onSecondModalOpenChange();
+			router.replace('/');
+		}
 	}
 
 	// 监听路由变化，关闭弹窗
@@ -142,13 +146,17 @@ export const Navbar = () => {
 		}
 	};
 
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
 	return (
 		<>
 			<HeroUINavbar maxWidth="xl" position="static" className="fixed top-0 left-0 right-0 z-50 bg-[#000000]" classNames={{ wrapper: "px-4 h-[56px] md:h-[64px] bg-[#000000]" }}>
 				<NextLink className="flex justify-start items-center logo-container" href="/">
 					<NextImage src='/images/logo.png' alt='logo' width={97} height={28} />
 				</NextLink>
-				{/* <div className="text-[14px] text-[#141414] hidden md:flex items-center gap-[16px] pl-[24px]">
+				<div className="text-[14px] text-[#fff] hidden md:flex items-center gap-[16px] pl-[24px]">
 					<NextLink href="/" className="hover:opacity-80 transition-opacity">首页</NextLink>
 					<button
 						className="hover:opacity-80 transition-opacity cursor-pointer"
@@ -159,28 +167,35 @@ export const Navbar = () => {
 					<NextLink href={siteConfig.links.work} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">运行机制</NextLink>
 					<NextLink href={siteConfig.links.x} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">X</NextLink>
 					<NextLink href={siteConfig.links.tg} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">Telegram</NextLink>
-				</div> */}
+				</div>
 
 				<NavbarContent justify="end" className="gap-[12px]">
-					<NextLink href={siteConfig.links.x} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
-						<NextImage src='/images/x.png' alt='x' width={32} height={32} />
-					</NextLink>
-					<NextLink href={siteConfig.links.tg} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
-						<NextImage src='/images/tg.png' alt='tg' width={32} height={32} />
-					</NextLink>
-					{/* {
-						isLoggedIn ? <Button className="h-[36px] md:h-[40px] bg-[#F5F6F9] text-[13px] text-[#24232A] rounded-[12px]" variant="flat" onPress={handleWalletClick}>
-							<WalletIcon />{shortenAddress(address!)}
-						</Button> : <Button className="h-[36px] md:h-[40px] bg-[#F5F6F9] text-[13px] text-[#24232A] rounded-[12px]" variant="flat" onPress={newLogin}>
+					{!mounted ? (
+						<div className="w-[96px] h-[36px] rounded-[12px] bg-[#2E2A55] animate-pulse" />
+					) : isConnected ? (
+						<button
+							type="button"
+							className="px-3 h-[36px] rounded-[12px] bg-[#1A1A1A] text-[13px] text-white flex items-center justify-center border border-[#333] hover:border-[#abf909] hover:bg-[#2A2A2A] transition-colors max-w-[160px] cursor-pointer"
+							title={address || ''}
+							onClick={onSecondModalOpen}
+						>
+							<span className="truncate">{address?.slice(0, 6)}...{address?.slice(-4)}</span>
+						</button>
+					) : (
+						<button
+							type="button"
+							className="w-[96px] h-[36px] rounded-[12px] bg-[#abf909] active:scale-[0.97] text-[13px] font-medium text-[#000] hover:bg-[#9AED2D] flex items-center justify-center transition-colors"
+							onClick={() => openConnectModal && openConnectModal()}
+						>
 							连接钱包
-						</Button>
-					}
+						</button>
+					)}
 
 					{router.pathname === '/user' ? (
 						<MenuCloseIcon className="cursor-pointer block md:hidden" onClick={() => { router.back(); }} />
 					) : (
 						<MenuIcon className="cursor-pointer block md:hidden" onClick={() => { router.push('/user'); }} />
-					)} */}
+					)}
 				</NavbarContent>
 			</HeroUINavbar>
 			<Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton isDismissable={false}>
@@ -201,20 +216,20 @@ export const Navbar = () => {
 			<Modal isOpen={isSecondModalOpen} onOpenChange={onSecondModalOpenChange} hideCloseButton placement="center"
 				style={{
 					borderRadius: "24px",
-					border: "2px solid #FFF",
-					background: "linear-gradient(180deg, #FFFDEB 0%, #FFF 70%)"
+					border: "2px solid #333",
+					background: "#1A1A1A"
 				}}
 			>
 				<ModalContent className="max-h-[80vh] overflow-y-auto">
 					{(onClose) => (
 						<>
 							<ModalHeader className="text-center relative p-0 pt-[8px]">
-								<div className="h-[48px] flex items-center justify-center w-full">我的钱包</div>
+								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">我的钱包</div>
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</ModalHeader>
 							<ModalBody className="px-[16px] pb-[20px]">
 								<WalletBox />
-								<Button fullWidth className="h-[44px] bg-[#EBEBEF] text-[15px] text-[#24232A] rounded-[16px] mt-[6px]" onPress={toLogout}>断开连接</Button>
+								<Button fullWidth className="h-[44px] bg-[#333] text-[15px] text-[#fff] rounded-[16px] mt-[6px] hover:bg-[#444] transition-colors" onPress={toLogout}>断开连接</Button>
 							</ModalBody>
 						</>
 					)}

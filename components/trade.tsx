@@ -5,11 +5,10 @@ import { SetIcon } from "./icons";
 import Slippage from "./slippage";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { toast } from 'sonner';
-import FactoryABI from "@/constant/TokenManager.abi.json";
+import FactoryABI from "@/constant/TokenFactory.abi.json";
 import { DEFAULT_CHAIN_CONFIG, CONTRACT_CONFIG } from "@/config/chains";
 import { ethers } from "ethers";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { useAuthStore } from "@/stores/auth";
+import { useAccount, useWalletClient, usePublicClient } from 'wagmi';
 import { formatBigNumber } from "@/utils/formatBigNumber";
 import { useBalanceContext } from "@/providers/balanceProvider";
 import _bignumber from "bignumber.js";
@@ -36,11 +35,9 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 	const { slippage } = useSlippageStore();
 	const queryClient = useQueryClient();
 
-	const { ready } = usePrivy();
-	const { wallets } = useWallets();
-	const { isLoggedIn, address } = useAuthStore();
-	const isConnected = ready && isLoggedIn && !!address;
-	const wallet = address ? wallets.find((w) => w.address?.toLowerCase() === address.toLowerCase()) : null;
+	const { address, isConnected } = useAccount();
+	const { data: walletClient } = useWalletClient();
+	const publicClient = usePublicClient();
 
 	const handleTabClick = (tab: TradeType) => {
 		setSelectedTab(tab);
@@ -68,17 +65,17 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 		if (selectedTab === 'buy') {
 			// 买入验证
 			if (!balance || balance === 0) {
-				return 'BNB余额不足';
+				return 'POP余额不足';
 			}
 
 			if (_bignumber(inputAmount).gt(balance)) {
-				return `BNB余额不足，当前余额: ${formatBigNumber(balance)} BNB`;
+				return `POP余额不足，当前余额: ${formatBigNumber(balance)} POP`;
 			}
 
 			// 预留gas费用检查
 			const gasReserve = 0.001;
 			if (_bignumber(inputAmount).plus(gasReserve).gt(balance)) {
-				return '请预留足够的BNB作为手续费';
+				return '请预留足够的POP作为手续费';
 			}
 		} else {
 			// 卖出验证
@@ -204,10 +201,10 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 	// 初始化 provider 和 signer
 	useEffect(() => {
 		const initializeProvider = async () => {
-			if (wallet) {
+			if (walletClient && publicClient) {
 				try {
-					const ethereumProvider = await wallet.getEthereumProvider();
-					const ethersProvider = new ethers.BrowserProvider(ethereumProvider);
+					// 使用 walletClient 的 transport 创建 provider
+					const ethersProvider = new ethers.BrowserProvider(walletClient.transport);
 					const ethersSigner = await ethersProvider.getSigner();
 
 					setProvider(ethersProvider);
@@ -218,10 +215,10 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 			}
 		};
 
-		if (isConnected && wallet) {
+		if (isConnected && walletClient) {
 			initializeProvider();
 		}
-	}, [wallet, isConnected]);
+	}, [walletClient, publicClient, isConnected]);
 
 	const handleClick = async (tokenAddress: string, amount: string) => {
 		// 验证输入
@@ -376,7 +373,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 
 				// 交易成功处理
 				toast.success('卖出成功！', {
-					description: `成功卖出 ${formatBigNumber(amount)} ${info?.symbol?.toUpperCase()}，获得 ${outputAmount} BNB`
+					description: `成功卖出 ${formatBigNumber(amount)} ${info?.symbol?.toUpperCase()}，获得 ${outputAmount} POP`
 				});
 
 				// 清空输入
@@ -417,20 +414,20 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 	return (
 		<div className="w-full">
 			<div className="w-full">
-				<div className="h-[40px] bg-[#EBEBEF] rounded-[16px] flex mb-[16px]">
+				<div className="h-[40px] bg-[#333] rounded-[16px] flex mb-[16px]">
 					<div
-						className={`flex-1 border-[3px] border-[#EBEBEF] rounded-[16px] text-[14px] flex items-center justify-center cursor-pointer transition-all duration-200 ${selectedTab === 'buy'
-							? 'bg-[#24232A] text-[#fff]'
-							: 'bg-[#EBEBEF] text-[#94989F] hover:bg-[#E0E0E0]'
+						className={`flex-1 border-[3px] border-[#333] rounded-[16px] text-[14px] flex items-center justify-center cursor-pointer transition-all duration-200 ${selectedTab === 'buy'
+							? 'bg-[#9AED2D] text-[#000]'
+							: 'bg-[#333] text-[#AAAAAA] hover:bg-[#444]'
 							}`}
 						onClick={() => handleTabClick('buy')}
 					>
 						买入
 					</div>
 					<div
-						className={`flex-1 border-[3px] border-[#EBEBEF] rounded-[16px] text-[14px] flex items-center justify-center cursor-pointer transition-all duration-200 ${selectedTab === 'sell'
-							? 'bg-[#24232A] text-[#fff]'
-							: 'bg-[#EBEBEF] text-[#94989F] hover:bg-[#E0E0E0]'
+						className={`flex-1 border-[3px] border-[#333] rounded-[16px] text-[14px] flex items-center justify-center cursor-pointer transition-all duration-200 ${selectedTab === 'sell'
+							? 'bg-[#FF4C4C] text-[#fff]'
+							: 'bg-[#333] text-[#AAAAAA] hover:bg-[#444]'
 							}`}
 						onClick={() => handleTabClick('sell')}
 					>
@@ -439,8 +436,8 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 				</div>
 				<Input
 					classNames={{
-						inputWrapper: "h-[48px] border-[#F5F6F9] bg-[#F5F6F9] border-1",
-						input: "text-[17px] text-[#24232A] placeholder:text-[#94989F] uppercase tracking-[-0.07px]",
+						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
+						input: "text-[17px] text-[#fff] placeholder:text-[#666] uppercase tracking-[-0.07px]",
 					}}
 					name="amount"
 					placeholder="0"
@@ -450,21 +447,21 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 						setInputAmount(e.target.value);
 						setSelectedAmount(null);
 					}}
-					endContent={<div className="shrink-0 h-[32px] rounded-[20px] bg-[#FFF] flex items-center px-[4px] pr-[6px] gap-[4px]">
+					endContent={<div className="shrink-0 h-[32px] rounded-[20px] bg-[#333] flex items-center px-[4px] pr-[6px] gap-[4px]">
 						{
-							isBuy ? <MyAvatar src={'/images/bnb.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" /> :
+							isBuy ? <MyAvatar src={'/images/pop.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" /> :
 								<MyAvatar src={info?.image_url || '/images/default.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" />
 						}
-						<div className="text-[15px] text-[#24232A]">{isBuy ? 'BNB' : info?.symbol?.toUpperCase() || '--'}</div>
+						<div className="text-[15px] text-[#fff]">{isBuy ? 'POP' : info?.symbol?.toUpperCase() || '--'}</div>
 					</div>}
 				/>
 				<div className="flex gap-[8px] mt-[12px]">
 					{currentAmounts.map((amount) => (
 						<div
 							key={amount.label}
-							className={`h-[24px] flex items-center justify-center cursor-pointer text-[12px] flex-1 rounded-[16px] transition-colors ${selectedAmount === amount.value
-								? 'bg-[#24232A] text-[#fff]'
-								: 'bg-[#EBEBEF] text-[#24232A] hover:bg-[#E0E0E0]'
+							className={`h-[28px] flex items-center justify-center cursor-pointer text-[12px] flex-1 rounded-[12px] transition-colors ${selectedAmount === amount.value
+								? 'bg-[#9AED2D] text-[#000] font-medium'
+								: 'bg-[#333] text-[#AAAAAA] hover:bg-[#444]'
 								}`}
 							onClick={() => handleAmountSelect(amount)}
 						>
@@ -472,13 +469,13 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 						</div>
 					))}
 				</div>
-				<div className="text-[14px] text-[#24232A] flex items-center justify-end gap-[3px] mt-[12px]">
-					<span className="text-[#94989F]">余额:</span>
+				<div className="text-[14px] text-[#fff] flex items-center justify-end gap-[3px] mt-[12px]">
+					<span className="text-[#AAAAAA]">余额:</span>
 					{
-						isBuy ? <>{formatBigNumber(balance)} BNB</> : <>{formatBigNumber(tokenBalance!)} {info?.symbol?.toUpperCase() || '--'}</>
+						isBuy ? <>{formatBigNumber(balance)} POP</> : <>{formatBigNumber(tokenBalance!)} {info?.symbol?.toUpperCase() || '--'}</>
 					}
 					{
-						isBuy && <span className="text-[#FFA600] cursor-pointer" onClick={() => {
+						isBuy && <span className="text-[#9AED2D] cursor-pointer hover:text-[#7ED321] transition-colors" onClick={() => {
 							if (balance && _bignumber(balance).gt(0)) {
 								// 预留一些gas费用，使用95%的余额
 								const maxAmount = _bignumber(balance).times(0.95).toFixed(6);
@@ -488,25 +485,25 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 						}}>Max</span>
 					}
 				</div>
-				<div className="border-dashed border-[1.5px] border-[#EBEBEF] rounded-[16px] p-[16px] mt-[16px] text-[14px] text-[#24232A]">
+				<div className="border-dashed border-[1.5px] border-[#333] rounded-[16px] p-[16px] mt-[16px] text-[14px] text-[#fff] bg-[#1A1A1A]">
 					<div className="flex items-center justify-between">
-						预计收到
+						<span className="text-[#AAAAAA]">预计收到</span>
 						<div>
-							<span className="text-[#94989F] mr-[4px]">{outputAmount || '0.0'}</span>
-							{selectedTab === 'buy' ? info?.symbol?.toUpperCase() : 'BNB'}
+							<span className="text-[#fff] mr-[4px] font-medium">{outputAmount || '0.0'}</span>
+							<span className="text-[#AAAAAA]">{selectedTab === 'buy' ? info?.symbol?.toUpperCase() : 'POP'}</span>
 						</div>
 					</div>
 					<div className="flex items-center justify-between mt-[12px]">
-						滑点
+						<span className="text-[#AAAAAA]">滑点</span>
 						<div className="flex items-center gap-[4px]">
-							{slippage}%
-							<SetIcon className="mb-[2px] cursor-pointer" onClick={() => setIsSlippageOpen(true)} />
+							<span className="text-[#fff] font-medium">{slippage}%</span>
+							<SetIcon className="mb-[2px] cursor-pointer hover:text-[#9AED2D] transition-colors" onClick={() => setIsSlippageOpen(true)} />
 						</div>
 					</div>
 				</div>
 				<Button
 					fullWidth
-					className={`h-[48px] text-[15px] text-[#fff] mt-[24px] ${selectedTab === 'buy' ? 'bg-[#00D935]' : 'bg-[#FF4C4C]'}`}
+					className={`h-[52px] text-[16px] text-[#fff] mt-[24px] font-medium rounded-[16px] transition-all duration-200 ${selectedTab === 'buy' ? 'bg-[#9AED2D] hover:bg-[#7ED321] text-[#000]' : 'bg-[#FF4C4C] hover:bg-[#FF3333]'}`}
 					onPress={() => { handleClick(info?.mint, inputAmount) }}
 					isLoading={isLoading}
 					isDisabled={isLoading || !inputAmount || parseFloat(inputAmount) <= 0}

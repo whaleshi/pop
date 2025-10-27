@@ -3,8 +3,8 @@ import { readContract } from "@wagmi/core";
 import { encodeFunctionData, decodeFunctionResult } from "viem";
 import _bignumber from "bignumber.js";
 import { CONTRACT_CONFIG, MULTICALL3_ADDRESS, MULTICALL3_ABI, DEFAULT_CHAIN_ID } from "@/config/chains";
-import { config } from "@/wagmiConfig";
-import contractABI from "@/constant/TokenManager.abi.json";
+import { config } from "@/config/wagmi";
+import contractABI from "@/constant/TokenFactory.abi.json";
 import { globalCache, CacheKeys, CacheTTL } from "@/utils/cache";
 
 interface TokenInfo {
@@ -185,14 +185,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             console.log(`Using cached token count: ${totalTokens}`);
         } else {
             console.log("Fetching token count from contract...");
-            const tokenCount = (await readContract(config, {
-                address: CONTRACT_CONFIG.FACTORY_CONTRACT as `0x${string}`,
-                abi: contractABI,
-                functionName: "allTokens",
-            })) as bigint;
 
-            totalTokens = Number(tokenCount);
-            console.log("Total tokens from contract:", totalTokens);
+            try {
+                const tokenCount = (await readContract(config, {
+                    address: CONTRACT_CONFIG.FACTORY_CONTRACT as `0x${string}`,
+                    abi: contractABI,
+                    functionName: "allTokens",
+                })) as bigint;
+                console.log("Raw token count from contract:", tokenCount.toString());
+                totalTokens = Number(tokenCount);
+                console.log("Total tokens from contract:", totalTokens);
+            } catch (error) {
+                console.error("Detailed readContract error:", {
+                    error: error,
+                    message: error instanceof Error ? error.message : "Unknown error",
+                    stack: error instanceof Error ? error.stack : "No stack trace",
+                });
+                throw error;
+            }
 
             // 缓存代币总数
             globalCache.set(tokenCountCacheKey, totalTokens, CacheTTL.TOKEN_COUNT);
@@ -435,9 +445,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         // 按地址搜索过滤
         if (search && typeof search === "string") {
             const searchLower = search.toLowerCase().trim();
-            filteredTokens = filteredTokens.filter((token) => 
-                token.address.toLowerCase().includes(searchLower)
-            );
+            filteredTokens = filteredTokens.filter((token) => token.address.toLowerCase().includes(searchLower));
         }
 
         // 按启动状态过滤
@@ -489,7 +497,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         // 缓存最终结果
         globalCache.set(cacheKey, result, CacheTTL.TOKEN_LIST);
         console.log(`Cached result for: ${cacheKey}`);
-
         return res.status(200).json({
             success: true,
             message: "Tokens retrieved successfully",

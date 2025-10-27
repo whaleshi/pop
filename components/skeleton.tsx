@@ -2,17 +2,17 @@ import React from "react";
 
 // 单个代币项目的骨架屏
 const SkeletonItem = () => (
-	<div className="bg-[#0E0E0E] rounded-[10px] p-[12px] animate-pulse">
+	<div className="bg-[#1A1A1A] border border-[#333] rounded-[10px] p-[12px] animate-pulse">
 		<div className="flex items-center gap-[8px]">
-			<div className="w-[40px] h-[40px] bg-[#1A1A1A] rounded-full flex-shrink-0"></div>
+			<div className="w-[40px] h-[40px] bg-[#333] rounded-full flex-shrink-0"></div>
 			<div className="flex-1">
 				<div className="flex items-center justify-between mb-[8px]">
-					<div className="h-[16px] bg-[#1A1A1A] rounded w-[120px]"></div>
-					<div className="h-[14px] bg-[#1A1A1A] rounded w-[60px]"></div>
+					<div className="h-[16px] bg-[#333] rounded w-[120px]"></div>
+					<div className="h-[14px] bg-[#333] rounded w-[60px]"></div>
 				</div>
 				<div className="flex items-center justify-between">
-					<div className="h-[12px] bg-[#1A1A1A] rounded w-[80px]"></div>
-					<div className="h-[12px] bg-[#1A1A1A] rounded w-[40px]"></div>
+					<div className="h-[12px] bg-[#333] rounded w-[80px]"></div>
+					<div className="h-[12px] bg-[#333] rounded w-[40px]"></div>
 				</div>
 			</div>
 		</div>
@@ -51,7 +51,7 @@ export const RectSkeleton: React.FC<RectSkeletonProps> = ({
 	rounded = true
 }) => (
 	<div 
-		className={`bg-[#1A1A1A] animate-pulse ${width} ${height} ${rounded ? 'rounded' : ''} ${className}`}
+		className={`bg-[#333] animate-pulse ${width} ${height} ${rounded ? 'rounded' : ''} ${className}`}
 	></div>
 );
 
@@ -66,7 +66,7 @@ export const AvatarSkeleton: React.FC<AvatarSkeletonProps> = ({
 	className = ""
 }) => (
 	<div 
-		className={`bg-[#1A1A1A] animate-pulse rounded-full ${size} ${className}`}
+		className={`bg-[#333] animate-pulse rounded-full ${size} ${className}`}
 	></div>
 );
 
@@ -80,7 +80,7 @@ export const CardSkeleton: React.FC<CardSkeletonProps> = ({
 	className = "",
 	children
 }) => (
-	<div className={`bg-[#0E0E0E] rounded-[10px] p-[12px] animate-pulse ${className}`}>
+	<div className={`bg-[#1A1A1A] border border-[#333] rounded-[10px] p-[12px] animate-pulse ${className}`}>
 		{children || (
 			<div className="space-y-3">
 				<RectSkeleton width="w-3/4" height="h-4" />
