@@ -24,7 +24,7 @@ export const Head = () => {
 					<meta property="og:description" content={siteConfig.description} />
 					<meta
 						property="og:image"
-						content=""
+						content="https://popme.mypinata.cloud/ipfs/bafkreigpmkeqa6o4xcd4eiwewuceedfr55h7a5kpacy3bcyo6alaxpdm6a"
 					/>
 					<meta property="og:url" content="https://popme.fun" />
 					<meta property="og:site_name" content={siteConfig.name} />
@@ -35,7 +35,7 @@ export const Head = () => {
 					<meta name="twitter:description" content={siteConfig.description} />
 					<meta
 						name="twitter:image"
-						content=""
+						content="https://popme.mypinata.cloud/ipfs/bafkreigpmkeqa6o4xcd4eiwewuceedfr55h7a5kpacy3bcyo6alaxpdm6a"
 					/>
 					<meta name="twitter:site" content="@popmefun" />
 					<meta name="twitter:creator" content="@popmefun" />
