@@ -17,12 +17,12 @@ const connectors = connectorsForWallets(
 );
 
 export const config = createConfig({
-    chains: [popchainTestnet],
+    chains: [popchainMainnet],
     connectors,
     transports: {
         // [localNetwork.id]: http(),
-        // [popchainMainnet.id]: http(),
-        [popchainTestnet.id]: http("http://47.76.179.249:8545"),
+        [popchainMainnet.id]: http(),
+        // [popchainTestnet.id]: http("http://47.76.179.249:8545"),
     },
     ssr: false,
 });

@@ -292,10 +292,14 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 					description: `Transaction hash: ${buyResult.hash.slice(0, 10)}...${buyResult.hash.slice(-6)}`
 				});
 
-				const receipt = await buyResult.wait();
-				console.log("buyToken transaction confirmed:", receipt, outputAmount);
+				// Asynchronously wait for transaction confirmation in background (don't block execution)
+				buyResult.wait().then((receipt: any) => {
+					console.log("buyToken transaction confirmed:", receipt, outputAmount);
+				}).catch((error: any) => {
+					console.error("Buy transaction confirmation failed:", error);
+				});
 
-				// Transaction success handling
+				// Transaction success handling (immediate)
 				toast.success('Buy successful!', {
 					description: `Successfully bought ${outputAmount} ${info?.metadata?.symbol?.toUpperCase()}`
 				});
@@ -374,10 +378,14 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 					description: `Transaction hash: ${sellResult.hash.slice(0, 10)}...${sellResult.hash.slice(-6)}`
 				});
 
-				const receipt = await sellResult.wait();
-				console.log("sellToken transaction confirmed:", receipt, outputAmount);
+				// Asynchronously wait for transaction confirmation in background (don't block execution)
+				sellResult.wait().then((receipt: any) => {
+					console.log("sellToken transaction confirmed:", receipt, outputAmount);
+				}).catch((error: any) => {
+					console.error("Sell transaction confirmation failed:", error);
+				});
 
-				// Transaction success handling
+				// Transaction success handling (immediate)
 				toast.success('Sell successful!', {
 					description: `Successfully sold ${formatBigNumber(amount)} ${info?.metadata?.symbol?.toUpperCase()}, received ${outputAmount} POP`
 				});

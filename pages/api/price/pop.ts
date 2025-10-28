@@ -30,33 +30,60 @@ export default async function handler(
   }
 
   try {
-    const response = await fetch('https://api.coinmarketcap.com/data-api/v3/cryptocurrency/detail/lite?id=38403', {
-      method: 'GET',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/json',
-      },
-    });
+    // 尝试多个数据源，提高成功率
+    const sources = [
+      // 直接访问
+      'https://api.coinmarketcap.com/data-api/v3/cryptocurrency/detail/lite?id=38403',
+      // 通过公共代理访问
+      'https://api.allorigins.win/get?url=' + encodeURIComponent('https://api.coinmarketcap.com/data-api/v3/cryptocurrency/detail/lite?id=38403'),
+    ];
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    let lastError: any = null;
+
+    for (const url of sources) {
+      try {
+        const isProxy = url.includes('allorigins');
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': 'application/json',
+          },
+          signal: AbortSignal.timeout(5000), // 5秒超时
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        let data = await response.json();
+
+        // 如果使用了代理，需要解析 contents
+        if (isProxy) {
+          data = JSON.parse(data.contents);
+        }
+
+        const price = data?.data?.statistics?.price;
+
+        if (typeof price === 'number') {
+          // 更新缓存
+          cachedPrice = price;
+          lastFetchTime = now;
+
+          return res.status(200).json({
+            success: true,
+            price: price,
+          });
+        }
+      } catch (error) {
+        lastError = error;
+        console.error(`Failed to fetch from ${url}:`, error);
+        continue; // 尝试下一个源
+      }
     }
 
-    const data = await response.json();
-    const price = data?.data?.statistics?.price;
-
-    if (typeof price !== 'number') {
-      throw new Error('Invalid price data received');
-    }
-
-    // 更新缓存
-    cachedPrice = price;
-    lastFetchTime = now;
-
-    res.status(200).json({
-      success: true,
-      price: price,
-    });
+    // 所有源都失败了
+    throw lastError || new Error('All sources failed');
   } catch (error) {
     console.error('Failed to fetch POP price:', error);
     

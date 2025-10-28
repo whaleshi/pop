@@ -98,7 +98,7 @@ export const HomeList = () => {
 							<div
 								key={tab.key}
 								className={`cursor-pointer transition-all duration-200 ${activeTab === tab.key
-									? 'text-[#FFFFFF] font-bold'
+									? 'text-[#FFFFFF] font-medium'
 									: 'text-[#AAAAAA] font-medium hover:text-[#FFFFFF]'
 									}`}
 								onClick={() => handleTabClick(tab.key)}
