@@ -194,7 +194,7 @@ export const Navbar = () => {
 								) : debouncedSearch && (
 									<div className="h-full flex flex-col items-center justify-center">
 										<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
-										<div className="text-[14px] text-[#AAAAAA]">No search results</div>
+										<div className="text-[14px] text-[#AAAAAA] mt-[12px]">No search results</div>
 									</div>
 								)}
 							</div>

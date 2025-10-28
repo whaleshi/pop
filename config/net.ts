@@ -11,7 +11,7 @@ export const popchainTestnet = defineChain({
     },
     rpcUrls: {
         default: {
-            http: ["http://47.76.179.249:8545/"],
+            http: ["http://47.76.179.249:8545"],
         },
     },
     blockExplorers: {

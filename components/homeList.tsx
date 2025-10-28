@@ -125,7 +125,7 @@ export const HomeList = () => {
 							) : (
 								<div className="flex flex-col items-center mt-[120px]">
 									<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
-									<div className="text-[14px] text-[#AAAAAA]">No results</div>
+									<div className="text-[14px] text-[#AAAAAA] mt-[12px]">No results</div>
 								</div>
 							)}
 						</div>

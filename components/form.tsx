@@ -307,7 +307,7 @@ export default function CreateForm() {
 			if (!address || !signer || !provider) {
 				throw new Error("Wallet not connected");
 			}
-			const salt = "0x" + randomBytes(32).toString("hex");
+			const salt = randomBytes(32).toString("hex");
 
 			// Check if there's pre-purchase amount
 			const hasPreBuy = amountVal && parseFloat(amountVal) > 0;
