@@ -13,12 +13,12 @@ interface TokenItemProps {
 export const TokenItem = ({ border = false, item }: TokenItemProps) => {
 	const { price: popPrice } = useBalanceContext();
 
-	// 计算市值
+	// Calculate market cap
 	const calculateMarketCap = () => {
 		try {
-			// 使用公式: BigNumber(lastPrice).div(1e18).times(1000000000).times(popPrice).dp(2)
+			// Use formula: BigNumber(lastPrice).div(1e18).times(1000000000).times(popPrice).dp(2)
 			const lastPrice = item?.info?.lastPrice || 0;
-			const tokenSupply = 1000000000; // 10亿代币总量
+			const tokenSupply = 1000000000; // 1 billion total token supply
 			
 			const marketCap = _bignumber(lastPrice)
 				.div(1e18)
@@ -34,7 +34,7 @@ export const TokenItem = ({ border = false, item }: TokenItemProps) => {
 		}
 	};
 
-	// 计算价格变化百分比
+	// Calculate price change percentage
 	const calculatePriceChange = () => {
 		const currentPrice = item?.info?.lastPrice;
 		const initialPrice = TRANSACTION_CONFIG.INITIAL_PRICE;
@@ -87,11 +87,11 @@ export const TokenItem = ({ border = false, item }: TokenItemProps) => {
 				</div>
 				<div className="flex flex-col gap-[2px] text-right">
 					<div className="text-[15px] text-[#FFFFFF]"><span className="text-[#FFFFFF]">MC</span> ${formatBigNumber(marketCap)}</div>
-					<div className="text-[13px] text-[#8C8C8C]">涨幅 <span className={`${priceChangeDisplay.color}`}>{priceChangeDisplay.text}</span></div>
+					<div className="text-[13px] text-[#8C8C8C]">Change <span className={`${priceChangeDisplay.color}`}>{priceChangeDisplay.text}</span></div>
 				</div>
 			</div>
 			
-			{/* 底部进度条 */}
+			{/* Bottom progress bar */}
 			<div className="absolute bottom-0 left-0 w-full h-[3px] bg-[#ffffff08]">
 				<div 
 					className="h-full bg-gradient-to-r from-[#9AED2D] to-[#7ED321] transition-all duration-1000 ease-out"

@@ -2,7 +2,7 @@ import { defineChain } from "viem";
 
 // Popchain 测试网配置
 export const popchainTestnet = defineChain({
-    id: 72570,
+    id: 7257,
     name: "Popchain Testnet",
     nativeCurrency: {
         decimals: 18,
@@ -57,7 +57,7 @@ export const localNetwork = defineChain({
     },
     rpcUrls: {
         default: {
-            http: ["http://192.168.1.73:8545"],
+            http: ["http://47.76.179.249:8545"],
         },
     },
     testnet: true,

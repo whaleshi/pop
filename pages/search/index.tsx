@@ -78,7 +78,7 @@ export default function Search() {
 							input: "text-[13px] text-[#fff] placeholder:text-[#666] uppercase tracking-[-0.07px]",
 						}}
 						name="amount"
-						placeholder="搜索代币地址"
+						placeholder="Search for token addresses"
 						variant="bordered"
 						value={searchValue}
 						onValueChange={(value) => setSearchValue(value)}
@@ -98,8 +98,8 @@ export default function Search() {
 					) : debouncedSearch && (
 						<div className="flex flex-col items-center mt-[120px]">
 							<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
-							<div className="text-[14px] text-[#AAAAAA]">暂无搜索结果</div>
-							<Button className="w-[100px] h-[36px] rounded-[18px] bg-[#ABF909] hover:bg-[#9AED2D] text-[13px] text-[#000] font-medium mt-[16px]" onPress={() => router.push("/create")}>创建代币</Button>
+							<div className="text-[14px] text-[#AAAAAA]">No search results</div>
+							<Button className="w-[100px] h-[36px] rounded-[18px] bg-[#ABF909] hover:bg-[#9AED2D] text-[13px] text-[#000] font-medium mt-[16px]" onPress={() => router.push("/create")}>Create Token</Button>
 						</div>
 					)}
 				</div>

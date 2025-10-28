@@ -37,11 +37,11 @@ export const Navbar = () => {
 
 	const toLogout = async () => {
 		try {
-			// 断开钱包连接
+			// Disconnect wallet
 			disconnect();
-			// 关闭弹窗
+			// Close modal
 			onSecondModalOpenChange();
-			// 延迟一下确保状态更新
+			// Delay to ensure state update
 			setTimeout(() => {
 				router.replace('/');
 			}, 100);
@@ -52,14 +52,14 @@ export const Navbar = () => {
 		}
 	}
 
-	// 监听路由变化，关闭弹窗
+	// Listen to route changes, close modals
 	useEffect(() => {
 		const handleRouteChange = () => {
-			// 路由变化时关闭创建代币弹窗
+			// Close create token modal on route change
 			if (isOpen) {
 				onOpenChange();
 			}
-			// 同时关闭钱包弹窗
+			// Also close wallet modal
 			if (isSecondModalOpen) {
 				onSecondModalOpenChange();
 			}
@@ -73,16 +73,16 @@ export const Navbar = () => {
 	}, [router.events, isOpen, isSecondModalOpen, onOpenChange, onSecondModalOpenChange]);
 
 
-	// 防抖处理搜索关键词
+	// Debounce search keywords
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setDebouncedSearch(searchValue);
-		}, 300); // 300ms 防抖延迟 (比搜索页面短一些，提供更快响应)
+		}, 300); // 300ms debounce delay (shorter than search page for faster response)
 
 		return () => clearTimeout(timer);
 	}, [searchValue]);
 
-	// 搜索token地址并获取详情
+	// Search token addresses and get details
 	const { data: searchResults, isLoading: searchLoading } = useQuery({
 		queryKey: ["navbarAddressSearch", debouncedSearch],
 		queryFn: async () => {
@@ -99,7 +99,7 @@ export const Navbar = () => {
 		retry: 1,
 	});
 
-	// 处理点击外部关闭下拉框
+	// Handle clicking outside to close dropdown
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -115,18 +115,18 @@ export const Navbar = () => {
 
 	const handleSearchChange = (value: string) => {
 		setSearchValue(value);
-		// 有输入内容时显示下拉框，无内容时隐藏
+		// Show dropdown when there's input, hide when empty
 		setIsSearchDropdownOpen(value.length > 0);
 	};
 
 	const handleSearchFocus = () => {
-		// 聚焦时如果有内容就显示下拉框
+		// Show dropdown on focus if there's content
 		if (searchValue.length > 0) {
 			setIsSearchDropdownOpen(true);
 		}
 	};
 
-	// 处理搜索结果点击，关闭下拉框并清空搜索
+	// Handle search result click, close dropdown and clear search
 	const handleSearchResultClick = () => {
 		setIsSearchDropdownOpen(false);
 		setSearchValue("");
@@ -134,7 +134,7 @@ export const Navbar = () => {
 	};
 
 	const handleWalletClick = () => {
-		// 使用hook检查屏幕尺寸，PC上打开弹窗，H5上跳转页面
+		// Use hook to check screen size, open modal on PC, navigate to page on H5
 		if (isMobile) {
 			router.push('/user');
 		} else {
@@ -153,11 +153,11 @@ export const Navbar = () => {
 					<NextImage src='/images/logo.png' alt='logo' width={97} height={28} />
 				</NextLink>
 				<div className="text-[14px] text-[#fff] hidden md:flex items-center gap-[16px] pl-[24px]">
-					<NextLink href="/" className="hover:opacity-80 transition-opacity">首页</NextLink>
+					<NextLink href="/" className="hover:opacity-80 transition-opacity">Home</NextLink>
 					<NextLink href="/create" className="hover:opacity-80 transition-opacity">
-						创建代币
+						Create Token
 					</NextLink>
-					<NextLink href={siteConfig.links.work} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">运行机制</NextLink>
+					<NextLink href={siteConfig.links.work} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">How It Works</NextLink>
 					<NextLink href={siteConfig.links.x} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">X</NextLink>
 					<NextLink href={siteConfig.links.tg} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">Telegram</NextLink>
 				</div>
@@ -167,10 +167,10 @@ export const Navbar = () => {
 						<Input
 							classNames={{
 								inputWrapper: "w-[300px] h-[40px] border-[#333] bg-[#1A1A1A] border-1",
-								input: "text-[13px] text-[#fff] placeholder:text-[#666] uppercase tracking-[-0.07px]",
+								input: "text-[13px] text-[#fff] placeholder:text-[#666] tracking-[-0.07px]",
 							}}
 							name="amount"
-							placeholder="搜索CA"
+							placeholder="Search for token addresses"
 							variant="bordered"
 							value={searchValue}
 							onValueChange={handleSearchChange}
@@ -194,7 +194,7 @@ export const Navbar = () => {
 								) : debouncedSearch && (
 									<div className="h-full flex flex-col items-center justify-center">
 										<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
-										<div className="text-[14px] text-[#AAAAAA]">暂无搜索结果</div>
+										<div className="text-[14px] text-[#AAAAAA]">No search results</div>
 									</div>
 								)}
 							</div>
@@ -218,7 +218,7 @@ export const Navbar = () => {
 							className="w-[96px] h-[36px] rounded-[12px] bg-[#abf909] active:scale-[0.97] text-[13px] font-medium text-[#000] hover:bg-[#9AED2D] flex items-center justify-center transition-colors"
 							onClick={() => openConnectModal && openConnectModal()}
 						>
-							连接钱包
+							Connect
 						</button>
 					)}
 
@@ -234,7 +234,7 @@ export const Navbar = () => {
 					{(onClose) => (
 						<>
 							<ModalHeader className="text-center relative p-0 pt-[8px]">
-								<div className="h-[48px] flex items-center justify-center w-full">立即创建</div>
+								<div className="h-[48px] flex items-center justify-center w-full">Create Now</div>
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</ModalHeader>
 							<ModalBody className="px-[0px] pb-[0px]">
@@ -255,12 +255,12 @@ export const Navbar = () => {
 					{(onClose) => (
 						<>
 							<ModalHeader className="text-center relative p-0 pt-[8px]">
-								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">我的钱包</div>
+								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">My Wallet</div>
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</ModalHeader>
 							<ModalBody className="px-[16px] pb-[20px]">
 								<WalletBox />
-								<Button fullWidth className="h-[44px] bg-[#333] text-[15px] text-[#fff] rounded-[16px] mt-[6px] hover:bg-[#444] transition-colors" onPress={toLogout}>断开连接</Button>
+								<Button fullWidth className="h-[44px] bg-[#333] text-[15px] text-[#fff] rounded-[16px] mt-[6px] hover:bg-[#444] transition-colors" onPress={toLogout}>Disconnect</Button>
 							</ModalBody>
 						</>
 					)}

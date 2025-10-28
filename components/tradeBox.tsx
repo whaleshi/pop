@@ -27,7 +27,7 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 		onOpen();
 	};
 
-	// 获取代币余额
+	// Get token balance
 	const { data: tokenBalance } = useQuery({
 		queryKey: ['tokenBalance', info?.address, address],
 		queryFn: async () => {
@@ -48,12 +48,12 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 				const tokenBal = await contract.balanceOf(address);
 				return ethers.formatEther(tokenBal);
 			} catch (error) {
-				console.error('获取代币余额失败:', error);
+				console.error('Failed to get token balance:', error);
 				return '0';
 			}
 		},
 		enabled: !!(info?.address && address),
-		refetchInterval: 3000, // 每3秒刷新一次
+		refetchInterval: 3000, // Refresh every 3 seconds
 		staleTime: 2000,
 		retry: 1,
 	});
@@ -63,13 +63,13 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 			<div className="w-full h-full flex items-end md:hidden">
 				<div className="flex gap-[12px] w-full">
 					{
-						parseFloat(tokenBalance!) > 0 && <Button fullWidth className="bg-[#FF4C4C] h-[48px] rounded-[16px] text-[15px] text-[#fff]" onPress={() => handleOpenTrade('sell')}>卖出</Button>
+						parseFloat(tokenBalance!) > 0 && <Button fullWidth className="bg-[#FF4C4C] h-[48px] rounded-[16px] text-[15px] text-[#fff]" onPress={() => handleOpenTrade('sell')}>Sell</Button>
 					}
-					<Button fullWidth className="bg-[#9AED2D] h-[48px] rounded-[16px] text-[15px] text-[#000]" onPress={() => handleOpenTrade('buy')}>买入</Button>
+					<Button fullWidth className="bg-[#9AED2D] h-[48px] rounded-[16px] text-[15px] text-[#000]" onPress={() => handleOpenTrade('buy')}>Buy</Button>
 				</div>
 			</div>
 			<div className="hidden md:block border-[2px] border-[#333] p-[16px] pt-[8px] bg-[#1A1A1A] rounded-[24px]">
-				<div className="h-[48px] text-[17px] text-[#fff] flex items-center justify-center">交易</div>
+				<div className="h-[48px] text-[17px] text-[#fff] flex items-center justify-center">Trade</div>
 				<Trade info={info} tokenBalance={tokenBalance} initialTab={initialTab} />
 			</div>
 			<Drawer isOpen={isOpen} placement="bottom" onOpenChange={onOpenChange} hideCloseButton>
@@ -83,7 +83,7 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 					{(onClose) => (
 						<>
 							<DrawerHeader className="text-center relative p-0 pt-[8px]">
-								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">交易</div>
+								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">Trade</div>
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</DrawerHeader>
 							<DrawerBody className="px-[16px] pb-[30px]">

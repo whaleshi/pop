@@ -20,10 +20,10 @@ export const TokenEnd = ({ info }: TokenProps) => {
 	const { copy } = useClipboard();
 	const { price: popPrice } = useBalanceContext();
 
-	// 计算代币价格
+	// Calculate token price
 	const calculateTokenPrice = () => {
 		try {
-			// 计算代币的美元价格: BigNumber(lastPrice).div(1e18).times(popPrice)
+			// Calculate token USD price: BigNumber(lastPrice).div(1e18).times(popPrice)
 			const lastPrice = info?.info?.lastPrice || 0;
 			
 			const tokenPrice = _bignumber(lastPrice)
@@ -38,12 +38,12 @@ export const TokenEnd = ({ info }: TokenProps) => {
 		}
 	};
 
-	// 计算市值
+	// Calculate market cap
 	const calculateMarketCap = () => {
 		try {
-			// 使用公式: BigNumber(lastPrice).div(1e18).times(1000000000).times(popPrice).dp(2)
+			// Use formula: BigNumber(lastPrice).div(1e18).times(1000000000).times(popPrice).dp(2)
 			const lastPrice = info?.info?.lastPrice || 0;
-			const tokenSupply = 1000000000; // 10亿代币总量
+			const tokenSupply = 1000000000; // 1 billion total token supply
 			
 			const marketCap = _bignumber(lastPrice)
 				.div(1e18)
@@ -59,7 +59,7 @@ export const TokenEnd = ({ info }: TokenProps) => {
 		}
 	};
 
-	// 计算价格变化百分比
+	// Calculate price change percentage
 	const calculatePriceChange = () => {
 		const currentPrice = info?.info?.lastPrice;
 		const initialPrice = TRANSACTION_CONFIG.INITIAL_PRICE;
@@ -82,7 +82,7 @@ export const TokenEnd = ({ info }: TokenProps) => {
 		}
 	};
 
-	// 格式化价格变化显示
+	// Format price change display
 	const formatPriceChange = (change: number | null) => {
 		if (change === undefined || change === null) {
 			return { text: '--', color: 'text-[#fff]' };
@@ -145,23 +145,23 @@ export const TokenEnd = ({ info }: TokenProps) => {
 			<div className="flex flex-col md:flex-row items-center gap-[12px] mt-[16px] w-full">
 				<div className="flex items-center gap-[12px] w-full">
 					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-						<div className="text-[13px] text-[#AAAAAA]">价格</div>
+						<div className="text-[13px] text-[#AAAAAA]">Price</div>
 						<div className="text-[20px] text-[#fff] font-semibold">${formatBigNumber(tokenPrice)}</div>
 					</div>
 					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-						<div className="text-[13px] text-[#AAAAAA]">市值</div>
+						<div className="text-[13px] text-[#AAAAAA]">Market Cap</div>
 						<div className="text-[20px] text-[#fff] font-semibold">${formatBigNumber(marketCap)}</div>
 					</div>
 				</div>
 				<div className="flex items-center gap-[12px] w-full">
 					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-						<div className="text-[13px] text-[#AAAAAA]">涨幅</div>
+						<div className="text-[13px] text-[#AAAAAA]">Change</div>
 						<div className={`text-[20px] font-semibold ${priceChangeDisplay.color}`}>
 							{priceChangeDisplay.text}
 						</div>
 					</div>
 					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-						<div className="text-[13px] text-[#AAAAAA]">持有者</div>
+						<div className="text-[13px] text-[#AAAAAA]">Holders</div>
 						<div className="text-[20px] text-[#fff] font-semibold">--</div>
 					</div>
 				</div>

@@ -17,13 +17,13 @@ import { FORM_STYLES, AVATAR_STYLES, ERROR_STYLES } from "@/constants/styles";
 const MAX_AVATAR_MB = 5;
 const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 
-/** 与 HeroUI Input 保持一致的错误样式 */
+/** Error styles consistent with HeroUI Input */
 function FieldError({ message }: { message?: string | null }) {
 	if (!message) return null;
 	return <p className={ERROR_STYLES.fieldError}>{message}</p>;
 }
 
-/** 头像字段：用“代理校验输入”确保优先校验头像 */
+/** Avatar field: use "proxy validation input" to ensure avatar validation priority */
 function AvatarField({
 	valueUrl,
 	onPick,
@@ -49,7 +49,7 @@ function AvatarField({
 	const fileInputRef = React.useRef<HTMLInputElement>(null);
 	const [errorText, setErrorText] = React.useState<string | null>(null);
 
-	// 暴露清空 file input 的方法给父组件
+	// Expose clearFileInput method to parent component
 	React.useImperativeHandle(clearInput, () => ({
 		clearFileInput: () => {
 			if (fileInputRef.current) {
@@ -85,17 +85,17 @@ function AvatarField({
 
 	return (
 		<div className="w-full">
-			{/* 代理校验输入：保持在最上方，DOM 参与 required 校验（不要 display:none） */}
+			{/* Proxy validation input: keep at top, DOM participates in required validation (don't use display:none) */}
 			<input
-				// 这个输入不提交业务数据，仅用于 required 校验顺序
+				// This input doesn't submit business data, only used for required validation order
 				tabIndex={-1}
 				aria-hidden="true"
 				className={AVATAR_STYLES.hiddenInput}
 				required={!!required}
-				// 有头像则通过，无头像则为空触发 invalid
+				// Pass if there's avatar, empty triggers invalid if no avatar
 				value={valueUrl ? "1" : ""}
 				onChange={() => { }}
-				// 提示与样式同步
+				// Hint synchronized with styles
 				onInvalid={(e) => {
 					e.preventDefault();
 				}}
@@ -107,7 +107,7 @@ function AvatarField({
 					htmlFor={inputId}
 					className={[`${FORM_STYLES.label.primary} font-bold`, errorText && AVATAR_STYLES.labelError].join(" ")}
 				>
-					图标
+					Icon
 					{required ? <span className="text-[#f31260] ml-[2px]">*</span> : null}
 				</label>
 			</div>
@@ -128,7 +128,7 @@ function AvatarField({
 							<div className={AVATAR_STYLES.loadingSpinner}></div>
 						</div>
 					)}
-					{/* 真正的文件选择输入：不再 required，让代理来控制校验顺序 */}
+					{/* Actual file selection input: no longer required, let proxy control validation order */}
 					<input
 						ref={fileInputRef}
 						id={inputId}
@@ -156,7 +156,7 @@ export default function CreateForm() {
 	const [ticker, setTicker] = useState("");
 	const [nameVal, setNameVal] = useState("");
 
-	// 头像
+	// Avatar
 	const [avatarFile, setAvatarFile] = useState<File | null>(null);
 	const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 	const [avatarError, setAvatarError] = useState<string | null>(null);
@@ -183,12 +183,12 @@ export default function CreateForm() {
 	const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
 
 
-	// 初始化 provider 和 signer
+	// Initialize provider and signer
 	useEffect(() => {
 		const initializeProvider = async () => {
 			if (walletClient && publicClient) {
 				try {
-					// 使用 walletClient 的 transport 创建 provider
+					// Create provider using walletClient transport
 					const ethersProvider = new ethers.BrowserProvider(walletClient.transport);
 					const ethersSigner = await ethersProvider.getSigner();
 
@@ -227,21 +227,21 @@ export default function CreateForm() {
 			return;
 		}
 
-		// 上传到 IPFS
+		// Upload to IPFS
 		try {
 			setUploadLoading(true);
 			const res = await pinFileToIPFS(file);
 			if (res) {
 				setIpfsHash(res);
 				setAvatarFile(file);
-				toast.success("图片上传成功");
+				toast.success("Image uploaded successfully");
 			} else {
-				toast.error("图片上传失败，请重试");
+				toast.error("Image upload failed, please try again");
 				avatarFieldRef.current?.clearFileInput();
 			}
 		} catch (error) {
 			console.error("IPFS upload error:", error);
-			toast.error("图片上传失败，请重试");
+			toast.error("Image upload failed, please try again");
 			avatarFieldRef.current?.clearFileInput();
 		} finally {
 			setUploadLoading(false);
@@ -255,7 +255,7 @@ export default function CreateForm() {
 		setIpfsHash(null);
 	};
 
-	// 重置表单数据
+	// Reset form data
 	const resetForm = () => {
 		setTicker("");
 		setNameVal("");
@@ -268,13 +268,13 @@ export default function CreateForm() {
 		setCreatedTokenAddress(null);
 	};
 
-	// 满足必填：头像、Name、Ticker、税费指定受益人、百分比 均存在
+	// Required fields: avatar, Name, Ticker all exist
 	const requiredValid = !!avatarUrl && nameVal.trim().length > 0 && ticker.trim().length > 0;
 	const readyToSubmit = requiredValid && isConnected;
 
 
 
-	// 上传最终的 JSON 元数据到 IPFS
+	// Upload final JSON metadata to IPFS
 	const uploadFile = async () => {
 		try {
 			const params = {
@@ -288,20 +288,20 @@ export default function CreateForm() {
 			};
 			const res = await pinFileToIPFS(params, "json");
 			if (!res) {
-				toast.error("元数据上传失败");
+				toast.error("Metadata upload failed");
 				setCreateLoading(false);
 				return false;
 			}
 			return res;
 		} catch (error) {
 			console.error("Upload file error:", error);
-			toast.error("元数据上传失败");
+			toast.error("Metadata upload failed");
 			setCreateLoading(false);
 			return false;
 		}
 	};
 
-	// 创建代币合约调用
+	// Create token contract call
 	const createToken = async (metadataHash: string) => {
 		try {
 			if (!address || !signer || !provider) {
@@ -309,13 +309,13 @@ export default function CreateForm() {
 			}
 			const salt = "0x" + randomBytes(32).toString("hex");
 
-			// 检查是否有提前购买金额
+			// Check if there's pre-purchase amount
 			const hasPreBuy = amountVal && parseFloat(amountVal) > 0;
 			const preBuyAmount = hasPreBuy ? ethers.parseEther(amountVal) : BigInt(0);
 
 			const contract = new ethers.Contract(factoryAddr, FactoryABI, signer);
 
-			// 估算 gas
+			// Estimate gas
 			let gasLimit;
 			try {
 				if (hasPreBuy) {
@@ -337,12 +337,12 @@ export default function CreateForm() {
 					);
 					gasLimit = estimatedGas + (estimatedGas * BigInt(50)) / BigInt(100); // +50% buffer
 				}
-				console.log("预估 Gas Limit:", gasLimit.toString());
+				console.log("Estimated Gas Limit:", gasLimit.toString());
 			} catch (e) {
-				console.warn("Gas 估算失败:", e);
+				console.warn("Gas estimation failed:", e);
 			}
 
-			// 获取 gas price
+			// Get gas price
 			const gasPrice = (await provider.getFeeData()).gasPrice;
 			const newGasPrice = gasPrice ? gasPrice + (gasPrice * BigInt(5)) / BigInt(100) : null;
 
@@ -358,7 +358,7 @@ export default function CreateForm() {
 			let txResult;
 			try {
 				if (hasPreBuy) {
-					// 调用 createTokenAndBuy
+					// Call createTokenAndBuy
 					txOptions.value = preBuyAmount;
 					txResult = await contract.createTokenAndBuy(
 						nameVal,
@@ -368,9 +368,9 @@ export default function CreateForm() {
 						preBuyAmount,
 						txOptions
 					);
-					console.log("createTokenAndBuy 交易已发送:", txResult.hash);
+					console.log("createTokenAndBuy transaction sent:", txResult.hash);
 				} else {
-					// 调用 createToken
+					// Call createToken
 					txResult = await contract.createToken(
 						nameVal,
 						ticker,
@@ -378,25 +378,25 @@ export default function CreateForm() {
 						salt,
 						txOptions
 					);
-					console.log("createToken 交易已发送:", txResult.hash);
+					console.log("createToken transaction sent:", txResult.hash);
 				}
 
-				toast.success('交易已提交', {
-					description: `交易哈希: ${txResult.hash.slice(0, 10)}...${txResult.hash.slice(-6)}`
+				toast.success('Transaction submitted', {
+					description: `Transaction hash: ${txResult.hash.slice(0, 10)}...${txResult.hash.slice(-6)}`
 				});
 			} catch (error: any) {
-				// 检查用户拒绝交易
+				// Check user rejected transaction
 				if (error.code === 'ACTION_REJECTED') {
 					return null;
 				}
 				throw error;
 			}
 
-			// 等待交易确认
+			// Wait for transaction confirmation
 			const receipt = await txResult.wait();
-			console.log("交易已确认:", receipt);
+			console.log("Transaction confirmed:", receipt);
 
-			// 使用 predictTokenAddress 获取新创建的代币地址
+			// Use predictTokenAddress to get newly created token address
 			const tokenAddress = await contract.predictTokenAddress(salt);
 
 			return tokenAddress;
@@ -409,46 +409,46 @@ export default function CreateForm() {
 		e.preventDefault();
 		const form = e.currentTarget;
 
-		// 统一触发一次原生校验（遵循 DOM 顺序，先校验头像代理）
+		// Uniformly trigger native validation once (follow DOM order, validate avatar proxy first)
 		if (!form.checkValidity()) {
 			form.reportValidity();
 			return;
 		}
 
-		// 检查钱包连接
+		// Check wallet connection
 		if (!isConnected || !address) {
-			toast.error("请先连接钱包");
+			toast.error("Please connect wallet first");
 			return;
 		}
 
-		// 检查网络连接
+		// Check network connection
 		if (!isConnected) {
-			toast.error("钱包连接异常，请重新连接");
+			toast.error("Wallet connection error, please reconnect");
 			return;
 		}
 
 		try {
 			setCreateLoading(true);
 
-			// 1. 上传最终的 JSON 元数据到 IPFS
+			// 1. Upload final JSON metadata to IPFS
 			const metadataHash = await uploadFile();
 			if (!metadataHash) {
-				toast.error("元数据上传失败，请重试");
-				return; // uploadFile 内部已经处理了错误
+				toast.error("Metadata upload failed, please try again");
+				return; // uploadFile has already handled the error internally
 			}
 
-			// 2. 调用合约创建代币
+			// 2. Call contract to create token
 			const tokenAddress = await createToken(metadataHash);
 			if (!tokenAddress) {
-				return; // createToken 内部已经处理了错误提示
+				return; // createToken has already handled error prompts internally
 			}
 
-			// 3. 创建成功处理
+			// 3. Creation success handling
 			setCreatedTokenAddress(tokenAddress as string);
 			setIsSuccessOpen(true);
-			toast.success('代币创建成功！');
+			toast.success('Token created successfully!');
 
-			// 4. 失效相关缓存，确保新代币立即显示
+			// 4. Invalidate related caches to ensure new token is displayed immediately
 			try {
 				await fetch('/api/cache/invalidate', {
 					method: 'POST',
@@ -460,21 +460,21 @@ export default function CreateForm() {
 				console.log('Cache invalidated after token creation');
 			} catch (error) {
 				console.warn('Failed to invalidate cache:', error);
-				// 不阻断用户流程，只是日志记录
+				// Don't block user flow, just log
 			}
 
 		} catch (error: any) {
 			console.error("Create error:", error);
 
-			// 更详细的错误处理
+			// More detailed error handling
 			if (error?.code === 4001) {
-				toast.error("用户取消了交易");
+				toast.error("User cancelled the transaction");
 			} else if (error?.message?.includes("insufficient funds")) {
-				toast.error("余额不足，请检查您的账户余额");
+				toast.error("Insufficient balance, please check your account balance");
 			} else if (error?.message?.includes("network")) {
-				toast.error("网络连接异常，请检查网络后重试");
+				toast.error("Network connection error, please check network and try again");
 			} else {
-				toast.error("创建失败，请稍后重试");
+				toast.error("Creation failed, please try again later");
 			}
 		} finally {
 			setCreateLoading(false);
@@ -484,7 +484,7 @@ export default function CreateForm() {
 	return (
 		<>
 			<Form className="w-full px-[16px] pt-[8px] gap-[24px]" onSubmit={onSubmit}>
-				{/* 头像（必填，统一提示样式） */}
+				{/* Avatar (required, consistent prompt style) */}
 				<AvatarField
 					valueUrl={avatarUrl}
 					onPick={onPickAvatar}
@@ -494,36 +494,36 @@ export default function CreateForm() {
 					clearInput={avatarFieldRef}
 				/>
 
-				{/* 基本信息 */}
+				{/* Basic information */}
 				<Input
 					classNames={{
 						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
 						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
 					isRequired
-					errorMessage="请输入名称"
-					label={<span className="text-[14px] text-[#AAAAAA]">名称</span>}
+					errorMessage="Please enter name"
+					label={<span className="text-[14px] text-[#AAAAAA]">Name</span>}
 					labelPlacement="outside-top"
 					name="name"
-					placeholder="请输入名称"
+					placeholder="Please enter name"
 					variant="bordered"
 					value={nameVal}
 					onChange={(e) => setNameVal(e.target.value)}
 					maxLength={20}
 				/>
 
-				{/* Ticker：强制大写 + 字距 + 验证 */}
+				{/* Ticker: force uppercase + letter spacing + validation */}
 				<Input
 					classNames={{
 						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
 						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666] uppercase tracking-[-0.07px]",
 					}}
 					isRequired
-					errorMessage="请输入Ticker"
+					errorMessage="Please enter Ticker"
 					label={<span className="text-[14px] text-[#AAAAAA]">Ticker</span>}
 					labelPlacement="outside-top"
 					name="ticker"
-					placeholder="请输入Ticker"
+					placeholder="Please enter Ticker"
 					variant="bordered"
 					value={ticker}
 					onChange={(e) => setTicker(e.target.value)}
@@ -539,15 +539,15 @@ export default function CreateForm() {
 					}}
 					label={
 						<div className="flex items-center gap-2">
-							<span className="text-[14px] text-[#AAAAAA]">描述</span>
-							<span className="text-[#666]">(可选)</span>
+							<span className="text-[14px] text-[#AAAAAA]">Description</span>
+							<span className="text-[#666]">(Optional)</span>
 						</div>
 					}
 					labelPlacement="outside"
-					placeholder="请输入描述"
+					placeholder="Please enter description"
 					variant="bordered"
 					name="description"
-					aria-label="请输入描述"
+					aria-label="Please enter description"
 					value={descriptionVal}
 					onChange={(e) => setDescriptionVal(e.target.value)}
 					maxLength={200}
@@ -559,8 +559,8 @@ export default function CreateForm() {
 					}}
 					label={
 						<div className="flex items-center gap-2">
-							<span className="text-[14px] text-[#AAAAAA]">提前买入</span>
-							<span className="text-[#666]">(可选)</span>
+							<span className="text-[14px] text-[#AAAAAA]">Pre-purchase</span>
+							<span className="text-[#666]">(Optional)</span>
 						</div>
 					}
 					labelPlacement="outside-top"
@@ -572,10 +572,10 @@ export default function CreateForm() {
 					value={amountVal}
 					onChange={(e) => {
 						const value = e.target.value;
-						// 只允许数字和小数点，并限制小数位数
+						// Only allow numbers and decimal points, limit decimal places
 						if (value === '' || /^\d*\.?\d{0,6}$/.test(value)) {
 							const numValue = parseFloat(value);
-							// 限制最大值，比如不超过100 POP
+							// Limit maximum value, e.g., not exceeding 100 POP
 							if (value === '' || numValue <= 100) {
 								setAmountVal(value);
 							}
@@ -583,7 +583,7 @@ export default function CreateForm() {
 					}}
 					endContent={<span className="text-[15px] text-[#fff]">POP</span>}
 				/>
-				{/* 社交链接 */}
+				{/* Social links */}
 				<Input
 					classNames={{
 						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
@@ -592,12 +592,12 @@ export default function CreateForm() {
 					label={
 						<div className="flex items-center gap-2">
 							<span className="text-[14px] text-[#AAAAAA]">X</span>
-							<span className="text-[#666]">(可选)</span>
+							<span className="text-[#666]">(Optional)</span>
 						</div>
 					}
 					labelPlacement="outside-top"
 					name="x"
-					placeholder="请输入 X 链接"
+					placeholder="Please enter X link"
 					variant="bordered"
 					type="url"
 					aria-label="X"
@@ -612,12 +612,12 @@ export default function CreateForm() {
 					label={
 						<div className="flex items-center gap-2">
 							<span className="text-[14px] text-[#AAAAAA]">Telegram</span>
-							<span className="text-[#666]">(可选)</span>
+							<span className="text-[#666]">(Optional)</span>
 						</div>
 					}
 					labelPlacement="outside-top"
 					name="telegram"
-					placeholder='请输入 Telegram 链接'
+					placeholder='Please enter Telegram link'
 					variant="bordered"
 					type="url"
 					aria-label='Telegram'
@@ -631,16 +631,16 @@ export default function CreateForm() {
 					}}
 					label={
 						<div className="flex items-center gap-2">
-							<span className="text-[14px] text-[#AAAAAA]">网站</span>
-							<span className="text-[#666]">(可选)</span>
+							<span className="text-[14px] text-[#AAAAAA]">Website</span>
+							<span className="text-[#666]">(Optional)</span>
 						</div>
 					}
 					labelPlacement="outside-top"
 					name="website"
-					placeholder="请输入网站链接"
+					placeholder="Please enter website link"
 					variant="bordered"
 					type="url"
-					aria-label="请输入网站链接"
+					aria-label="Please enter website link"
 					value={websiteVal}
 					onChange={(e) => setWebsiteVal(e.target.value)}
 				/>
@@ -654,7 +654,7 @@ export default function CreateForm() {
 					isLoading={createLoading}
 					disabled={createLoading || !readyToSubmit}
 				>
-					{createLoading ? "创建中..." : "立即创建"}
+					{createLoading ? "Creating..." : "Create Now"}
 				</Button>
 			</Form>
 			<CreateSuccess

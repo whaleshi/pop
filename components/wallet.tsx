@@ -15,21 +15,21 @@ export const WalletBox = () => {
 
 	const toLogout = async () => {
 		try {
-			// 断开钱包连接
+			// Disconnect wallet
 			disconnect();
 
-			// 延迟一下确保状态更新
+			// Delay to ensure state update
 			setTimeout(() => {
 				router.replace('/');
 			}, 100);
 		} catch (error) {
 			console.error('Logout error:', error);
-			// 即使出错也要跳转到首页
+			// Navigate to home page even if error occurs
 			router.replace('/');
 		}
 	}
 
-	// 生成邀请码（基于地址的后6位）
+	// Generate invite code (based on last 6 characters of address)
 	const generateInviteCode = () => {
 		if (!address) return "000000";
 		return address.slice(-6).toUpperCase();
@@ -40,18 +40,18 @@ export const WalletBox = () => {
 
 	return (
 		<div className="w-full flex flex-col gap-[16px]">
-			{/* 余额模块 */}
+			{/* Balance module */}
 			<div className="w-full relative border-[1.5px] border-[#333] rounded-[16px] bg-[#1A1A1A] overflow-hidden">
 				<div className="w-full p-[16px]">
 					<div className="text-[13px] text-[#AAAAAA] flex items-center gap-[8px]">
 						<span className="text-[#9AED2D]">💰</span>
-						余额
+						Balance
 					</div>
 					<div className="text-[24px] text-[#fff] mt-[6px]">{formatBigNumber(balance)} {symbol}</div>
 				</div>
 				<div className="h-[44px] flex items-center justify-between px-[16px] border-t border-[#333]">
 					<div className="text-[13px] text-[#AAAAAA] flex items-center gap-[4px]">
-						钱包地址
+						Wallet Address
 						<span className="text-[#fff]">{shortenAddress(address!)}</span>
 						<CopyIcon className="cursor-pointer block md:hidden hover:text-[#fff] transition-colors" onClick={() => copy(address!)} />
 					</div>
@@ -60,12 +60,12 @@ export const WalletBox = () => {
 				</div>
 			</div>
 
-			{/* 邀请码模块 */}
+			{/* Invite code module */}
 			<div className="w-full relative border-[1.5px] border-[#333] rounded-[16px] bg-[#1A1A1A] overflow-hidden">
 				<div className="w-full p-[16px]">
 					<div className="text-[13px] text-[#AAAAAA] flex items-center gap-[8px]">
 						<span className="text-[#9AED2D]">🔗</span>
-						邀请链接
+						Invite Link
 					</div>
 					<div className="text-[16px] text-[#fff] mt-[6px] flex items-center justify-between">
 						<span>--</span>

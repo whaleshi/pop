@@ -13,9 +13,9 @@ export const HomeList = () => {
 	const [activeTab, setActiveTab] = useState<TabType>('1');
 
 	const tabs = [
-		{ key: '1' as TabType, label: '新创建' },
-		{ key: '2' as TabType, label: '飙升' },
-		{ key: '3' as TabType, label: '已开盘' }
+		{ key: '1' as TabType, label: 'New Created' },
+		{ key: '2' as TabType, label: 'Trending' },
+		{ key: '3' as TabType, label: 'Launched' }
 	];
 
 	const handleSearchClick = () => {
@@ -26,7 +26,7 @@ export const HomeList = () => {
 		setActiveTab(tab);
 	};
 
-	// 新创建数据
+	// New created data
 	const { data: newData, isLoading: newLoading, isFetching: newFetching } = useQuery({
 		queryKey: ["tokenList", "newest"],
 		queryFn: async () => {
@@ -35,14 +35,14 @@ export const HomeList = () => {
 			return data.success ? data.data.tokens : [];
 		},
 		placeholderData: (prev) => prev,
-		staleTime: 5000, // 5秒内认为数据是新鲜的，避免频繁请求
-		gcTime: 300000, // 5分钟垃圾回收时间，保持缓存更久
-		refetchInterval: 3000, // 3秒刷新一次
+		staleTime: 5000, // Consider data fresh for 5 seconds to avoid frequent requests
+		gcTime: 300000, // 5 minute garbage collection time to keep cache longer
+		refetchInterval: 3000, // Refresh every 3 seconds
 		refetchOnWindowFocus: false,
-		refetchOnMount: false, // 组件挂载时不自动重新获取
+		refetchOnMount: false, // Don't automatically refetch on component mount
 	});
 
-	// 飙升数据
+	// Trending data
 	const { data: trendingData, isLoading: trendingLoading, isFetching: trendingFetching } = useQuery({
 		queryKey: ["tokenList", "trending"],
 		queryFn: async () => {
@@ -51,14 +51,14 @@ export const HomeList = () => {
 			return data.success ? data.data.tokens : [];
 		},
 		placeholderData: (prev) => prev,
-		staleTime: 5000, // 5秒内认为数据是新鲜的，避免频繁请求
-		gcTime: 300000, // 5分钟垃圾回收时间，保持缓存更久
-		refetchInterval: 3000, // 3秒刷新一次
+		staleTime: 5000, // Consider data fresh for 5 seconds to avoid frequent requests
+		gcTime: 300000, // 5 minute garbage collection time to keep cache longer
+		refetchInterval: 3000, // Refresh every 3 seconds
 		refetchOnWindowFocus: false,
-		refetchOnMount: false, // 组件挂载时不自动重新获取
+		refetchOnMount: false, // Don't automatically refetch on component mount
 	});
 
-	// 已开盘数据
+	// Launched data
 	const { data: listedData, isLoading: listedLoading, isFetching: listedFetching } = useQuery({
 		queryKey: ["tokenList", "launched"],
 		queryFn: async () => {
@@ -67,14 +67,14 @@ export const HomeList = () => {
 			return data.success ? data.data.tokens : [];
 		},
 		placeholderData: (prev) => prev,
-		staleTime: 5000, // 5秒内认为数据是新鲜的，避免频繁请求
-		gcTime: 300000, // 5分钟垃圾回收时间，保持缓存更久
-		refetchInterval: 3000, // 3秒刷新一次
+		staleTime: 5000, // Consider data fresh for 5 seconds to avoid frequent requests
+		gcTime: 300000, // 5 minute garbage collection time to keep cache longer
+		refetchInterval: 3000, // Refresh every 3 seconds
 		refetchOnWindowFocus: false,
-		refetchOnMount: false, // 组件挂载时不自动重新获取
+		refetchOnMount: false, // Don't automatically refetch on component mount
 	});
 
-	// 根据当前选中的标签获取对应的数据
+	// Get corresponding data based on currently selected tab
 	const getCurrentData = () => {
 		switch (activeTab) {
 			case '1': return { data: newData, isLoading: newLoading, isFetching: newFetching };
@@ -86,7 +86,7 @@ export const HomeList = () => {
 
 	const { data: currentData, isLoading: currentLoading } = getCurrentData();
 
-	// 优化骨架屏显示逻辑 - 只有在真正加载且无数据时才显示
+	// Optimize skeleton screen display logic - only show when actually loading and no data
 	const showSkeleton = currentLoading && !currentData;
 
 	return (
@@ -125,7 +125,7 @@ export const HomeList = () => {
 							) : (
 								<div className="flex flex-col items-center mt-[120px]">
 									<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
-									<div className="text-[14px] text-[#AAAAAA]">暂无结果</div>
+									<div className="text-[14px] text-[#AAAAAA]">No results</div>
 								</div>
 							)}
 						</div>

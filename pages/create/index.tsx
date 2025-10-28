@@ -42,7 +42,7 @@ export default function CreatePage() {
 			<section className="flex flex-col items-center justify-center w-full px-[16px]">
 				<div className="h-[48px] w-full flex items-center relative max-w-[450px] mx-auto">
 					<BackIcon className="cursor-pointer relative z-1" onClick={() => router.push('/')} />
-					<div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-[17px] text-[#fff]">立即创建</div>
+					<div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-[17px] text-[#fff]">Create now</div>
 				</div>
 			</section>
 			<div className="max-w-[450px] mx-auto"><CreateForm /></div>

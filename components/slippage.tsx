@@ -13,14 +13,14 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 	const [customValue, setCustomValue] = useState('');
 	const [tempSlippage, setTempSlippage] = useState(slippage);
 
-	// 预设滑点选项
+	// Preset slippage options
 	const presetSlippages = [10, 20, 30];
 
-	// 当打开模态框时，同步当前滑点值
+	// When opening the modal, synchronize the current slippage value
 	useEffect(() => {
 		if (isOpen) {
 			setTempSlippage(slippage);
-			// 如果当前滑点不在预设值中，显示在自定义输入框
+			// If the current slippage is not in the preset values, show it in the custom input
 			if (!presetSlippages.includes(slippage)) {
 				setCustomValue(slippage.toString());
 			} else {
@@ -29,13 +29,13 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 		}
 	}, [isOpen, slippage]);
 
-	// 处理预设按钮点击
+	// Handle preset button click
 	const handlePresetClick = (value: number) => {
 		setTempSlippage(value);
 		setCustomValue('');
 	};
 
-	// 处理自定义输入
+	// Handle custom input
 	const handleCustomInput = (value: string) => {
 		setCustomValue(value);
 		const numValue = parseFloat(value);
@@ -44,7 +44,7 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 		}
 	};
 
-	// 确认设置
+	// Confirm settings
 	const handleConfirm = () => {
 		setSlippage(tempSlippage);
 		onClose();
@@ -62,19 +62,19 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 					{() => (
 						<>
 							<ModalHeader className="text-center relative p-0 pt-[8px]">
-								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">设置滑点</div>
+								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">Set Slippage</div>
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</ModalHeader>
 							<ModalBody className="px-[16px] pb-[16px]">
-								<div className="text-[13px] text-[#AAAAAA]">设置交易中可接受的最大价格变动</div>
+								<div className="text-[13px] text-[#AAAAAA]"></div>
 								<div className="flex items-center gap-[8px]">
 									{presetSlippages.map((preset) => (
 										<Button
 											key={preset}
 											fullWidth
 											className={`h-[40px] rounded-[16px] text-[14px] transition-colors ${tempSlippage === preset && !customValue
-													? 'bg-[#9AED2D] text-[#000]'
-													: 'bg-[#333] text-[#fff] hover:bg-[#444]'
+												? 'bg-[#9AED2D] text-[#000]'
+												: 'bg-[#333] text-[#fff] hover:bg-[#444]'
 												}`}
 											onPress={() => handlePresetClick(preset)}
 										>
@@ -88,7 +88,7 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 										input: "text-[14px] text-[#fff] placeholder:text-[#666] tracking-[-0.07px] text-center",
 									}}
 									name="customSlippage"
-									placeholder="自定义 (0.1-50)"
+									placeholder="Custom (0.1-50)"
 									variant="bordered"
 									value={customValue}
 									onChange={(e) => handleCustomInput(e.target.value)}
@@ -96,12 +96,12 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 								/>
 								{customValue && (parseFloat(customValue) < 0.1 || parseFloat(customValue) > 50) && (
 									<div className="text-[#FF4C4C] text-[12px] text-center">
-										滑点应在 0.1% - 50% 之间
+										Slippage should be between 0.1% - 50%
 									</div>
 								)}
 								{tempSlippage > 10 && (
 									<div className="text-[#FFA600] text-[12px] text-center">
-										警告: 高滑点可能导致不利交易
+										Warning: High slippage may result in unfavorable trades
 									</div>
 								)}
 								<Button
@@ -110,7 +110,7 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 									onPress={handleConfirm}
 									isDisabled={customValue ? (parseFloat(customValue) < 0.1 || parseFloat(customValue) > 50) : false}
 								>
-									确认设置 {tempSlippage}%
+									Confirm Settings {tempSlippage}%
 								</Button>
 							</ModalBody>
 						</>

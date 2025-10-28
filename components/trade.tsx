@@ -48,44 +48,44 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 		setError(null);
 	};
 
-	// 验证输入
+	// Validate input
 	const validateInput = (): string | null => {
 		if (!isConnected) {
-			return '请先连接钱包';
+			return 'Please connect wallet first';
 		}
 
 		if (!inputAmount || inputAmount.trim() === '') {
-			return '请输入交易金额';
+			return 'Please enter trade amount';
 		}
 
 		const amount = parseFloat(inputAmount);
 		if (isNaN(amount) || amount <= 0) {
-			return '请输入有效的数字金额';
+			return 'Please enter a valid amount';
 		}
 
 		if (selectedTab === 'buy') {
-			// 买入验证
+			// Buy validation
 			if (!balance || balance === 0) {
-				return 'POPME余额不足';
+				return 'Insufficient POP balance';
 			}
 
 			if (_bignumber(inputAmount).gt(balance)) {
-				return `POPME余额不足，当前余额: ${formatBigNumber(balance)} POPME`;
+				return `Insufficient POP balance, current balance: ${formatBigNumber(balance)} POP`;
 			}
 
-			// 预留gas费用检查
+			// Reserve gas fee check
 			const gasReserve = 0.001;
 			if (_bignumber(inputAmount).plus(gasReserve).gt(balance)) {
-				return '请预留足够的POPME作为手续费';
+				return 'Please reserve enough POP for gas fees';
 			}
 		} else {
-			// 卖出验证
+			// Sell validation
 			if (!tokenBalance || parseFloat(tokenBalance) === 0) {
-				return '代币余额不足';
+				return 'Insufficient token balance';
 			}
 
 			if (_bignumber(inputAmount).gt(tokenBalance)) {
-				return `代币余额不足，当前余额: ${formatBigNumber(tokenBalance)} ${info?.metadata?.symbol?.toUpperCase() || 'Token'}`;
+				return `Insufficient token balance, current balance: ${formatBigNumber(tokenBalance)} ${info?.metadata?.symbol?.toUpperCase() || 'Token'}`;
 			}
 		}
 
@@ -118,10 +118,10 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 					const userBalance = _bignumber(tokenBalance);
 					const percentage = _bignumber(amount.value);
 					const sellAmount = userBalance.times(percentage);
-					console.log('用户余额:', userBalance.toString());
-					// 格式化结果，正确处理小数点后的尾随零
+					console.log('User balance:', userBalance.toString());
+					// Format result, properly handle trailing zeros after decimal point
 					const formattedAmount = sellAmount.dp(18, _bignumber.ROUND_DOWN).toFixed();
-					console.log('计算卖出金额:', formattedAmount);
+					console.log('Calculated sell amount:', formattedAmount);
 
 					// 只有当包含小数点时才去除尾随零，避免删除整数末尾的有意义零
 					const finalAmount = formattedAmount.includes('.') ?
@@ -130,11 +130,11 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 
 					setInputAmount(finalAmount);
 				} catch (error) {
-					console.error('計算賣出金額失敗:', error);
+					console.error('Failed to calculate sell amount:', error);
 					setInputAmount('0');
 				}
 			} else {
-				// 如果没有余额，设置为0
+				// If no balance, set to 0
 				setInputAmount('0');
 			}
 		}
@@ -163,12 +163,12 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 					return ethers.formatEther(result);
 				}
 			} catch (error) {
-				console.error('预估输出失败:', error);
+				console.error('Failed to estimate output:', error);
 				return '0';
 			}
 		},
 		enabled: !!(inputAmount && info?.address && parseFloat(inputAmount) > 0),
-		refetchInterval: 3000, // 每3秒刷新一次
+		refetchInterval: 3000, // Refresh every 3 seconds
 		staleTime: 2000,
 		retry: 1,
 	});
@@ -178,12 +178,12 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 		setOutputAmount("");
 	}, [isBuy]);
 
-	// 设置mounted标志
+	// Set mounted flag
 	useEffect(() => {
 		mountedRef.current = true;
 	}, []);
 
-	// 只在组件挂载后且 initialTab 实际变化时更新状态，避免hydration期间的状态更新
+	// Only update state after component is mounted and initialTab actually changes, avoiding state updates during hydration
 	useEffect(() => {
 		if (mountedRef.current) {
 			setSelectedTab(initialTab);
@@ -193,7 +193,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 
 	useEffect(() => {
 		if (estimatedOutput) {
-			// 格式化输出，去除多余的小数位
+			// Format output, remove excess decimal places
 			const formatted = formatBigNumber(estimatedOutput);
 			setOutputAmount(formatted);
 		} else {
@@ -204,12 +204,12 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 	const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
 	const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
 
-	// 初始化 provider 和 signer
+	// Initialize provider and signer
 	useEffect(() => {
 		const initializeProvider = async () => {
 			if (walletClient && publicClient) {
 				try {
-					// 使用 walletClient 的 transport 创建 provider
+					// Create provider using walletClient transport
 					const ethersProvider = new ethers.BrowserProvider(walletClient.transport);
 					const ethersSigner = await ethersProvider.getSigner();
 
@@ -227,7 +227,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 	}, [walletClient, publicClient, isConnected]);
 
 	const handleClick = async (tokenAddress: string, amount: string) => {
-		// 验证输入
+		// Validate input
 		const validationError = validateInput();
 		if (validationError) {
 			toast.error(validationError);
@@ -235,7 +235,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 		}
 
 		if (!signer || !provider) {
-			toast.error("钱包未连接");
+			toast.error("Wallet not connected");
 			return;
 		}
 
@@ -248,23 +248,23 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 			const slippagePercentage = slippage;
 
 			if (selectedTab === 'buy') {
-				// 买入逻辑
+				// Buy logic
 				console.log("Calling tryBuy with parameters:");
 				console.log("Token address:", tokenAddress);
 				console.log("Amount:", ethers.parseEther(amount));
 
-				// 1. 调用 tryBuy 获取预期输出
+				// 1. Call tryBuy to get expected output
 				const result = await readOnlyContract.tryBuy(tokenAddress, ethers.parseEther(amount));
-				console.log("tryBuy 返回值:", result);
+				console.log("tryBuy result:", result);
 
-				// 2. 计算滑点保护
+				// 2. Calculate slippage protection
 				const tokenAmountOut = result[0];
 				const minAmountOut = (tokenAmountOut * BigInt(Math.floor((100 - slippagePercentage) * 100))) / BigInt(10000);
 
-				console.log("调用 buyToken 参数:");
+				console.log("buyToken parameters:");
 				console.log(`MinAmountOut (with ${slippagePercentage}% slippage):`, minAmountOut.toString());
 
-				// 3. 估算 gas 和执行买入交易
+				// 3. Estimate gas and execute buy transaction
 				let gasLimit;
 				try {
 					const estimatedGas = await contract.buyToken.estimateGas(tokenAddress, ethers.parseEther(amount), minAmountOut, {
@@ -272,7 +272,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 					});
 					gasLimit = estimatedGas + (estimatedGas * BigInt(20)) / BigInt(100);
 				} catch (e) {
-					console.warn("Gas 估算失败:", e);
+					console.warn("Gas estimation failed:", e);
 				}
 
 				const gasPrice = (await provider.getFeeData()).gasPrice;
@@ -286,31 +286,31 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 				if (newGasPrice) txOptions.gasPrice = newGasPrice;
 
 				const buyResult = await contract.buyToken(tokenAddress, ethers.parseEther(amount), minAmountOut, txOptions);
-				console.log("buyToken 交易已发送:", buyResult.hash);
+				console.log("buyToken transaction sent:", buyResult.hash);
 
-				toast.success('交易已提交', {
-					description: `交易哈希: ${buyResult.hash.slice(0, 10)}...${buyResult.hash.slice(-6)}`
+				toast.success('Transaction submitted', {
+					description: `Transaction hash: ${buyResult.hash.slice(0, 10)}...${buyResult.hash.slice(-6)}`
 				});
 
 				const receipt = await buyResult.wait();
-				console.log("buyToken 交易已确认:", receipt, outputAmount);
+				console.log("buyToken transaction confirmed:", receipt, outputAmount);
 
-				// 交易成功处理
-				toast.success('买入成功！', {
-					description: `成功买入 ${outputAmount} ${info?.metadata?.symbol?.toUpperCase()}`
+				// Transaction success handling
+				toast.success('Buy successful!', {
+					description: `Successfully bought ${outputAmount} ${info?.metadata?.symbol?.toUpperCase()}`
 				});
 
-				// 清空输入
+				// Clear input
 				setInputAmount('');
 				setSelectedAmount(null);
 
-				// 刷新余额和代币列表
+				// Refresh balance and token list
 				queryClient.invalidateQueries({ queryKey: ['balance'] });
 				queryClient.invalidateQueries({ queryKey: ['tokenBalance'] });
 				queryClient.invalidateQueries({ queryKey: ['coinList'] });
 
 			} else {
-				// 卖出逻辑
+				// Sell logic
 				console.log("Calling trySell with parameters:");
 				console.log("Token address:", tokenAddress);
 				console.log("Token amount:", ethers.parseEther(amount));
@@ -321,43 +321,43 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 					"function approve(address spender, uint256 amount) returns (bool)"
 				];
 
-				// 1. 检查授权额度
+				// 1. Check allowance
 				const tokenContract = new ethers.Contract(tokenAddress, erc20Abi, signer);
 				const sellAmount = ethers.parseEther(amount);
 				const currentAllowance = await tokenContract.allowance(address, CONTRACT_CONFIG.FACTORY_CONTRACT);
 
-				console.log("当前授权额度:", currentAllowance.toString());
-				console.log("需要卖出数量:", sellAmount.toString());
+				console.log("Current allowance:", currentAllowance.toString());
+				console.log("Required sell amount:", sellAmount.toString());
 
-				// 2. 如果授权不足，先进行授权
+				// 2. If allowance is insufficient, approve first
 				if (currentAllowance < sellAmount) {
-					console.log("授权不足，开始授权...");
+					console.log("Insufficient allowance, starting approval...");
 
-					// 授权最大值以避免频繁授权
+					// Approve maximum value to avoid frequent approvals
 					const maxApproval = ethers.MaxUint256;
 					const approveResult = await tokenContract.approve(CONTRACT_CONFIG.FACTORY_CONTRACT, maxApproval);
-					console.log("授权交易已发送:", approveResult.hash);
+					console.log("Approval transaction sent:", approveResult.hash);
 					await approveResult.wait();
-					console.log("授权交易已确认");
+					console.log("Approval transaction confirmed");
 				}
 
-				// 3. 调用 trySell 获取预期ETH输出
+				// 3. Call trySell to get expected ETH output
 				const ethOut = await readOnlyContract.trySell(tokenAddress, sellAmount);
-				console.log("trySell 返回值:", ethOut.toString());
+				console.log("trySell result:", ethOut.toString());
 
-				// 4. 计算滑点保护
+				// 4. Calculate slippage protection
 				const minEthOut = (ethOut * BigInt(Math.floor((100 - slippagePercentage) * 100))) / BigInt(10000);
 
-				console.log("调用 sellToken 参数:");
+				console.log("sellToken parameters:");
 				console.log(`MinEthOut (with ${slippagePercentage}% slippage):`, minEthOut.toString());
 
-				// 5. 估算 gas 和执行卖出交易
+				// 5. Estimate gas and execute sell transaction
 				let gasLimit;
 				try {
 					const estimatedGas = await contract.sellToken.estimateGas(tokenAddress, sellAmount, minEthOut);
 					gasLimit = estimatedGas + (estimatedGas * BigInt(20)) / BigInt(100);
 				} catch (e) {
-					console.warn("Gas 估算失败:", e);
+					console.warn("Gas estimation failed:", e);
 				}
 
 				const gasPrice = (await provider.getFeeData()).gasPrice;
@@ -368,48 +368,48 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 				if (newGasPrice) txOptions.gasPrice = newGasPrice;
 
 				const sellResult = await contract.sellToken(tokenAddress, sellAmount, minEthOut, txOptions);
-				console.log("sellToken 交易已发送:", sellResult.hash);
+				console.log("sellToken transaction sent:", sellResult.hash);
 
-				toast.success('交易已提交', {
-					description: `交易哈希: ${sellResult.hash.slice(0, 10)}...${sellResult.hash.slice(-6)}`
+				toast.success('Transaction submitted', {
+					description: `Transaction hash: ${sellResult.hash.slice(0, 10)}...${sellResult.hash.slice(-6)}`
 				});
 
 				const receipt = await sellResult.wait();
-				console.log("sellToken 交易已确认:", receipt, outputAmount);
+				console.log("sellToken transaction confirmed:", receipt, outputAmount);
 
-				// 交易成功处理
-				toast.success('卖出成功！', {
-					description: `成功卖出 ${formatBigNumber(amount)} ${info?.metadata?.symbol?.toUpperCase()}，获得 ${outputAmount} POPME`
+				// Transaction success handling
+				toast.success('Sell successful!', {
+					description: `Successfully sold ${formatBigNumber(amount)} ${info?.metadata?.symbol?.toUpperCase()}, received ${outputAmount} POP`
 				});
 
-				// 清空输入
+				// Clear input
 				setInputAmount('');
 				setSelectedAmount(null);
 
-				// 刷新余额和代币列表
+				// Refresh balance and token list
 				queryClient.invalidateQueries({ queryKey: ['balance'] });
 				queryClient.invalidateQueries({ queryKey: ['tokenBalance'] });
 				queryClient.invalidateQueries({ queryKey: ['coinList'] });
 			}
 		} catch (error: any) {
-			console.error('交易失败:', error);
+			console.error('Transaction failed:', error);
 
-			// 更详细的错误处理
-			let errorMessage = '交易失败，请重试';
+			// More detailed error handling
+			let errorMessage = 'Transaction failed, please try again';
 			if (error.code === 'ACTION_REJECTED') {
-				errorMessage = '用户拒绝了交易';
+				errorMessage = 'User rejected the transaction';
 			} else if (error.code === 'INSUFFICIENT_FUNDS') {
-				errorMessage = '余额不足';
+				errorMessage = 'Insufficient balance';
 			} else if (error.message?.includes('slippage')) {
-				errorMessage = '滑点过大，请调整滑点设置';
+				errorMessage = 'Slippage too high, please adjust slippage settings';
 			} else if (error.message?.includes('deadline')) {
-				errorMessage = '交易超时，请重试';
+				errorMessage = 'Transaction timeout, please try again';
 			} else if (error.message) {
-				errorMessage = '交易超时，请重试';
+				errorMessage = 'Transaction timeout, please try again';
 			}
 
 			setError(errorMessage);
-			toast.error('交易失败', {
+			toast.error('Transaction failed', {
 				description: errorMessage
 			});
 		} finally {
@@ -428,7 +428,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 							}`}
 						onClick={() => handleTabClick('buy')}
 					>
-						买入
+						Buy
 					</div>
 					<div
 						className={`flex-1 border-[3px] border-[#333] rounded-[16px] text-[14px] flex items-center justify-center cursor-pointer transition-all duration-200 ${selectedTab === 'sell'
@@ -437,7 +437,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 							}`}
 						onClick={() => handleTabClick('sell')}
 					>
-						卖出
+						Sell
 					</div>
 				</div>
 				<Input
@@ -458,7 +458,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 							isBuy ? <MyAvatar src={'/images/pop.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" /> :
 								<MyAvatar src={info?.metadata?.image || '/images/default.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" />
 						}
-						<div className="text-[15px] text-[#fff]">{isBuy ? 'POPME' : info?.metadata?.symbol?.toUpperCase() || '--'}</div>
+						<div className="text-[15px] text-[#fff]">{isBuy ? 'POP' : info?.metadata?.symbol?.toUpperCase() || '--'}</div>
 					</div>}
 				/>
 				<div className="flex gap-[8px] mt-[12px]">
@@ -476,9 +476,9 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 					))}
 				</div>
 				<div className="text-[14px] text-[#fff] flex items-center justify-end gap-[3px] mt-[12px]">
-					<span className="text-[#AAAAAA]">余额:</span>
+					<span className="text-[#AAAAAA]">Balance:</span>
 					{
-						isBuy ? <>{formatBigNumber(balance)} POPME</> : <>{formatBigNumber(tokenBalance!)} {info?.metadata?.symbol?.toUpperCase() || '--'}</>
+						isBuy ? <>{formatBigNumber(balance)} POP</> : <>{formatBigNumber(tokenBalance!)} {info?.metadata?.symbol?.toUpperCase() || '--'}</>
 					}
 					{
 						isBuy && <span className="text-[#9AED2D] cursor-pointer hover:text-[#7ED321] transition-colors" onClick={() => {
@@ -493,14 +493,14 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 				</div>
 				<div className="border-dashed border-[1.5px] border-[#333] rounded-[16px] p-[16px] mt-[16px] text-[14px] text-[#fff] bg-[#1A1A1A]">
 					<div className="flex items-center justify-between">
-						<span className="text-[#AAAAAA]">预计收到</span>
+						<span className="text-[#AAAAAA]">Expected to receive</span>
 						<div>
 							<span className="text-[#fff] mr-[4px] font-medium">{outputAmount || '0.0'}</span>
-							<span className="text-[#AAAAAA]">{selectedTab === 'buy' ? info?.metadata?.symbol?.toUpperCase() : 'POPME'}</span>
+							<span className="text-[#AAAAAA]">{selectedTab === 'buy' ? info?.metadata?.symbol?.toUpperCase() : 'POP'}</span>
 						</div>
 					</div>
 					<div className="flex items-center justify-between mt-[12px]">
-						<span className="text-[#AAAAAA]">滑点</span>
+						<span className="text-[#AAAAAA]">Slippage</span>
 						<div className="flex items-center gap-[4px]">
 							<span className="text-[#fff] font-medium">{slippage}%</span>
 							<SetIcon className="mb-[2px] cursor-pointer hover:text-[#9AED2D] transition-colors" onClick={() => setIsSlippageOpen(true)} />
@@ -514,7 +514,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 					isLoading={isLoading}
 					isDisabled={isLoading || !inputAmount || parseFloat(inputAmount) <= 0}
 				>
-					{isLoading ? '处理中...' : (selectedTab === 'buy' ? '买入' : '卖出')}
+					{isLoading ? 'Processing...' : (selectedTab === 'buy' ? 'Buy' : 'Sell')}
 				</Button>
 			</div>
 			<Slippage isOpen={isSlippageOpen} onClose={() => setIsSlippageOpen(false)} />

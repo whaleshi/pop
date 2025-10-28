@@ -63,7 +63,16 @@ export default function App({ Component, pageProps }: AppProps) {
 			</Head>
 			<WagmiProvider config={config}>
 				<QueryProvider>
-					<RainbowKitProvider theme={darkTheme()}>
+					<RainbowKitProvider 
+						theme={darkTheme({
+							accentColor: '#9AED2D',
+							accentColorForeground: 'black',
+							borderRadius: 'medium',
+							fontStack: 'system',
+							overlayBlur: 'small',
+						})}
+						locale="en-US"
+					>
 						<BalanceProvider>
 							<HeroUIProvider navigate={router.push}>
 								<Toaster richColors position="top-center" />
