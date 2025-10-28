@@ -39,10 +39,16 @@ export function useIsMobile(query = "(max-width: 768px)") {
         const mql = window.matchMedia(query);
         const handler = (e: MediaQueryListEvent | MediaQueryList) =>
             setIsMobile("matches" in e ? e.matches : (e as MediaQueryList).matches);
-        handler(mql);
+        
+        // 延迟设置初始状态，避免水合期间的状态更新
+        const timeoutId = setTimeout(() => {
+            handler(mql);
+        }, 0);
+        
         if ("addEventListener" in mql) mql.addEventListener("change", handler as any);
         else (mql as any).addListener(handler);
         return () => {
+            clearTimeout(timeoutId);
             if ("removeEventListener" in mql) mql.removeEventListener("change", handler as any);
             else (mql as any).removeListener(handler);
         };

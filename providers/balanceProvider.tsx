@@ -16,7 +16,6 @@ const BalanceContext = createContext<BalanceContextType | undefined>(undefined);
 
 export function BalanceProvider({ children }: { children: ReactNode }) {
 	const { address, isConnected } = useAccount();
-	const [price, setPrice] = useState<any>(0);
 
 	// 获取钱包余额
 	const { data: walletBalance, isLoading: balanceLoading } = useQuery({
@@ -41,6 +40,24 @@ export function BalanceProvider({ children }: { children: ReactNode }) {
 		retry: 2,
 	});
 
+	// 获取 POP 价格
+	const { data: popPrice } = useQuery({
+		queryKey: ['popPrice'],
+		queryFn: async () => {
+			try {
+				const response = await fetch('/api/price/pop');
+				const data = await response.json();
+				return data.success ? data.price : 0;
+			} catch (error) {
+				console.error('Failed to fetch POP price:', error);
+				return 0;
+			}
+		},
+		refetchInterval: 10000, // 每10秒刷新一次价格
+		staleTime: 8000,
+		retry: 2,
+	});
+
 	// 格式化余额
 	const balance = walletBalance ? Number(ethers.formatEther(walletBalance.value)) : 0;
 
@@ -48,7 +65,7 @@ export function BalanceProvider({ children }: { children: ReactNode }) {
 		<BalanceContext.Provider
 			value={{
 				balance,
-				price,
+				price: popPrice || 0,
 				symbol: 'POP',
 			}}
 		>

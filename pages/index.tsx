@@ -6,6 +6,7 @@ import NextImage from "next/image"
 import { useState, useEffect } from "react"
 import { siteConfig } from "@/config/site";
 import { useQuery } from "@tanstack/react-query";
+import RippleGrid from '@/components/rippleGrid';
 
 export default function IndexPage() {
 	const router = useRouter();
@@ -47,31 +48,43 @@ export default function IndexPage() {
 	return (
 		<DefaultLayout>
 			<div className="flex flex-col h-full max-w-[1280px] mx-auto px-4 relative">
-				{/* 左上角绿色光晕 */}
-				<div 
+				{/* <div
 					className="absolute top-0 left-0 w-[300px] h-[300px] rounded-full blur-[60px] opacity-60 pointer-events-none z-0"
 					style={{
 						background: 'radial-gradient(circle, #9AED2D 0%, rgba(154, 237, 45, 0.8) 15%, rgba(154, 237, 45, 0.3) 35%, transparent 70%)'
 					}}
-				></div>
-				<section className="flex flex-row-reverse items-center justify-center relative z-10">
-					<div className="pt-[20px] block md:hidden">
-						<NextImage src="/images/banner.png" width={215} height={215} alt="banner" />
+				></div> */}
+				<section className="flex items-center justify-center relative min-h-[350px] md:min-h-[420px] py-[30px] md:py-[40px]">
+					<div className="absolute inset-0 w-full h-full overflow-hidden bg-[#000000]">
+						<RippleGrid
+							enableRainbow={false}
+							gridColor="#abf909"
+							rippleIntensity={0.08}
+							gridSize={10}
+							gridThickness={8}
+							mouseInteraction={true}
+							mouseInteractionRadius={2}
+							opacity={0.35}
+						/>
 					</div>
-					<div className="hidden md:block w-[464px] h-[464px] shrink-0">
-						<NextImage src="/images/banner.png" width={464} height={464} alt="banner" />
-					</div>
-					<div className="w-full">
-						<div className="text-[26px] md:text-[50px] text-[#fff] text-center md:text-left font-bold">An innovation launchpad<br /> built on <span className="text-[#ABF909]">Pop Chain</span></div>
-						<div className="text-[16px] md:text-[26px] text-[#AAAAAA] mt-[20px] md:mt-[30px] text-center md:text-left">Everyone can deploy a token with one click</div>
-						<div className="w-full px-[30px] md:px-[0] mt-[50px] flex gap-[20px]">
-							<Button 
-								className="bg-[#fff] w-[200px] h-[50px] rounded-[8px] md:rounded-full text-[16px] text-[#000000]"
+					<div className="w-full relative z-10 flex flex-col items-center justify-center max-w-[800px] px-[20px]">
+						<div className="text-[32px] md:text-[56px] text-[#fff] text-center font-bold leading-tight mb-[24px]">
+							An innovation launchpad<br />
+							built on <span className="text-[#ABF909]">Pop Chain</span>
+						</div>
+						<div className="text-[18px] md:text-[24px] text-[#AAAAAA] text-center max-w-[600px] mb-[48px]">
+							Everyone can deploy a token with one click
+						</div>
+						<div className="flex flex-row gap-[12px] md:gap-[16px] items-center justify-center w-full max-w-[320px] md:max-w-none mx-auto">
+							<Button
+								className="bg-[#ABF909] hover:bg-[#C8FF1A] active:scale-[0.98] flex-1 md:flex-none md:w-[180px] h-[48px] rounded-[16px] text-[14px] md:text-[15px] font-semibold text-[#000000] transition-all duration-200 shadow-lg hover:shadow-xl"
 								onPress={() => router.push('/create')}
 							>
-								Token Creation
+								🚀 Launch Token
 							</Button>
-							<Button className="bg-[transparent] border-[1px] border-[#1E1E1E] w-[200px] h-[50px] rounded-[8px] md:rounded-full text-[16px] text-[#fff]">Modus Operandi</Button>
+							<Button className="bg-[rgba(255,255,255,0.05)] backdrop-blur-md border-[1px] border-[rgba(171,249,9,0.2)] hover:border-[rgba(171,249,9,0.5)] hover:bg-[rgba(171,249,9,0.1)] flex-1 md:flex-none md:w-[180px] h-[48px] rounded-[16px] text-[14px] md:text-[15px] font-medium text-[#fff] transition-all duration-200">
+								Learn More
+							</Button>
 						</div>
 					</div>
 				</section>

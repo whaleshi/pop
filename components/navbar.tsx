@@ -5,7 +5,6 @@ import { useRouter } from "next/router"
 import { Image, Input } from "@heroui/react"
 import NextImage from "next/image"
 import { shortenAddress, useIsMobile } from "@/utils";
-import { getCoinList } from "@/service/api";
 import { useQuery } from "@tanstack/react-query";
 import { TokenListSkeleton } from "./skeleton";
 
@@ -83,23 +82,20 @@ export const Navbar = () => {
 		return () => clearTimeout(timer);
 	}, [searchValue]);
 
-	// 搜索API调用
+	// 搜索token地址并获取详情
 	const { data: searchResults, isLoading: searchLoading } = useQuery({
-		queryKey: ["navbarSearchCoinList", debouncedSearch],
+		queryKey: ["navbarAddressSearch", debouncedSearch],
 		queryFn: async () => {
 			if (!debouncedSearch.trim()) {
 				return [];
 			}
-			const res: any = await getCoinList({
-				keyword: debouncedSearch.trim(),
-				page: 1,
-				page_size: 10 // 下拉框显示少一些结果
-			});
-			return res?.data?.list ?? [];
+			const response = await fetch(`/api/tokens/addresses?keyword=${encodeURIComponent(debouncedSearch.trim())}`);
+			const data = await response.json();
+			return data.success ? data.data : [];
 		},
 		enabled: !!debouncedSearch.trim(),
-		staleTime: 30000, // 30秒内认为数据是新鲜的
-		gcTime: 300000, // 5分钟垃圾回收时间
+		staleTime: 30000,
+		gcTime: 300000,
 		retry: 1,
 	});
 
@@ -158,27 +154,62 @@ export const Navbar = () => {
 				</NextLink>
 				<div className="text-[14px] text-[#fff] hidden md:flex items-center gap-[16px] pl-[24px]">
 					<NextLink href="/" className="hover:opacity-80 transition-opacity">首页</NextLink>
-					<button
-						className="hover:opacity-80 transition-opacity cursor-pointer"
-						onClick={onOpen}
-					>
+					<NextLink href="/create" className="hover:opacity-80 transition-opacity">
 						创建代币
-					</button>
+					</NextLink>
 					<NextLink href={siteConfig.links.work} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">运行机制</NextLink>
 					<NextLink href={siteConfig.links.x} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">X</NextLink>
 					<NextLink href={siteConfig.links.tg} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">Telegram</NextLink>
 				</div>
 
 				<NavbarContent justify="end" className="gap-[12px]">
+					<div className="hidden md:block relative" ref={searchRef}>
+						<Input
+							classNames={{
+								inputWrapper: "w-[300px] h-[40px] border-[#333] bg-[#1A1A1A] border-1",
+								input: "text-[13px] text-[#fff] placeholder:text-[#666] uppercase tracking-[-0.07px]",
+							}}
+							name="amount"
+							placeholder="搜索CA"
+							variant="bordered"
+							value={searchValue}
+							onValueChange={handleSearchChange}
+							onFocus={handleSearchFocus}
+							startContent={<SearchInputIcon className="shrink-0" />}
+						/>
+						{isSearchDropdownOpen && (
+							<div className="absolute top-[48px] w-[375px] h-[320px] bg-[#1A1A1A] rounded-[16px] border-[1px] border-[#333] p-[16px] pt-[8px] z-50 overflow-y-auto"
+								style={{ boxShadow: "0 4px 12px 0 rgba(0, 0, 0, 0.3)" }}
+							>
+								{searchLoading && debouncedSearch ? (
+									<TokenListSkeleton count={5} className="!flex !flex-col md:!flex md:!flex-col md:!grid-cols-none" />
+								) : searchResults && searchResults.length > 0 ? (
+									<div>
+										{searchResults.map((item: any, index: number) => (
+											<div key={`navbar-search-${index}`} onClick={handleSearchResultClick} className="mb-[10px]">
+												<TokenItem item={item} border />
+											</div>
+										))}
+									</div>
+								) : debouncedSearch && (
+									<div className="h-full flex flex-col items-center justify-center">
+										<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
+										<div className="text-[14px] text-[#AAAAAA]">暂无搜索结果</div>
+									</div>
+								)}
+							</div>
+						)}
+					</div>
 					{!mounted ? (
 						<div className="w-[96px] h-[36px] rounded-[12px] bg-[#2E2A55] animate-pulse" />
 					) : isConnected ? (
 						<button
 							type="button"
-							className="px-3 h-[36px] rounded-[12px] bg-[#1A1A1A] text-[13px] text-white flex items-center justify-center border border-[#333] hover:border-[#abf909] hover:bg-[#2A2A2A] transition-colors max-w-[160px] cursor-pointer"
+							className="px-3 h-[36px] rounded-[12px] bg-[#1A1A1A] text-[13px] text-white flex items-center justify-center gap-[6px] border border-[#333] hover:border-[#abf909] hover:bg-[#2A2A2A] transition-colors max-w-[160px] cursor-pointer"
 							title={address || ''}
-							onClick={onSecondModalOpen}
+							onClick={handleWalletClick}
 						>
+							<WalletIcon className="shrink-0" />
 							<span className="truncate">{address?.slice(0, 6)}...{address?.slice(-4)}</span>
 						</button>
 					) : (

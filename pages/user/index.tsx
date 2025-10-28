@@ -88,7 +88,7 @@ export default function User() {
 					</div>
 				</div>
 				<div className="flex-1"></div>
-				<div className="w-full pb-[30px]">
+				<div className="w-full">
 					{
 						!isConnected && <Button fullWidth className="h-[52px] w-full rounded-[16px] bg-[#abf909] text-[15px] text-[#000] hover:bg-[#9AED2D] transition-colors" onPress={handleConnect}>连接钱包</Button>
 					}

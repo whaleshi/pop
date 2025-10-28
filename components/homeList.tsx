@@ -107,10 +107,9 @@ export const HomeList = () => {
 							</div>
 						))}
 					</div>
-					{/* <div className="h-[28px] bg-[#EBEBEF] rounded-[12px] pl-[6px] pr-[8px] text-[13px] text-[#94989F] flex items-center gap-[4px] cursor-pointer" onClick={handleSearchClick}>
-						<SearchIcon /><span className="pt-[2px]">搜索</span>
-					</div> */}
-					<div className="bg-[#1A1A1A] border border-[#333] rounded-[10px] w-[200px] h-[40px] cursor-pointer flex items-center px-[12px] text-[16px] text-[#AAAAAA] gap-[10px] hover:bg-[#2A2A2A] transition-colors" onClick={handleSearchClick}><SearchIcon />Search</div>
+					<div className="w-[32px] h-[32px] bg-[#1A1A1A] border border-[#333] rounded-[8px] cursor-pointer flex items-center justify-center hover:bg-[#2A2A2A] transition-colors md:hidden" onClick={handleSearchClick}>
+						<SearchIcon />
+					</div>
 				</div>
 				<div className="">
 					{showSkeleton ? (

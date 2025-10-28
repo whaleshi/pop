@@ -1,5 +1,5 @@
 import { Button, Input } from "@heroui/react"
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import MyAvatar from "@/components/avatarImage";
 import { SetIcon } from "./icons";
 import Slippage from "./slippage";
@@ -23,8 +23,8 @@ interface TokenProps {
 }
 
 export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) => {
-	const [isBuy, setIsBuy] = useState(initialTab === 'buy');
-	const [selectedTab, setSelectedTab] = useState<TradeType>(initialTab);
+	const [isBuy, setIsBuy] = useState(() => initialTab === 'buy');
+	const [selectedTab, setSelectedTab] = useState<TradeType>(() => initialTab);
 	const [isSlippageOpen, setIsSlippageOpen] = useState(false);
 	const [inputAmount, setInputAmount] = useState('');
 	const [outputAmount, setOutputAmount] = useState("");
@@ -34,6 +34,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 	const { balance } = useBalanceContext();
 	const { slippage } = useSlippageStore();
 	const queryClient = useQueryClient();
+	const mountedRef = useRef(false);
 
 	const { address, isConnected } = useAccount();
 	const { data: walletClient } = useWalletClient();
@@ -65,17 +66,17 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 		if (selectedTab === 'buy') {
 			// 买入验证
 			if (!balance || balance === 0) {
-				return 'POP余额不足';
+				return 'POPME余额不足';
 			}
 
 			if (_bignumber(inputAmount).gt(balance)) {
-				return `POP余额不足，当前余额: ${formatBigNumber(balance)} POP`;
+				return `POPME余额不足，当前余额: ${formatBigNumber(balance)} POPME`;
 			}
 
 			// 预留gas费用检查
 			const gasReserve = 0.001;
 			if (_bignumber(inputAmount).plus(gasReserve).gt(balance)) {
-				return '请预留足够的POP作为手续费';
+				return '请预留足够的POPME作为手续费';
 			}
 		} else {
 			// 卖出验证
@@ -92,10 +93,10 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 	};
 
 	const buyAmounts = [
-		{ label: "0.1", value: 0.1 },
-		{ label: "0.2", value: 0.2 },
-		{ label: "0.5", value: 0.5 },
-		{ label: "1", value: 1 }
+		{ label: "50", value: 50 },
+		{ label: "100", value: 100 },
+		{ label: "200", value: 200 },
+		{ label: "500", value: 500 }
 	];
 
 	const sellAmounts = [
@@ -177,9 +178,14 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 		setOutputAmount("");
 	}, [isBuy]);
 
-	// 当initialTab改变时，更新选中的tab
+	// 设置mounted标志
 	useEffect(() => {
-		if (initialTab) {
+		mountedRef.current = true;
+	}, []);
+
+	// 只在组件挂载后且 initialTab 实际变化时更新状态，避免hydration期间的状态更新
+	useEffect(() => {
+		if (mountedRef.current) {
 			setSelectedTab(initialTab);
 			setIsBuy(initialTab === 'buy');
 		}
@@ -373,7 +379,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 
 				// 交易成功处理
 				toast.success('卖出成功！', {
-					description: `成功卖出 ${formatBigNumber(amount)} ${info?.metadata?.symbol?.toUpperCase()}，获得 ${outputAmount} POP`
+					description: `成功卖出 ${formatBigNumber(amount)} ${info?.metadata?.symbol?.toUpperCase()}，获得 ${outputAmount} POPME`
 				});
 
 				// 清空输入
@@ -452,7 +458,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 							isBuy ? <MyAvatar src={'/images/pop.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" /> :
 								<MyAvatar src={info?.metadata?.image || '/images/default.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" />
 						}
-						<div className="text-[15px] text-[#fff]">{isBuy ? 'POP' : info?.metadata?.symbol?.toUpperCase() || '--'}</div>
+						<div className="text-[15px] text-[#fff]">{isBuy ? 'POPME' : info?.metadata?.symbol?.toUpperCase() || '--'}</div>
 					</div>}
 				/>
 				<div className="flex gap-[8px] mt-[12px]">
@@ -472,7 +478,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 				<div className="text-[14px] text-[#fff] flex items-center justify-end gap-[3px] mt-[12px]">
 					<span className="text-[#AAAAAA]">余额:</span>
 					{
-						isBuy ? <>{formatBigNumber(balance)} POP</> : <>{formatBigNumber(tokenBalance!)} {info?.metadata?.symbol?.toUpperCase() || '--'}</>
+						isBuy ? <>{formatBigNumber(balance)} POPME</> : <>{formatBigNumber(tokenBalance!)} {info?.metadata?.symbol?.toUpperCase() || '--'}</>
 					}
 					{
 						isBuy && <span className="text-[#9AED2D] cursor-pointer hover:text-[#7ED321] transition-colors" onClick={() => {
@@ -490,7 +496,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 						<span className="text-[#AAAAAA]">预计收到</span>
 						<div>
 							<span className="text-[#fff] mr-[4px] font-medium">{outputAmount || '0.0'}</span>
-							<span className="text-[#AAAAAA]">{selectedTab === 'buy' ? info?.metadata?.symbol?.toUpperCase() : 'POP'}</span>
+							<span className="text-[#AAAAAA]">{selectedTab === 'buy' ? info?.metadata?.symbol?.toUpperCase() : 'POPME'}</span>
 						</div>
 					</div>
 					<div className="flex items-center justify-between mt-[12px]">

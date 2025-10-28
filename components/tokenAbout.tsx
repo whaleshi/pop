@@ -6,6 +6,9 @@ import Share from "./share";
 import { shortenAddress } from "@/utils";
 import useClipboard from '@/hooks/useCopyToClipboard';
 import { formatBigNumber } from "@/utils/formatBigNumber";
+import { TRANSACTION_CONFIG } from "@/config/chains";
+import { useBalanceContext } from "@/providers/balanceProvider";
+import _bignumber from "bignumber.js";
 
 interface TokenProps {
 	info?: any;
@@ -14,9 +17,72 @@ interface TokenProps {
 export const TokenAbout = ({ info }: TokenProps) => {
 	const [isShareOpen, setIsShareOpen] = useState(false);
 	const { copy } = useClipboard();
+	const { price: popPrice } = useBalanceContext();
+
+	// 计算代币价格
+	const calculateTokenPrice = () => {
+		try {
+			// 计算代币的美元价格: BigNumber(lastPrice).div(1e18).times(popPrice)
+			const lastPrice = info?.info?.lastPrice || 0;
+			
+			const tokenPrice = _bignumber(lastPrice)
+				.div(1e18)
+				.times(popPrice || 0)
+				.toString();
+			
+			return parseFloat(tokenPrice);
+		} catch (error) {
+			console.error('Token price calculation error:', error);
+			return 0;
+		}
+	};
+
+	// 计算市值
+	const calculateMarketCap = () => {
+		try {
+			// 使用公式: BigNumber(lastPrice).div(1e18).times(1000000000).times(popPrice).dp(2)
+			const lastPrice = info?.info?.lastPrice || 0;
+			const tokenSupply = 1000000000; // 10亿代币总量
+			
+			const marketCap = _bignumber(lastPrice)
+				.div(1e18)
+				.times(tokenSupply)
+				.times(popPrice || 0)
+				.dp(2)
+				.toString();
+			
+			return parseFloat(marketCap);
+		} catch (error) {
+			console.error('Market cap calculation error:', error);
+			return 0;
+		}
+	};
+
+	// 计算价格变化百分比
+	const calculatePriceChange = () => {
+		const currentPrice = info?.info?.lastPrice;
+		const initialPrice = TRANSACTION_CONFIG.INITIAL_PRICE;
+
+		if (!currentPrice || !initialPrice) {
+			return null;
+		}
+
+		try {
+			const current = parseFloat(currentPrice);
+			const initial = parseFloat(initialPrice);
+
+			if (initial === 0) return null;
+
+			const changePercent = ((current - initial) / initial) * 100;
+			return changePercent;
+		} catch (error) {
+			console.error('Price change calculation error:', error);
+			return null;
+		}
+	};
 
 	// 格式化价格变化显示
-	const formatPriceChange = (change: number | undefined) => {
+	const formatPriceChange = (change: number | null) => {
 		if (change === undefined || change === null) {
 			return { text: '--', color: 'text-[#fff]' };
 		}
@@ -30,7 +96,10 @@ export const TokenAbout = ({ info }: TokenProps) => {
 		}
 	};
 
-	const priceChangeDisplay = formatPriceChange(info?.price_change_24h_f);
+	const priceChangePercent = calculatePriceChange();
+	const priceChangeDisplay = formatPriceChange(priceChangePercent);
+	const tokenPrice = calculateTokenPrice();
+	const marketCap = calculateMarketCap();
 
 	console.log(info)
 	return (
@@ -97,23 +166,23 @@ export const TokenAbout = ({ info }: TokenProps) => {
 			<div className="flex items-center gap-[12px] mt-[16px] w-full">
 				<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
 					<div className="text-[13px] text-[#AAAAAA]">价格</div>
-					<div className="text-[20px] text-[#fff] font-semibold">${formatBigNumber(info?.price_usd_f)}</div>
+					<div className="text-[20px] text-[#fff] font-semibold">${formatBigNumber(tokenPrice)}</div>
 				</div>
 				<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
 					<div className="text-[13px] text-[#AAAAAA]">市值</div>
-					<div className="text-[20px] text-[#fff] font-semibold">${formatBigNumber(info?.price_usd_f * 1e9)}</div>
+					<div className="text-[20px] text-[#fff] font-semibold">${formatBigNumber(marketCap)}</div>
 				</div>
 			</div>
 			<div className="flex items-center gap-[12px] mt-[12px] w-full">
 				<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-					<div className="text-[13px] text-[#AAAAAA]">24H 涨跌</div>
+					<div className="text-[13px] text-[#AAAAAA]">涨幅</div>
 					<div className={`text-[20px] font-semibold ${priceChangeDisplay.color}`}>
 						{priceChangeDisplay.text}
 					</div>
 				</div>
 				<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
 					<div className="text-[13px] text-[#AAAAAA]">持有者</div>
-					<div className="text-[20px] text-[#fff] font-semibold">{info?.holder_count || 0}</div>
+					<div className="text-[20px] text-[#fff] font-semibold">--</div>
 				</div>
 			</div>
 			<Share isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} info={info} />

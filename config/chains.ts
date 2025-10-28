@@ -27,7 +27,7 @@ export const CHAINS_CONFIG = {
             name: "Local Development",
             symbol: "ETH",
             explorerUrl: "http://localhost:3000", // 本地区块浏览器或占位符
-            rpcUrl: "http://47.254.247.214:8545",
+            rpcUrl: "http://192.168.1.73:8545",
             factoryContract: "0x86c64DA12DA5C7d1C4Ccd484A833ac32E675B2c2",
         },
     },
@@ -45,9 +45,7 @@ export const CONTRACT_CONFIG = {
 
 // Mint/Refund 相关配置
 export const TRANSACTION_CONFIG = {
-    MINT_FEE: "0.12", // ETH/BNB/OKB 等
-    REFUND_FEE: "0.02",
-    MINT_TARGET: 800, // 目标mint次数
+    INITIAL_PRICE: "1562500001464", // 初始价格
 } as const;
 
 // Multicall3 合约地址 (通用地址，大多数链都支持)

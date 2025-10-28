@@ -15,8 +15,8 @@ import { WagmiProvider } from 'wagmi';
 import { config } from '@/config/wagmi';
 
 import { fontSans } from "@/config/fonts";
-import "@/styles/globals.css";
 import "nprogress/nprogress.css";
+import "@/styles/globals.css";
 
 export default function App({ Component, pageProps }: AppProps) {
 	const router = useRouter();
@@ -67,8 +67,10 @@ export default function App({ Component, pageProps }: AppProps) {
 						<BalanceProvider>
 							<HeroUIProvider navigate={router.push}>
 								<Toaster richColors position="top-center" />
-								<NextThemesProvider attribute="class" defaultTheme="light">
-									<Component {...pageProps} />
+								<NextThemesProvider attribute="class" defaultTheme="dark">
+									<div className="page-transition bg-[#000000] min-h-screen">
+										<Component {...pageProps} />
+									</div>
 								</NextThemesProvider>
 							</HeroUIProvider>
 						</BalanceProvider>

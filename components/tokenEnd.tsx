@@ -6,6 +6,9 @@ import Share from "./share";
 import { shortenAddress } from "@/utils";
 import useClipboard from '@/hooks/useCopyToClipboard';
 import { formatBigNumber } from "@/utils/formatBigNumber";
+import { TRANSACTION_CONFIG } from "@/config/chains";
+import { useBalanceContext } from "@/providers/balanceProvider";
+import _bignumber from "bignumber.js";
 
 interface TokenProps {
 	info?: any;
@@ -15,11 +18,74 @@ export const TokenEnd = ({ info }: TokenProps) => {
 	const [isShareOpen, setIsShareOpen] = useState(false);
 	const [isAuthOpen, setIsAuthOpen] = useState(false);
 	const { copy } = useClipboard();
+	const { price: popPrice } = useBalanceContext();
+
+	// 计算代币价格
+	const calculateTokenPrice = () => {
+		try {
+			// 计算代币的美元价格: BigNumber(lastPrice).div(1e18).times(popPrice)
+			const lastPrice = info?.info?.lastPrice || 0;
+			
+			const tokenPrice = _bignumber(lastPrice)
+				.div(1e18)
+				.times(popPrice || 0)
+				.toString();
+			
+			return parseFloat(tokenPrice);
+		} catch (error) {
+			console.error('Token price calculation error:', error);
+			return 0;
+		}
+	};
+
+	// 计算市值
+	const calculateMarketCap = () => {
+		try {
+			// 使用公式: BigNumber(lastPrice).div(1e18).times(1000000000).times(popPrice).dp(2)
+			const lastPrice = info?.info?.lastPrice || 0;
+			const tokenSupply = 1000000000; // 10亿代币总量
+			
+			const marketCap = _bignumber(lastPrice)
+				.div(1e18)
+				.times(tokenSupply)
+				.times(popPrice || 0)
+				.dp(2)
+				.toString();
+			
+			return parseFloat(marketCap);
+		} catch (error) {
+			console.error('Market cap calculation error:', error);
+			return 0;
+		}
+	};
+
+	// 计算价格变化百分比
+	const calculatePriceChange = () => {
+		const currentPrice = info?.info?.lastPrice;
+		const initialPrice = TRANSACTION_CONFIG.INITIAL_PRICE;
+
+		if (!currentPrice || !initialPrice) {
+			return null;
+		}
+
+		try {
+			const current = parseFloat(currentPrice);
+			const initial = parseFloat(initialPrice);
+
+			if (initial === 0) return null;
+
+			const changePercent = ((current - initial) / initial) * 100;
+			return changePercent;
+		} catch (error) {
+			console.error('Price change calculation error:', error);
+			return null;
+		}
+	};
 
 	// 格式化价格变化显示
-	const formatPriceChange = (change: number | undefined) => {
+	const formatPriceChange = (change: number | null) => {
 		if (change === undefined || change === null) {
-			return { text: '--', color: 'text-[#94989F]' };
+			return { text: '--', color: 'text-[#fff]' };
 		}
 
 		if (change > 0) {
@@ -27,96 +93,89 @@ export const TokenEnd = ({ info }: TokenProps) => {
 		} else if (change < 0) {
 			return { text: `${change.toFixed(2)}%`, color: 'text-[#FF4C4C]' };
 		} else {
-			return { text: '0.00%', color: 'text-[#94989F]' };
+			return { text: '0.00%', color: 'text-[#fff]' };
 		}
 	};
 
-	const priceChangeDisplay = formatPriceChange(info?.price_change_24h_f);
+	const priceChangePercent = calculatePriceChange();
+	const priceChangeDisplay = formatPriceChange(priceChangePercent);
+	const tokenPrice = calculateTokenPrice();
+	const marketCap = calculateMarketCap();
 
 	return (
 		<div className="flex-1 w-full px-[16px] md:px-[0px] flex flex-col items-center pt-[8px] relative">
 			<div className="flex flex-col items-center w-full md:gap-[12px]">
 				<MyAvatar src={info?.metadata?.image || '/images/default.png'} alt="icon" className="w-[80px] h-[80px] rounded-[16px]" />
 				<div className="md:flex md:flex-col md:gap-[2px]">
-					<div className="text-[#101010] mt-[16px] md:mt-[0px] text-[20px] font-bold flex items-center justify-center gap-[4px] md:justify-start">{info?.metadata?.symbol?.toUpperCase() || '--'} </div>
-					<div className="text-[#95989F] mt-[2px] md:mt-[0px] text-[13px] text-center">{info?.metadata?.name || '--'}</div>
+					<div className="text-[#fff] mt-[16px] md:mt-[0px] text-[20px] font-bold flex items-center justify-center gap-[4px] md:justify-start">{info?.metadata?.symbol?.toUpperCase() || '--'} </div>
+					<div className="text-[#AAAAAA] mt-[2px] md:mt-[0px] text-[13px] text-center">{info?.metadata?.name || '--'}</div>
 				</div>
 			</div>
 			<div className="w-full flex items-center justify-center gap-[4px] mt-[12px]">
-				<div className="border-[1px] border-[rgba(255,233,0,0.35)] bg-[rgba(255,233,0,0.15)] rounded-[12px] h-[28px] text-[12px] px-[8px] text-[#24232A] flex items-center gap-[4px]">
+				<div className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] text-[12px] px-[10px] text-[#fff] flex items-center gap-[6px] hover:bg-[#2A2A2A] transition-colors">
 					{shortenAddress(info?.address || '')}
-					<CopyIcon className="cursor-pointer" onClick={() => copy(info?.address || '')} />
+					<CopyIcon className="cursor-pointer hover:text-[#9AED2D] transition-colors" onClick={() => copy(info?.address || '')} />
 				</div>
 				{
 					info?.metadata?.x && <div
 						onClick={() => { window.open(info?.metadata?.x, "_blank"); }}
-						className="border-[1px] border-[rgba(255,233,0,0.35)] bg-[rgba(255,233,0,0.15)] rounded-[12px] h-[28px] px-[8px] flex items-center cursor-pointer">
-						<Image src="/images/x.png" alt="x" width={16} height={16} disableSkeleton radius='none' />
+						className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] px-[10px] flex items-center cursor-pointer hover:bg-[#2A2A2A] transition-colors">
+						<Image src="/images/x.png" alt="x" width={20} height={20} disableSkeleton radius='none' />
 					</div>
 				}
 				{
 					info?.metadata?.telegram && <div
 						onClick={() => { window.open(info?.metadata?.telegram, "_blank"); }}
-						className="border-[1px] border-[rgba(255,233,0,0.35)] bg-[rgba(255,233,0,0.15)] rounded-[12px] h-[28px] px-[8px] flex items-center cursor-pointer">
-						<Image src="/images/tg.png" alt="tg" width={16} height={16} disableSkeleton radius='none' />
+						className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] px-[10px] flex items-center cursor-pointer hover:bg-[#2A2A2A] transition-colors">
+						<Image src="/images/tg.png" alt="tg" width={20} height={20} disableSkeleton radius='none' />
 					</div>
 				}
 				{
 					info?.metadata?.website && <div
 						onClick={() => { window.open(info?.metadata?.website, "_blank"); }}
-						className="border-[1px] border-[rgba(255,233,0,0.35)] bg-[rgba(255,233,0,0.15)] rounded-[12px] h-[28px] px-[8px] flex items-center cursor-pointer">
+						className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] px-[10px] flex items-center cursor-pointer hover:bg-[#2A2A2A] transition-colors">
 						<Image src="/images/web.png" alt="web" width={16} height={16} disableSkeleton radius='none' />
 					</div>
 				}
-				<div className="border-[1px] border-[rgba(255,233,0,0.35)] bg-[rgba(255,233,0,0.15)] rounded-[12px] h-[28px] px-[8px] md:flex items-center cursor-pointer hidden" onClick={() => setIsShareOpen(true)}>
+				<div className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] px-[10px] md:flex items-center cursor-pointer hidden hover:bg-[#2A2A2A] transition-colors" onClick={() => setIsShareOpen(true)}>
 					<ShareIcon className="w-[16px]" />
 				</div>
 			</div>
-			<div className="text-[13px] text-[#94989F] text-center mt-[16px] md:max-w-[600px]">{info?.description}</div>
+			<div className="text-[13px] text-[#AAAAAA] text-center mt-[16px] md:max-w-[600px]">{info?.metadata?.description}</div>
 			<div className="flex flex-col md:flex-row items-center gap-[12px] mt-[16px] w-full">
 				<div className="flex items-center gap-[12px] w-full">
-					<div className="w-full py-[12px] px-[16px] border-[#F5F6F9] border-[2px] rounded-[16px]">
-						<div className="text-[13px] text-[#717075]">价格</div>
-						<div className="text-[20px] text-[#141414] font-semibold">${formatBigNumber(info?.price_usd_f)}</div>
+					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
+						<div className="text-[13px] text-[#AAAAAA]">价格</div>
+						<div className="text-[20px] text-[#fff] font-semibold">${formatBigNumber(tokenPrice)}</div>
 					</div>
-					<div className="w-full py-[12px] px-[16px] border-[#F5F6F9] border-[2px] rounded-[16px]">
-						<div className="text-[13px] text-[#717075]">市值</div>
-						<div className="text-[20px] text-[#141414] font-semibold">${formatBigNumber(info?.price_usd_f * 1e9)}</div>
+					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
+						<div className="text-[13px] text-[#AAAAAA]">市值</div>
+						<div className="text-[20px] text-[#fff] font-semibold">${formatBigNumber(marketCap)}</div>
 					</div>
 				</div>
 				<div className="flex items-center gap-[12px] w-full">
-					<div className="w-full py-[12px] px-[16px] border-[#F5F6F9] border-[2px] rounded-[16px]">
-						<div className="text-[13px] text-[#717075]">24H 涨跌</div>
+					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
+						<div className="text-[13px] text-[#AAAAAA]">涨幅</div>
 						<div className={`text-[20px] font-semibold ${priceChangeDisplay.color}`}>
 							{priceChangeDisplay.text}
 						</div>
 					</div>
-					<div className="w-full py-[12px] px-[16px] border-[#F5F6F9] border-[2px] rounded-[16px]">
-						<div className="text-[13px] text-[#717075]">持有者</div>
-						<div className="text-[20px] text-[#141414] font-semibold">{info?.holder_count || 0}</div>
+					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
+						<div className="text-[13px] text-[#AAAAAA]">持有者</div>
+						<div className="text-[20px] text-[#fff] font-semibold">--</div>
 					</div>
 				</div>
 			</div>
 			<div className="w-full mt-[16px] md:mt-[24px] flex flex-col md:grid md:grid-cols-2 gap-[12px]">
-				<Button fullWidth className="h-[48px] rounded-[16px] bg-[#FFB218] text-[14px] text-[#fff]"
-					onPress={() => { window.open(`https://web3.binance.com/zh-CN/token/bsc/${info?.address}`, "_blank"); }}
+				<Button fullWidth className="h-[48px] rounded-[16px] bg-[#5A4CF3] text-[14px] text-[#fff]"
+					onPress={() => { window.open(`https://swap.popchain.ai/swap?chainId=7257&inputCurrency=${info?.address}&outputCurrency=POP`, "_blank"); }}
 				>
-					<Image src="/images/bian.png" alt="Binance" width={16} height={16} disableSkeleton radius='none' />Binance Wallet
+					<Image src="/images/popSwap.png" alt="pop" width={16} height={18} disableSkeleton radius='none' />Pop Swap
 				</Button>
 				<Button fullWidth className="h-[48px] rounded-[16px] bg-[#24232A] text-[14px] text-[#fff]"
-					onPress={() => { window.open(`https://web3.okx.com/zh-hant/token/bsc/${info?.address}`, "_blank"); }}
+					onPress={() => { window.open(`https://ave.ai/token/${info?.address}-popchain`, "_blank"); }}
 				>
-					<Image src="/images/okx.png" alt="OKX" width={16} height={16} disableSkeleton radius='none' />OKX Wallet
-				</Button>
-				<Button fullWidth className="h-[48px] rounded-[16px] bg-[#64CB83] text-[14px] text-[#fff]"
-					onPress={() => { window.open(`https://gmgn.ai/bsc/token/${info?.address}`, "_blank"); }}
-				>
-					<Image src="/images/gmgn.png" alt="GMGN" width={16} height={16} disableSkeleton radius='none' />GMGN
-				</Button>
-				<Button fullWidth className="h-[48px] rounded-[16px] bg-[#3AC9D2] text-[14px] text-[#fff]"
-					onPress={() => { window.open(`https://pancakeswap.finance/swap?outputCurrency=${info?.address}&inputCurrency=BNB`, "_blank"); }}
-				>
-					<Image src="/images/pancake.png" alt="Pancake" width={16} height={16} disableSkeleton radius='none' />Pancake Swap
+					<Image src="/images/ave.png" alt="ave" width={16} height={16} disableSkeleton radius='none' />Ave
 				</Button>
 			</div>
 			<Share isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} info={info} />

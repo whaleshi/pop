@@ -45,7 +45,18 @@ body {
 }
 
 html,
-body {
+body,
+#__next {
+    background: #000000 !important;
+    min-height: 100vh;
+}
+
+/* 防止页面跳转时闪烁白色 */
+* {
+    box-sizing: border-box;
+}
+
+main {
     background: #000000;
 }
 
@@ -54,15 +65,27 @@ body {
     pointer-events: none;
 }
 
+/* 更高优先级的选择器 */
+html #nprogress .bar,
+body #nprogress .bar,
 #nprogress .bar {
     background: linear-gradient(90deg, #9AED2D, #8BD926, #7CC520) !important;
-    position: fixed;
-    z-index: 9999;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    box-shadow: 0 0 10px rgba(154, 237, 45, 0.5);
+    position: fixed !important;
+    z-index: 9999 !important;
+    top: 56px !important; /* 移动端 navbar 高度 */
+    left: 0 !important;
+    width: 100% !important;
+    height: 2px !important;
+    box-shadow: 0 0 10px rgba(154, 237, 45, 0.5) !important;
+}
+
+/* 桌面端适配 */
+@media (min-width: 768px) {
+    html #nprogress .bar,
+    body #nprogress .bar,
+    #nprogress .bar {
+        top: 64px !important; /* 桌面端 navbar 高度 */
+    }
 }
 
 #nprogress .peg {
