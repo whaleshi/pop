@@ -97,7 +97,7 @@ export default function Search() {
 						</div>
 					) : debouncedSearch && (
 						<div className="flex flex-col items-center mt-[120px]">
-							<Image src="/images/nothing.png" alt="nothing" className="w-[80px] h-auto" disableSkeleton />
+							<Image src="/images/nothing.png" alt="nothing" className="w-[60px] h-auto" disableSkeleton />
 							<div className="text-[14px] text-[#AAAAAA] mt-[12px]">No search results</div>
 							<Button className="w-[100px] h-[36px] rounded-[18px] bg-[#ABF909] hover:bg-[#9AED2D] text-[13px] text-[#000] font-medium mt-[16px]" onPress={() => router.push("/create")}>Create Token</Button>
 						</div>
