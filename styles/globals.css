@@ -69,7 +69,7 @@ main {
 html #nprogress .bar,
 body #nprogress .bar,
 #nprogress .bar {
-    background: linear-gradient(90deg, #9AED2D, #8BD926, #7CC520) !important;
+    background: linear-gradient(90deg, #9aed2d, #8bd926, #7cc520) !important;
     position: fixed !important;
     z-index: 9999 !important;
     top: 56px !important; /* 移动端 navbar 高度 */
@@ -89,15 +89,5 @@ body #nprogress .bar,
 }
 
 #nprogress .peg {
-    display: block;
-    position: absolute;
-    right: 0px;
-    width: 100px;
-    height: 100%;
-    box-shadow:
-        0 0 10px rgba(154, 237, 45, 0.8),
-        0 0 5px rgba(154, 237, 45, 0.8);
-    opacity: 1;
-    transform: rotate(3deg) translate(0px, -4px);
+    display: none !important;
 }
-
