@@ -150,7 +150,7 @@ export const Navbar = () => {
 		<>
 			<HeroUINavbar maxWidth="xl" position="static" className="fixed top-0 left-0 right-0 z-50 bg-[#000000]" classNames={{ wrapper: "px-4 h-[56px] md:h-[64px] bg-[#000000]" }}>
 				<NextLink className="flex justify-start items-center logo-container" href="/">
-					<NextImage src='/images/logo.png' alt='logo' width={97} height={28} />
+					<LogoIcon className="w-[97] h-[28px]" />
 				</NextLink>
 				<div className="text-[14px] text-[#fff] hidden md:flex items-center gap-[16px] pl-[24px]">
 					<NextLink href="/" className="hover:opacity-80 transition-opacity">Home</NextLink>

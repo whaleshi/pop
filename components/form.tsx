@@ -354,7 +354,7 @@ export default function CreateForm() {
 			const txOptions = {} as any;
 			if (gasLimit) txOptions.gasLimit = gasLimit;
 			if (newGasPrice) txOptions.gasPrice = newGasPrice;
-
+			console.log(txOptions)
 			let txResult;
 			try {
 				if (hasPreBuy) {
@@ -589,6 +589,7 @@ export default function CreateForm() {
 						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
 						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
+					errorMessage="Please enter a valid URL"
 					label={
 						<div className="flex items-center gap-2">
 							<span className="text-[14px] text-[#AAAAAA]">X</span>
@@ -609,6 +610,7 @@ export default function CreateForm() {
 						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
 						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
+					errorMessage="Please enter a valid URL"
 					label={
 						<div className="flex items-center gap-2">
 							<span className="text-[14px] text-[#AAAAAA]">Telegram</span>
@@ -629,6 +631,7 @@ export default function CreateForm() {
 						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
 						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
+					errorMessage="Please enter a valid URL"
 					label={
 						<div className="flex items-center gap-2">
 							<span className="text-[14px] text-[#AAAAAA]">Website</span>

@@ -20,7 +20,7 @@ export const CHAINS_CONFIG = {
             name: "Popchain Testnet",
             symbol: "POP",
             explorerUrl: "https://popchaintest.cloud.blockscout.com/",
-            rpcUrl: "https://47.76.179.249:8545/",
+            rpcUrl: "http://47.76.179.249:8545/",
             factoryContract: "0x540098C1adDBcEABD6Bf052652e37ecC0575d79A", // TODO: 需要部署后填入实际合约地址
         },
         // [31337]: {
