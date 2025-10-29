@@ -39,7 +39,7 @@ export const TokenHead: React.FC<TokenHeadProps> = ({
       setMetadata(serverMetadata);
       return;
     }
-    
+
     if (!addr || typeof addr !== "string") {
       return;
     }
@@ -87,13 +87,13 @@ export const TokenHead: React.FC<TokenHeadProps> = ({
 
   // 构建动态 meta 数据
   const title = metadata?.name ? `${metadata.name} (${metadata.symbol}) - ${siteConfig.name}` : fallbackTitle;
-  const description = `Trade ${metadata?.name || 'token'} on ${siteConfig.name}. ${fallbackDescription}`;
-  
+  const description = `Trade ${metadata?.symbol?.toUpperCase() || 'token'} on ${siteConfig.name}. ${fallbackDescription}`;
+
   // 使用 OG API 生成图片
-  const ogImageUrl = metadata?.name && metadata?.symbol && metadata?.image 
+  const ogImageUrl = metadata?.name && metadata?.symbol && metadata?.image
     ? `/api/og?name=${encodeURIComponent(metadata.name)}&symbol=${encodeURIComponent(metadata.symbol)}&imgUrl=${encodeURIComponent(metadata.image)}`
     : fallbackImage;
-    
+
   const url = `https://popme.fun/token/${addr}`;
 
   return (
