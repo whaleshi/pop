@@ -1,5 +1,5 @@
 import type { AppProps } from "next/app";
-import Head from "next/head";
+import { Head } from "@/layouts/head";
 import { useEffect, useState } from "react";
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -61,16 +61,11 @@ export default function App({ Component, pageProps }: AppProps) {
 
 	return (
 		<>
-			<Head>
-				<link rel="preload" href="/images/logo.png" as="image" />
-				<link rel="preload" href="/images/nothing.png" as="image" />
-				<link rel="preload" href="/images/default.png" as="image" />
-				<link rel="preload" href="/images/banner.png" as="image" />
-			</Head>
+			<Head />
 			{isMounted ? (
 				<WagmiProvider config={config}>
 					<QueryProvider>
-						<RainbowKitProvider 
+						<RainbowKitProvider
 							theme={darkTheme({
 								accentColor: '#9AED2D',
 								accentColorForeground: 'black',
