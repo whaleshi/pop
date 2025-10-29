@@ -39,6 +39,12 @@ export const Navbar = () => {
 		try {
 			// Disconnect wallet
 			disconnect();
+
+			// Clear RainbowKit and Wagmi cache to prevent auto-reconnect
+			localStorage.removeItem('wagmi.store');
+			localStorage.removeItem('wagmi.cache');
+			localStorage.removeItem('wagmi.recentConnectorId');
+
 			// Close modal
 			onSecondModalOpenChange();
 			// Delay to ensure state update

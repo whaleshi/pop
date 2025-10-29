@@ -25,4 +25,5 @@ export const config = createConfig({
         [popchainTestnet.id]: http(),
     },
     ssr: false,
+    multiInjectedProviderDiscovery: false,
 });
