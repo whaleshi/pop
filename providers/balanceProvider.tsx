@@ -3,10 +3,8 @@ import { createContext, useContext, useState, ReactNode, useEffect } from "react
 import { useAccount, useWalletClient, usePublicClient } from 'wagmi';
 import { useQuery } from "@tanstack/react-query";
 import { config } from "@/config/wagmi";
-import { getBalance, readContract } from '@wagmi/core';
+import { getBalance } from '@wagmi/core';
 import { ethers } from "ethers";
-import { CONTRACT_CONFIG } from "@/config/chains";
-import contractABI from "@/constant/TokenFactory.abi.json";
 
 interface BalanceContextType {
 	balance: number;
@@ -62,19 +60,6 @@ export function BalanceProvider({ children }: { children: ReactNode }) {
 
 	// 格式化余额
 	const balance = walletBalance ? Number(ethers.formatEther(walletBalance.value)) : 0;
-
-	useEffect(() => {
-		a()
-	}, []);
-
-	const a = async () => {
-		const tokenCount = (await readContract(config, {
-			address: CONTRACT_CONFIG.FACTORY_CONTRACT as `0x${string}`,
-			abi: contractABI,
-			functionName: "allTokens",
-		})) as bigint;
-		console.log("Raw token count from contract:", tokenCount.toString());
-	}
 
 	return (
 		<BalanceContext.Provider
