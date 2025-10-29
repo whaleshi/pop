@@ -30,15 +30,8 @@ interface TokenData {
     launched: boolean;
     progress: string;
     progressPercent: number;
-    metadata?: {
-        name?: string;
-        symbol?: string;
-        description?: string;
-        image?: string;
-        website?: string;
-        x?: string;
-        telegram?: string;
-    };
+    name?: string;
+    symbol?: string;
 }
 
 type TokenListResponse = {
@@ -62,87 +55,6 @@ type ErrorResponse = {
     code?: number;
 };
 
-// 批量获取代币元数据的函数
-async function fetchTokensMetadata(tokens: TokenData[]): Promise<void> {
-    const BATCH_SIZE = 10;
-
-    for (let i = 0; i < tokens.length; i += BATCH_SIZE) {
-        const batch = tokens.slice(i, i + BATCH_SIZE);
-
-        const batchPromises = batch.map(async (token) => {
-            // 检查缓存
-            const cacheKey = CacheKeys.TOKEN_METADATA(token.address);
-            const cachedMetadata = globalCache.get<any>(cacheKey);
-
-            if (cachedMetadata) {
-                token.metadata = cachedMetadata;
-                return;
-            }
-
-            if (!token.uri || token.uri === "") {
-                const defaultMetadata = {
-                    name: `Token ${token.address.slice(0, 6)}...${token.address.slice(-4)}`,
-                    symbol: "--",
-                    description: "",
-                };
-                token.metadata = defaultMetadata;
-                globalCache.set(cacheKey, defaultMetadata, CacheTTL.TOKEN_METADATA);
-                return;
-            }
-
-            try {
-                // 处理IPFS URI
-                let fetchUrl = token.uri;
-                if (token.uri.startsWith("Qm") || token.uri.startsWith("bafy")) {
-                    fetchUrl = `https://ipfs.io/ipfs/${token.uri}`;
-                } else if (token.uri.startsWith("ipfs://")) {
-                    fetchUrl = token.uri.replace("ipfs://", "https://ipfs.io/ipfs/");
-                }
-
-                const response = await fetch(fetchUrl, {
-                    headers: {
-                        Accept: "application/json",
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const metadata = await response.json();
-                const result = {
-                    name: metadata.name || `Token ${token.address.slice(0, 6)}...${token.address.slice(-4)}`,
-                    symbol: metadata.symbol || "--",
-                    description: metadata.description || "",
-                    image: metadata.image || undefined,
-                    website: metadata.website || "",
-                    x: metadata.x || "",
-                    telegram: metadata.telegram || "",
-                };
-
-                token.metadata = result;
-                globalCache.set(cacheKey, result, CacheTTL.TOKEN_METADATA);
-                // console.log(`Fetched metadata for: ${token.address}`);
-            } catch (error) {
-                console.warn(`Failed to fetch metadata for token ${token.address}:`, error);
-                const errorMetadata = {
-                    name: `Token ${token.address.slice(0, 6)}...${token.address.slice(-4)}`,
-                    symbol: "--",
-                    description: "",
-                };
-                token.metadata = errorMetadata;
-                globalCache.set(cacheKey, errorMetadata, 300); // 5分钟后重试
-            }
-        });
-
-        await Promise.allSettled(batchPromises);
-
-        // 在批次之间添加小延迟，避免请求过于频繁
-        if (i + BATCH_SIZE < tokens.length) {
-            await new Promise((resolve) => setTimeout(resolve, 100));
-        }
-    }
-}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<TokenListResponse | ErrorResponse>) {
     if (req.method !== "GET") {
@@ -317,15 +229,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         if (cachedContractData !== null && cachedContractData.length >= validAddresses.length) {
             allTokens = cachedContractData;
             console.log(`Using cached contract data: ${allTokens.length} tokens`);
-
-            // 检查缓存的数据是否包含元数据，如果没有则获取
-            const hasMetadata = allTokens.some((token) => token.metadata);
-            if (!hasMetadata) {
-                console.log("Contract data cached but missing metadata, fetching...");
-                await fetchTokensMetadata(allTokens);
-                // 更新缓存
-                globalCache.set(contractDataCacheKey, allTokens, CacheTTL.CONTRACT_DATA);
-            }
         } else {
             console.log(`Fetching data for ${validAddresses.length} tokens from contract...`);
             const dataCalls = [];
@@ -350,6 +253,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                         args: [address],
                     }),
                 });
+                // name 调用
+                dataCalls.push({
+                    target: address,
+                    allowFailure: true,
+                    callData: encodeFunctionData({
+                        abi: [{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}],
+                        functionName: "name",
+                        args: [],
+                    }),
+                });
+                // symbol 调用
+                dataCalls.push({
+                    target: address,
+                    allowFailure: true,
+                    callData: encodeFunctionData({
+                        abi: [{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}],
+                        functionName: "symbol",
+                        args: [],
+                    }),
+                });
             }
 
             const dataResults = (await readContract(config, {
@@ -362,8 +285,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
             // 4. 组装代币数据
             allTokens = validAddresses.map((address, index) => {
-                const uriIndex = index * 2;
-                const infoIndex = index * 2 + 1;
+                const uriIndex = index * 4;
+                const infoIndex = index * 4 + 1;
+                const nameIndex = index * 4 + 2;
+                const symbolIndex = index * 4 + 3;
 
                 // 解析 URI
                 let uri = "";
@@ -407,6 +332,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     }
                 }
 
+                // 解析 name
+                let name = "";
+                if (dataResults[nameIndex]?.success) {
+                    try {
+                        name = decodeFunctionResult({
+                            abi: [{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}],
+                            functionName: "name",
+                            data: dataResults[nameIndex].returnData,
+                        }) as string;
+                    } catch (error) {
+                        console.warn(`Failed to decode name for token ${address}:`, error);
+                    }
+                }
+
+                // 解析 symbol
+                let symbol = "";
+                if (dataResults[symbolIndex]?.success) {
+                    try {
+                        symbol = decodeFunctionResult({
+                            abi: [{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}],
+                            functionName: "symbol",
+                            data: dataResults[symbolIndex].returnData,
+                        }) as string;
+                    } catch (error) {
+                        console.warn(`Failed to decode symbol for token ${address}:`, error);
+                    }
+                }
+
                 // 计算进度
                 let progress = 0;
                 if (tokenInfo && tokenInfo.reserve1 && tokenInfo.target) {
@@ -426,16 +379,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     launched: tokenInfo?.launched || false,
                     progress: progress.toFixed(2),
                     progressPercent: progress,
+                    name: name || undefined,
+                    symbol: symbol || undefined,
                 };
             });
 
-            // 先获取元数据，然后缓存完整数据
-            console.log(`Fetching metadata for ${allTokens.length} tokens...`);
-            await fetchTokensMetadata(allTokens);
-
-            // 缓存包含元数据的完整合约数据
+            // 缓存合约数据（不包含元数据）
             globalCache.set(contractDataCacheKey, allTokens, CacheTTL.CONTRACT_DATA);
-            console.log(`Cached contract data with metadata for ${allTokens.length} tokens`);
+            console.log(`Cached contract data for ${allTokens.length} tokens`);
         }
 
         // 4. 应用过滤器

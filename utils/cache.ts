@@ -217,7 +217,8 @@ export const CacheKeys = {
     // 批量代币元数据
     BATCH_TOKEN_METADATA: (addresses: string[]) => {
         const sortedAddresses = addresses.map((addr) => addr.toLowerCase()).sort();
-        return `token:metadata:batch:${sortedAddresses.join(",")}`;
+        const hash = sortedAddresses.join(",");
+        return `token:metadata:batch:${hash.length > 50 ? hash.substring(0, 50) + "..." + sortedAddresses.length : hash}`;
     },
 
     // 原始合约数据

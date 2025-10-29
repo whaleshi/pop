@@ -22,7 +22,7 @@ export const config = createConfig({
     transports: {
         // [localNetwork.id]: http(),
         [popchainMainnet.id]: http(),
-        // [popchainTestnet.id]: http("http://47.76.179.249:8545"),
+        // [popchainTestnet.id]: http(),
     },
     ssr: false,
 });

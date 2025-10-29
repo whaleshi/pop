@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SearchIcon } from "./icons"
 import { TokenItem } from "./tokenItem"
 import { useRouter } from "next/router"
@@ -26,52 +26,47 @@ export const HomeList = () => {
 		setActiveTab(tab);
 	};
 
-	// New created data
+	// 简化的获取基础代币数据函数
+	const fetchTokenList = async (sort: string) => {
+		const response = await fetch(`/api/tokens/list?sort=${sort}&limit=50`);
+		const data = await response.json();
+		return data.success ? data.data.tokens : [];
+	};
+
+	// New created data - 只获取基础数据
 	const { data: newData, isLoading: newLoading, isFetching: newFetching } = useQuery({
 		queryKey: ["tokenList", "newest"],
-		queryFn: async () => {
-			const response = await fetch('/api/tokens/list?sort=newest&limit=50');
-			const data = await response.json();
-			return data.success ? data.data.tokens : [];
-		},
+		queryFn: () => fetchTokenList("newest"),
 		placeholderData: (prev) => prev,
-		staleTime: 5000, // Consider data fresh for 5 seconds to avoid frequent requests
-		gcTime: 300000, // 5 minute garbage collection time to keep cache longer
-		refetchInterval: 3000, // Refresh every 3 seconds
+		staleTime: 5000,
+		gcTime: 300000,
+		refetchInterval: 3000,
 		refetchOnWindowFocus: false,
-		refetchOnMount: false, // Don't automatically refetch on component mount
+		refetchOnMount: false,
 	});
 
-	// Trending data
+	// Trending data - 只获取基础数据
 	const { data: trendingData, isLoading: trendingLoading, isFetching: trendingFetching } = useQuery({
 		queryKey: ["tokenList", "trending"],
-		queryFn: async () => {
-			const response = await fetch('/api/tokens/list?sort=trending&limit=50');
-			const data = await response.json();
-			return data.success ? data.data.tokens : [];
-		},
+		queryFn: () => fetchTokenList("trending"),
 		placeholderData: (prev) => prev,
-		staleTime: 5000, // Consider data fresh for 5 seconds to avoid frequent requests
-		gcTime: 300000, // 5 minute garbage collection time to keep cache longer
-		refetchInterval: 3000, // Refresh every 3 seconds
+		staleTime: 5000,
+		gcTime: 300000,
+		refetchInterval: 3000,
 		refetchOnWindowFocus: false,
-		refetchOnMount: false, // Don't automatically refetch on component mount
+		refetchOnMount: false,
 	});
 
-	// Launched data
+	// Launched data - 只获取基础数据
 	const { data: listedData, isLoading: listedLoading, isFetching: listedFetching } = useQuery({
 		queryKey: ["tokenList", "launched"],
-		queryFn: async () => {
-			const response = await fetch('/api/tokens/list?sort=launched&limit=50');
-			const data = await response.json();
-			return data.success ? data.data.tokens : [];
-		},
+		queryFn: () => fetchTokenList("launched"),
 		placeholderData: (prev) => prev,
-		staleTime: 5000, // Consider data fresh for 5 seconds to avoid frequent requests
-		gcTime: 300000, // 5 minute garbage collection time to keep cache longer
-		refetchInterval: 3000, // Refresh every 3 seconds
+		staleTime: 5000,
+		gcTime: 300000,
+		refetchInterval: 3000,
 		refetchOnWindowFocus: false,
-		refetchOnMount: false, // Don't automatically refetch on component mount
+		refetchOnMount: false,
 	});
 
 	// Get corresponding data based on currently selected tab

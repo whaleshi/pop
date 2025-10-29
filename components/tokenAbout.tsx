@@ -8,6 +8,7 @@ import useClipboard from '@/hooks/useCopyToClipboard';
 import { formatBigNumber } from "@/utils/formatBigNumber";
 import { TRANSACTION_CONFIG } from "@/config/chains";
 import { useBalanceContext } from "@/providers/balanceProvider";
+import { useQuery } from "@tanstack/react-query";
 import _bignumber from "bignumber.js";
 
 interface TokenProps {
@@ -19,17 +20,81 @@ export const TokenAbout = ({ info }: TokenProps) => {
 	const { copy } = useClipboard();
 	const { price: popPrice } = useBalanceContext();
 
+	// 获取代币元数据 - 永久缓存
+	const { data: metadata } = useQuery({
+		queryKey: ["tokenMetadata", info?.address],
+		queryFn: async () => {
+			// 如果没有 URI，直接使用基础数据
+			if (!info?.uri || info?.uri === "") {
+				return {
+					name: info?.name || `Token ${info?.address?.slice(0, 6)}...${info?.address?.slice(-4)}`,
+					symbol: info?.symbol || "--",
+					description: "",
+					image: '/images/default.png',
+				};
+			}
+
+			try {
+				const response = await fetch('/api/tokens/metadata', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						addresses: [info.address],
+						uris: [info.uri]
+					})
+				});
+
+				if (response.ok) {
+					const data = await response.json();
+					if (data.success && data.data[info.address]) {
+						// 合并基础数据和元数据，优先使用合约的 name/symbol
+						return {
+							name: info?.name || data.data[info.address].name,
+							symbol: info?.symbol || data.data[info.address].symbol,
+							description: data.data[info.address].description || "",
+							image: data.data[info.address].image || '/images/default.png',
+							website: data.data[info.address].website || "",
+							x: data.data[info.address].x || "",
+							telegram: data.data[info.address].telegram || "",
+						};
+					}
+				}
+			} catch (error) {
+				console.warn(`Failed to fetch metadata for ${info?.address}:`, error);
+			}
+
+			// 降级方案
+			return {
+				name: info?.name || `Token ${info?.address?.slice(0, 6)}...${info?.address?.slice(-4)}`,
+				symbol: info?.symbol || "--",
+				description: "",
+				image: '/images/default.png',
+			};
+		},
+		enabled: !!info?.address,
+		staleTime: Infinity, // 永久缓存，元数据不会变
+		gcTime: Infinity, // 永不清理缓存
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		refetchOnReconnect: false,
+	});
+
+	// 使用元数据或基础数据
+	const displayName = metadata?.name || info?.name || `Token ${info?.address?.slice(0, 6)}...${info?.address?.slice(-4)}`;
+	const displaySymbol = metadata?.symbol || info?.symbol || "--";
+	const displayImage = metadata?.image || '/images/default.png';
+
 	// Calculate token price
 	const calculateTokenPrice = () => {
 		try {
 			// Calculate token USD price: BigNumber(lastPrice).div(1e18).times(popPrice)
 			const lastPrice = info?.info?.lastPrice || 0;
-			
+
 			const tokenPrice = _bignumber(lastPrice)
 				.div(1e18)
 				.times(popPrice || 0)
 				.toString();
-			
+
 			return parseFloat(tokenPrice);
 		} catch (error) {
 			console.error('Token price calculation error:', error);
@@ -43,14 +108,14 @@ export const TokenAbout = ({ info }: TokenProps) => {
 			// Use formula: BigNumber(lastPrice).div(1e18).times(1000000000).times(popPrice).dp(2)
 			const lastPrice = info?.info?.lastPrice || 0;
 			const tokenSupply = 1000000000; // 1 billion total token supply
-			
+
 			const marketCap = _bignumber(lastPrice)
 				.div(1e18)
 				.times(tokenSupply)
 				.times(popPrice || 0)
 				.dp(2)
 				.toString();
-			
+
 			return parseFloat(marketCap);
 		} catch (error) {
 			console.error('Market cap calculation error:', error);
@@ -105,10 +170,10 @@ export const TokenAbout = ({ info }: TokenProps) => {
 	return (
 		<div className="flex-1 w-full px-[16px] md:px-[0px] flex flex-col items-center pt-[8px] relative mb-[50px]">
 			<div className="flex md:flex-row flex-col items-center w-full md:gap-[12px]">
-				<MyAvatar src={info?.metadata?.image || '/images/default.png'} alt="icon" className="w-[80px] h-[80px] rounded-[16px]" />
+				<MyAvatar src={displayImage} alt="icon" className="w-[80px] h-[80px] rounded-[16px]" />
 				<div className="md:flex md:flex-col md:gap-[2px]">
-					<div className="text-[#fff] mt-[16px] md:mt-[0px] text-[20px] font-bold flex items-center justify-center gap-[4px] md:justify-start">{info?.metadata?.symbol?.toUpperCase() || '--'}</div>
-					<div className="text-[#AAAAAA] mt-[2px] md:mt-[0px] text-[13px] text-center md:text-left">{info?.metadata?.name || '--'}</div>
+					<div className="text-[#fff] mt-[16px] md:mt-[0px] text-[20px] font-bold flex items-center justify-center gap-[4px] md:justify-start">{displaySymbol.toUpperCase()}</div>
+					<div className="text-[#AAAAAA] mt-[2px] md:mt-[0px] text-[13px] text-center md:text-left">{displayName}</div>
 				</div>
 			</div>
 
@@ -123,7 +188,7 @@ export const TokenAbout = ({ info }: TokenProps) => {
 						className="h-full bg-gradient-to-r from-[#9AED2D] via-[#7ED321] to-[#6BCF1F] rounded-full transition-all duration-1500 ease-out relative shadow-lg"
 						style={{ width: `${info?.progress}%` }}
 					>
-							{/* Inner glow effect */}
+						{/* Inner glow effect */}
 						<div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/20 to-transparent rounded-full"></div>
 						{/* Flow effect */}
 						<div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-full animate-pulse"></div>

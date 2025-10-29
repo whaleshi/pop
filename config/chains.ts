@@ -14,20 +14,20 @@ export const CHAINS_CONFIG = {
             symbol: "POP",
             explorerUrl: "https://scan.popchain.ai/",
             rpcUrl: "https://rpc.popchain.ai",
-            factoryContract: "0x86c64DA12DA5C7d1C4Ccd484A833ac32E675B2c2", // TODO: 需要部署后填入实际合约地址
+            factoryContract: "0x86c64DA12DA5C7d1C4Ccd484A833ac32E675B2c2",
         },
         // [7257]: {
         //     name: "Popchain Testnet",
         //     symbol: "POP",
         //     explorerUrl: "https://popchaintest.cloud.blockscout.com/",
-        //     rpcUrl: "http://47.76.179.249:8545",
-        //     factoryContract: "0x540098C1adDBcEABD6Bf052652e37ecC0575d79A", // TODO: 需要部署后填入实际合约地址
+        //     rpcUrl: "https://testnet.popchain.ai/",
+        //     factoryContract: "0x540098C1adDBcEABD6Bf052652e37ecC0575d79A",
         // },
         // [31337]: {
         //     name: "Local Development",
         //     symbol: "ETH",
         //     explorerUrl: "http://localhost:3000", // 本地区块浏览器或占位符
-        //     rpcUrl: "http://47.76.179.249:8545",
+        //     rpcUrl: "https://testnet.popchain.ai/",
         //     factoryContract: "0x86c64DA12DA5C7d1C4Ccd484A833ac32E675B2c2",
         // },
     },
@@ -50,7 +50,7 @@ export const TRANSACTION_CONFIG = {
 
 // Multicall3 合约地址 (通用地址，大多数链都支持)
 export const MULTICALL3_ADDRESS = "0xbd64A7c53c825655e83718805e8b747B3387ee95";
-// 0xcA11bde05977b3631167028862bE2a173976CA11
+// 0xbd64A7c53c825655e83718805e8b747B3387ee95 pro 0xe1058f76F658086BF0562320e6Bd94228AC1f681 dev
 // Multicall3 ABI
 export const MULTICALL3_ABI = [
     {

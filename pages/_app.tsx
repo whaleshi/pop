@@ -1,6 +1,6 @@
 import type { AppProps } from "next/app";
 import Head from "next/head";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import '@rainbow-me/rainbowkit/styles.css';
 
 import { HeroUIProvider } from "@heroui/system";
@@ -20,6 +20,12 @@ import "@/styles/globals.css";
 
 export default function App({ Component, pageProps }: AppProps) {
 	const router = useRouter();
+	const [isMounted, setIsMounted] = useState(false);
+
+	// 客户端挂载检查
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
 
 	// 配置nprogress
 	useEffect(() => {
@@ -61,31 +67,37 @@ export default function App({ Component, pageProps }: AppProps) {
 				<link rel="preload" href="/images/default.png" as="image" />
 				<link rel="preload" href="/images/banner.png" as="image" />
 			</Head>
-			<WagmiProvider config={config}>
-				<QueryProvider>
-					<RainbowKitProvider 
-						theme={darkTheme({
-							accentColor: '#9AED2D',
-							accentColorForeground: 'black',
-							borderRadius: 'medium',
-							fontStack: 'system',
-							overlayBlur: 'small',
-						})}
-						locale="en-US"
-					>
-						<BalanceProvider>
-							<HeroUIProvider navigate={router.push}>
-								<Toaster richColors position="top-center" />
-								<NextThemesProvider attribute="class" defaultTheme="dark">
-									<div className="page-transition bg-[#000000] min-h-screen">
-										<Component {...pageProps} />
-									</div>
-								</NextThemesProvider>
-							</HeroUIProvider>
-						</BalanceProvider>
-					</RainbowKitProvider>
-				</QueryProvider>
-			</WagmiProvider>
+			{isMounted ? (
+				<WagmiProvider config={config}>
+					<QueryProvider>
+						<RainbowKitProvider 
+							theme={darkTheme({
+								accentColor: '#9AED2D',
+								accentColorForeground: 'black',
+								borderRadius: 'medium',
+								fontStack: 'system',
+								overlayBlur: 'small',
+							})}
+							locale="en-US"
+						>
+							<BalanceProvider>
+								<HeroUIProvider navigate={router.push}>
+									<Toaster richColors position="top-center" />
+									<NextThemesProvider attribute="class" defaultTheme="dark">
+										<div className="page-transition bg-[#000000] min-h-screen">
+											<Component {...pageProps} />
+										</div>
+									</NextThemesProvider>
+								</HeroUIProvider>
+							</BalanceProvider>
+						</RainbowKitProvider>
+					</QueryProvider>
+				</WagmiProvider>
+			) : (
+				<div className="page-transition bg-[#000000] min-h-screen">
+					{/* 加载占位符，等待客户端挂载 */}
+				</div>
+			)}
 		</>
 	);
 }
