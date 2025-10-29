@@ -12,9 +12,10 @@ import _bignumber from "bignumber.js";
 
 interface TokenProps {
 	info?: any;
+	metadata?: any;
 }
 
-export const TokenEnd = ({ info }: TokenProps) => {
+export const TokenEnd = ({ info, metadata }: TokenProps) => {
 	const [isShareOpen, setIsShareOpen] = useState(false);
 	const [isAuthOpen, setIsAuthOpen] = useState(false);
 	const { copy } = useClipboard();
@@ -105,10 +106,10 @@ export const TokenEnd = ({ info }: TokenProps) => {
 	return (
 		<div className="flex-1 w-full px-[16px] md:px-[0px] flex flex-col items-center pt-[8px] relative">
 			<div className="flex flex-col items-center w-full md:gap-[12px]">
-				<MyAvatar src={info?.metadata?.image || '/images/default.png'} alt="icon" className="w-[80px] h-[80px] rounded-[16px]" />
+				<MyAvatar src={metadata?.image || '/images/default.png'} alt="icon" className="w-[80px] h-[80px] rounded-[16px]" />
 				<div className="md:flex md:flex-col md:gap-[2px]">
-					<div className="text-[#fff] mt-[16px] md:mt-[0px] text-[20px] font-bold flex items-center justify-center gap-[4px] md:justify-start">{info?.metadata?.symbol?.toUpperCase() || '--'} </div>
-					<div className="text-[#AAAAAA] mt-[2px] md:mt-[0px] text-[13px] text-center">{info?.metadata?.name || '--'}</div>
+					<div className="text-[#fff] mt-[16px] md:mt-[0px] text-[20px] font-bold flex items-center justify-center gap-[4px] md:justify-start">{metadata?.symbol?.toUpperCase() || '--'} </div>
+					<div className="text-[#AAAAAA] mt-[2px] md:mt-[0px] text-[13px] text-center">{metadata?.name || '--'}</div>
 				</div>
 			</div>
 			<div className="w-full flex items-center justify-center gap-[4px] mt-[12px]">
@@ -117,22 +118,22 @@ export const TokenEnd = ({ info }: TokenProps) => {
 					<CopyIcon className="cursor-pointer hover:text-[#9AED2D] transition-colors" onClick={() => copy(info?.address || '')} />
 				</div>
 				{
-					info?.metadata?.x && <div
-						onClick={() => { window.open(info?.metadata?.x, "_blank"); }}
+					metadata?.x && <div
+						onClick={() => { window.open(metadata?.x, "_blank"); }}
 						className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] px-[10px] flex items-center cursor-pointer hover:bg-[#2A2A2A] transition-colors">
 						<Image src="/images/x.png" alt="x" width={20} height={20} disableSkeleton radius='none' />
 					</div>
 				}
 				{
-					info?.metadata?.telegram && <div
-						onClick={() => { window.open(info?.metadata?.telegram, "_blank"); }}
+					metadata?.telegram && <div
+						onClick={() => { window.open(metadata?.telegram, "_blank"); }}
 						className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] px-[10px] flex items-center cursor-pointer hover:bg-[#2A2A2A] transition-colors">
 						<Image src="/images/tg.png" alt="tg" width={20} height={20} disableSkeleton radius='none' />
 					</div>
 				}
 				{
-					info?.metadata?.website && <div
-						onClick={() => { window.open(info?.metadata?.website, "_blank"); }}
+					metadata?.website && <div
+						onClick={() => { window.open(metadata?.website, "_blank"); }}
 						className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] px-[10px] flex items-center cursor-pointer hover:bg-[#2A2A2A] transition-colors">
 						<Image src="/images/web.png" alt="web" width={16} height={16} disableSkeleton radius='none' />
 					</div>
@@ -141,7 +142,7 @@ export const TokenEnd = ({ info }: TokenProps) => {
 					<ShareIcon className="w-[16px]" />
 				</div>
 			</div>
-			<div className="text-[13px] text-[#AAAAAA] text-center mt-[16px] md:max-w-[600px]">{info?.metadata?.description}</div>
+			<div className="text-[13px] text-[#AAAAAA] text-center mt-[16px] md:max-w-[600px]">{metadata?.description}</div>
 			<div className="flex flex-col md:flex-row items-center gap-[12px] mt-[16px] w-full">
 				<div className="flex items-center gap-[12px] w-full">
 					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">

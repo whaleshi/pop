@@ -5,7 +5,7 @@ import { TokenEnd } from "@/components/tokenEnd";
 import { TokenTradeBox } from "@/components/tradeBox";
 import DefaultLayout from "@/layouts/default";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 
@@ -32,6 +32,65 @@ export default function TokenPage() {
 		retryDelay: 1000, // 重试延迟1秒
 	});
 
+	// 获取代币元数据 - 永久缓存
+	const { data: metadata } = useQuery({
+		queryKey: ["tokenMetadata", data?.address],
+		queryFn: async () => {
+			// 如果没有 URI，直接使用基础数据
+			if (!data?.uri || data?.uri === "") {
+				return {
+					name: data?.name || `Token ${data?.address?.slice(0, 6)}...${data?.address?.slice(-4)}`,
+					symbol: data?.symbol || "--",
+					description: "",
+					image: '/images/default.png',
+				};
+			}
+
+			try {
+				const response = await fetch('/api/tokens/metadata', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						addresses: [data.address],
+						uris: [data.uri]
+					})
+				});
+
+				if (response.ok) {
+					const result = await response.json();
+					if (result.success && result.data[data.address]) {
+						// 合并基础数据和元数据，优先使用合约的 name/symbol
+						return {
+							name: data?.name || result.data[data.address].name,
+							symbol: data?.symbol || result.data[data.address].symbol,
+							description: result.data[data.address].description || "",
+							image: result.data[data.address].image || '/images/default.png',
+							website: result.data[data.address].website || "",
+							x: result.data[data.address].x || "",
+							telegram: result.data[data.address].telegram || "",
+						};
+					}
+				}
+			} catch (error) {
+				console.warn(`Failed to fetch metadata for ${data?.address}:`, error);
+			}
+
+			// 降级方案
+			return {
+				name: data?.name || `Token ${data?.address?.slice(0, 6)}...${data?.address?.slice(-4)}`,
+				symbol: data?.symbol || "--",
+				description: "",
+				image: '/images/default.png',
+			};
+		},
+		enabled: !!data?.address,
+		staleTime: Infinity, // 永久缓存，元数据不会变
+		gcTime: Infinity, // 永不清理缓存
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		refetchOnReconnect: false,
+	});
+
 	if (isLoading || !data) {
 		return (
 			<DefaultLayout>
@@ -51,14 +110,14 @@ export default function TokenPage() {
 				</div>
 				<div className="w-full flex-1 flex flex-col md:flex-row md:max-w-[800px] md:gap-[24px] relative md:pt-[80px]">
 					{
-						data?.progressPercent === 100 ? <TokenEnd info={data} /> : <>
-							<TokenAbout info={data} />
-							<TokenTradeBox info={data} />
+						data?.progressPercent === 100 ? <TokenEnd info={data} metadata={metadata} /> : <>
+							<TokenAbout info={data} metadata={metadata} />
+							<TokenTradeBox info={data} metadata={metadata} />
 						</>
 					}
 				</div>
 			</section>
-			<Share isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} info={data} />
+			<Share isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} info={data} metadata={metadata} />
 		</DefaultLayout>
 	);
 }

@@ -2,27 +2,27 @@ import { popchainTestnet, popchainMainnet, localNetwork } from "./net";
 const isProd = process.env.NEXT_PUBLIC_APP_ENV === "production";
 export const CHAINS_CONFIG = {
     // 默认链 - 修改这里即可切换整个应用的默认网络
-    DEFAULT_CHAIN: popchainMainnet,
+    DEFAULT_CHAIN: popchainTestnet,
 
     // 支持的链列表 - 按优先级排序
-    SUPPORTED_CHAINS: [popchainMainnet],
+    SUPPORTED_CHAINS: [popchainTestnet],
 
     // 链相关配置
     CHAIN_CONFIG: {
-        [7257]: {
-            name: "Popchain",
-            symbol: "POP",
-            explorerUrl: "https://scan.popchain.ai/",
-            rpcUrl: "https://rpc.popchain.ai",
-            factoryContract: "0x86c64DA12DA5C7d1C4Ccd484A833ac32E675B2c2",
-        },
         // [7257]: {
-        //     name: "Popchain Testnet",
+        //     name: "Popchain",
         //     symbol: "POP",
-        //     explorerUrl: "https://popchaintest.cloud.blockscout.com/",
-        //     rpcUrl: "https://testnet.popchain.ai/",
-        //     factoryContract: "0x540098C1adDBcEABD6Bf052652e37ecC0575d79A",
+        //     explorerUrl: "https://scan.popchain.ai/",
+        //     rpcUrl: "https://rpc.popchain.ai",
+        //     factoryContract: "0x86c64DA12DA5C7d1C4Ccd484A833ac32E675B2c2",
         // },
+        [7257]: {
+            name: "Popchain Testnet",
+            symbol: "POP",
+            explorerUrl: "https://popchaintest.cloud.blockscout.com/",
+            rpcUrl: "https://testnet.popchain.ai/",
+            factoryContract: "0x3dcFe3149c50DdC1E69358F4380512aC6e73D976",
+        },
         // [31337]: {
         //     name: "Local Development",
         //     symbol: "ETH",
@@ -49,8 +49,8 @@ export const TRANSACTION_CONFIG = {
 } as const;
 
 // Multicall3 合约地址 (通用地址，大多数链都支持)
-export const MULTICALL3_ADDRESS = "0xbd64A7c53c825655e83718805e8b747B3387ee95";
-// 0xbd64A7c53c825655e83718805e8b747B3387ee95 pro 0xe1058f76F658086BF0562320e6Bd94228AC1f681 dev
+export const MULTICALL3_ADDRESS = "0xF743cAaE4A6Bdd248D99B0EEDA249a67F522Bbb5";
+// 0xbd64A7c53c825655e83718805e8b747B3387ee95 pro 0xF743cAaE4A6Bdd248D99B0EEDA249a67F522Bbb5 dev
 // Multicall3 ABI
 export const MULTICALL3_ABI = [
     {

@@ -18,11 +18,12 @@ type TradeType = 'buy' | 'sell';
 
 interface TokenProps {
 	info?: any;
+	metadata?: any;
 	tokenBalance?: string;
 	initialTab?: 'buy' | 'sell';
 }
 
-export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) => {
+export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: TokenProps) => {
 	const [isBuy, setIsBuy] = useState(() => initialTab === 'buy');
 	const [selectedTab, setSelectedTab] = useState<TradeType>(() => initialTab);
 	const [isSlippageOpen, setIsSlippageOpen] = useState(false);
@@ -85,7 +86,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 			}
 
 			if (_bignumber(inputAmount).gt(tokenBalance)) {
-				return `Insufficient token balance, current balance: ${formatBigNumber(tokenBalance)} ${info?.metadata?.symbol?.toUpperCase() || 'Token'}`;
+				return `Insufficient token balance, current balance: ${formatBigNumber(tokenBalance)} ${metadata?.symbol?.toUpperCase() || 'Token'}`;
 			}
 		}
 
@@ -301,7 +302,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 
 				// Transaction success handling (immediate)
 				toast.success('Buy successful!', {
-					description: `Successfully bought ${outputAmount} ${info?.metadata?.symbol?.toUpperCase()}`
+					description: `Successfully bought ${outputAmount} ${metadata?.symbol?.toUpperCase()}`
 				});
 
 				// Clear input
@@ -387,7 +388,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 
 				// Transaction success handling (immediate)
 				toast.success('Sell successful!', {
-					description: `Successfully sold ${formatBigNumber(amount)} ${info?.metadata?.symbol?.toUpperCase()}, received ${outputAmount} POP`
+					description: `Successfully sold ${formatBigNumber(amount)} ${metadata?.symbol?.toUpperCase()}, received ${outputAmount} POP`
 				});
 
 				// Clear input
@@ -464,9 +465,9 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 					endContent={<div className="shrink-0 h-[32px] rounded-[20px] bg-[#333] flex items-center px-[4px] pr-[6px] gap-[4px]">
 						{
 							isBuy ? <MyAvatar src={'/images/pop.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" /> :
-								<MyAvatar src={info?.metadata?.image || '/images/default.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" />
+								<MyAvatar src={metadata?.image || '/images/default.png'} alt="icon" className="w-[24px] h-[24px] rounded-[16px]" />
 						}
-						<div className="text-[15px] text-[#fff]">{isBuy ? 'POP' : info?.metadata?.symbol?.toUpperCase() || '--'}</div>
+						<div className="text-[15px] text-[#fff]">{isBuy ? 'POP' : metadata?.symbol?.toUpperCase() || '--'}</div>
 					</div>}
 				/>
 				<div className="flex gap-[8px] mt-[12px]">
@@ -486,7 +487,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 				<div className="text-[14px] text-[#fff] flex items-center justify-end gap-[3px] mt-[12px]">
 					<span className="text-[#AAAAAA]">Balance:</span>
 					{
-						isBuy ? <>{formatBigNumber(balance)} POP</> : <>{formatBigNumber(tokenBalance!)} {info?.metadata?.symbol?.toUpperCase() || '--'}</>
+						isBuy ? <>{formatBigNumber(balance)} POP</> : <>{formatBigNumber(tokenBalance!)} {metadata?.symbol?.toUpperCase() || '--'}</>
 					}
 					{
 						isBuy && <span className="text-[#9AED2D] cursor-pointer hover:text-[#7ED321] transition-colors" onClick={() => {
@@ -504,7 +505,7 @@ export const Trade = ({ info, tokenBalance, initialTab = 'buy' }: TokenProps) =>
 						<span className="text-[#AAAAAA]">Expected to receive</span>
 						<div>
 							<span className="text-[#fff] mr-[4px] font-medium">{outputAmount || '0.0'}</span>
-							<span className="text-[#AAAAAA]">{selectedTab === 'buy' ? info?.metadata?.symbol?.toUpperCase() : 'POP'}</span>
+							<span className="text-[#AAAAAA]">{selectedTab === 'buy' ? metadata?.symbol?.toUpperCase() : 'POP'}</span>
 						</div>
 					</div>
 					<div className="flex items-center justify-between mt-[12px]">

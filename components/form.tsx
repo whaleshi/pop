@@ -313,6 +313,18 @@ export default function CreateForm() {
 			const hasPreBuy = amountVal && parseFloat(amountVal) > 0;
 			const preBuyAmount = hasPreBuy ? ethers.parseEther(amountVal) : BigInt(0);
 
+			// Check balance if there's pre-purchase
+			if (hasPreBuy) {
+				const balance = await provider.getBalance(address);
+				// Reserve some ETH for gas fees (estimated 0.01 ETH)
+				const gasReserve = ethers.parseEther("0.01");
+				const requiredAmount = preBuyAmount + gasReserve;
+
+				if (balance < requiredAmount) {
+					throw new Error(`Insufficient balance for pre-purchase. Required: ${ethers.formatEther(preBuyAmount)} POP + gas fees, Available: ${ethers.formatEther(balance)} POP`);
+				}
+			}
+
 			const contract = new ethers.Contract(factoryAddr, FactoryABI, signer);
 
 			// Estimate gas
@@ -385,10 +397,6 @@ export default function CreateForm() {
 					description: `Transaction hash: ${txResult.hash.slice(0, 10)}...${txResult.hash.slice(-6)}`
 				});
 			} catch (error: any) {
-				// Check user rejected transaction
-				if (error.code === 'ACTION_REJECTED') {
-					return null;
-				}
 				throw error;
 			}
 
@@ -467,8 +475,10 @@ export default function CreateForm() {
 			console.error("Create error:", error);
 
 			// More detailed error handling
-			if (error?.code === 4001) {
+			if (error?.code === 4001 || error?.code === 'ACTION_REJECTED') {
 				toast.error("User cancelled the transaction");
+			} else if (error?.message?.includes("Insufficient balance for pre-purchase")) {
+				toast.error(error.message);
 			} else if (error?.message?.includes("insufficient funds")) {
 				toast.error("Insufficient balance, please check your account balance");
 			} else if (error?.message?.includes("network")) {
@@ -574,11 +584,7 @@ export default function CreateForm() {
 						const value = e.target.value;
 						// Only allow numbers and decimal points, limit decimal places
 						if (value === '' || /^\d*\.?\d{0,6}$/.test(value)) {
-							const numValue = parseFloat(value);
-							// Limit maximum value, e.g., not exceeding 100 POP
-							if (value === '' || numValue <= 100) {
-								setAmountVal(value);
-							}
+							setAmountVal(value);
 						}
 					}}
 					endContent={<span className="text-[15px] text-[#fff]">POP</span>}

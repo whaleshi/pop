@@ -7,9 +7,10 @@ interface ShareProps {
 	isOpen: boolean;
 	onClose: () => void;
 	info?: any;
+	metadata?: any;
 }
 
-export default function Share({ isOpen, onClose, info }: ShareProps) {
+export default function Share({ isOpen, onClose, info, metadata }: ShareProps) {
 	const { copy } = useClipboard();
 	return (
 		<>
@@ -28,11 +29,11 @@ export default function Share({ isOpen, onClose, info }: ShareProps) {
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</ModalHeader>
 							<ModalBody className="px-[16px] pb-[16px] items-center gap-0">
-								<MyAvatar src={info?.metadata?.image || '/images/default.png'} alt="icon" className="w-[80px] h-[80px] rounded-[16px]" />
-								<div className="text-[17px] text-[#fff] mt-[10px]">{info?.metadata?.symbol?.toUpperCase() || '--'}</div>
-								<div className="text-[13px] text-[#AAAAAA] mt-[4px]">{info?.metadata?.name || '--'}</div>
+								<MyAvatar src={metadata?.image || '/images/default.png'} alt="icon" className="w-[80px] h-[80px] rounded-[16px]" />
+								<div className="text-[17px] text-[#fff] mt-[10px]">{metadata?.symbol?.toUpperCase() || '--'}</div>
+								<div className="text-[13px] text-[#AAAAAA] mt-[4px]">{metadata?.name || '--'}</div>
 								<Button fullWidth className="h-[44px] bg-[#9AED2D] text-[15px] text-[#000] rounded-[16px] mt-[20px] hover:bg-[#7ED321] transition-colors" onPress={() => {
-									const text = `I found $${info?.metadata?.symbol?.toUpperCase()} on PopMe! Come trade together 👉 https://popmefun.com/token/${info?.address}`;
+									const text = `I found $${metadata?.symbol?.toUpperCase()} on PopMe! Come trade together 👉 https://popmefun.com/token/${info?.address}`;
 									const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 									window.open(url, "_blank");
 								}}>Share to X</Button>

@@ -10,9 +10,10 @@ import { useConnectModal } from '@rainbow-me/rainbowkit';
 
 interface TokenProps {
 	info?: any;
+	metadata?: any;
 }
 
-export const TokenTradeBox = ({ info }: TokenProps) => {
+export const TokenTradeBox = ({ info, metadata }: TokenProps) => {
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
 	const { address, isConnected } = useAccount();
 	const { openConnectModal } = useConnectModal();
@@ -70,7 +71,7 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 			</div>
 			<div className="hidden md:block border-[2px] border-[#333] p-[16px] pt-[8px] bg-[#1A1A1A] rounded-[24px]">
 				<div className="h-[48px] text-[17px] text-[#fff] flex items-center justify-center">Trade</div>
-				<Trade info={info} tokenBalance={tokenBalance} initialTab={initialTab} />
+				<Trade info={info} metadata={metadata} tokenBalance={tokenBalance} initialTab={initialTab} />
 			</div>
 			<Drawer isOpen={isOpen} placement="bottom" onOpenChange={onOpenChange} hideCloseButton>
 				<DrawerContent
@@ -87,7 +88,7 @@ export const TokenTradeBox = ({ info }: TokenProps) => {
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</DrawerHeader>
 							<DrawerBody className="px-[16px] pb-[30px]">
-								<Trade info={info} tokenBalance={tokenBalance} initialTab={initialTab} />
+								<Trade info={info} metadata={metadata} tokenBalance={tokenBalance} initialTab={initialTab} />
 							</DrawerBody>
 						</>
 					)}

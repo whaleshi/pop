@@ -8,76 +8,18 @@ import useClipboard from '@/hooks/useCopyToClipboard';
 import { formatBigNumber } from "@/utils/formatBigNumber";
 import { TRANSACTION_CONFIG } from "@/config/chains";
 import { useBalanceContext } from "@/providers/balanceProvider";
-import { useQuery } from "@tanstack/react-query";
 import _bignumber from "bignumber.js";
 
 interface TokenProps {
 	info?: any;
+	metadata?: any;
 }
 
-export const TokenAbout = ({ info }: TokenProps) => {
+export const TokenAbout = ({ info, metadata }: TokenProps) => {
 	const [isShareOpen, setIsShareOpen] = useState(false);
 	const { copy } = useClipboard();
 	const { price: popPrice } = useBalanceContext();
 
-	// 获取代币元数据 - 永久缓存
-	const { data: metadata } = useQuery({
-		queryKey: ["tokenMetadata", info?.address],
-		queryFn: async () => {
-			// 如果没有 URI，直接使用基础数据
-			if (!info?.uri || info?.uri === "") {
-				return {
-					name: info?.name || `Token ${info?.address?.slice(0, 6)}...${info?.address?.slice(-4)}`,
-					symbol: info?.symbol || "--",
-					description: "",
-					image: '/images/default.png',
-				};
-			}
-
-			try {
-				const response = await fetch('/api/tokens/metadata', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						addresses: [info.address],
-						uris: [info.uri]
-					})
-				});
-
-				if (response.ok) {
-					const data = await response.json();
-					if (data.success && data.data[info.address]) {
-						// 合并基础数据和元数据，优先使用合约的 name/symbol
-						return {
-							name: info?.name || data.data[info.address].name,
-							symbol: info?.symbol || data.data[info.address].symbol,
-							description: data.data[info.address].description || "",
-							image: data.data[info.address].image || '/images/default.png',
-							website: data.data[info.address].website || "",
-							x: data.data[info.address].x || "",
-							telegram: data.data[info.address].telegram || "",
-						};
-					}
-				}
-			} catch (error) {
-				console.warn(`Failed to fetch metadata for ${info?.address}:`, error);
-			}
-
-			// 降级方案
-			return {
-				name: info?.name || `Token ${info?.address?.slice(0, 6)}...${info?.address?.slice(-4)}`,
-				symbol: info?.symbol || "--",
-				description: "",
-				image: '/images/default.png',
-			};
-		},
-		enabled: !!info?.address,
-		staleTime: Infinity, // 永久缓存，元数据不会变
-		gcTime: Infinity, // 永不清理缓存
-		refetchOnWindowFocus: false,
-		refetchOnMount: false,
-		refetchOnReconnect: false,
-	});
 
 	// 使用元数据或基础数据
 	const displayName = metadata?.name || info?.name || `Token ${info?.address?.slice(0, 6)}...${info?.address?.slice(-4)}`;
@@ -203,22 +145,22 @@ export const TokenAbout = ({ info }: TokenProps) => {
 					<CopyIcon className="cursor-pointer hover:text-[#9AED2D] transition-colors" onClick={() => copy(info?.address || '')} />
 				</div>
 				{
-					info?.metadata?.x && <div
-						onClick={() => { window.open(info?.metadata?.x, "_blank"); }}
+					metadata?.x && <div
+						onClick={() => { window.open(metadata?.x, "_blank"); }}
 						className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] px-[10px] flex items-center cursor-pointer hover:bg-[#2A2A2A] transition-colors">
 						<Image src="/images/x.png" alt="x" width={20} height={20} disableSkeleton radius='none' />
 					</div>
 				}
 				{
-					info?.metadata?.telegram && <div
-						onClick={() => { window.open(info?.metadata?.telegram, "_blank"); }}
+					metadata?.telegram && <div
+						onClick={() => { window.open(metadata?.telegram, "_blank"); }}
 						className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] px-[10px] flex items-center cursor-pointer hover:bg-[#2A2A2A] transition-colors">
 						<Image src="/images/tg.png" alt="tg" width={20} height={20} disableSkeleton radius='none' />
 					</div>
 				}
 				{
-					info?.metadata?.website && <div
-						onClick={() => { window.open(info?.metadata?.website, "_blank"); }}
+					metadata?.website && <div
+						onClick={() => { window.open(metadata?.website, "_blank"); }}
 						className="border-[1px] border-[#333] bg-[#1A1A1A] rounded-[12px] h-[32px] px-[10px] flex items-center cursor-pointer hover:bg-[#2A2A2A] transition-colors">
 						<Image src="/images/web.png" alt="web" width={16} height={16} disableSkeleton radius='none' />
 					</div>
@@ -227,7 +169,7 @@ export const TokenAbout = ({ info }: TokenProps) => {
 					<ShareIcon className="w-[16px]" />
 				</div>
 			</div>
-			<div className="text-[13px] text-[#AAAAAA] text-center md:text-left mt-[16px] w-full">{info?.metadata?.description}</div>
+			<div className="text-[13px] text-[#AAAAAA] text-center md:text-left mt-[16px] w-full">{metadata?.description}</div>
 			<div className="flex items-center gap-[12px] mt-[16px] w-full">
 				<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
 					<div className="text-[13px] text-[#AAAAAA]">Price</div>
