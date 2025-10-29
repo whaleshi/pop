@@ -88,7 +88,12 @@ export const TokenHead: React.FC<TokenHeadProps> = ({
   // 构建动态 meta 数据
   const title = metadata?.name ? `${metadata.name} (${metadata.symbol}) - ${siteConfig.name}` : fallbackTitle;
   const description = `Trade ${metadata?.name || 'token'} on ${siteConfig.name}. ${fallbackDescription}`;
-  const image = metadata?.image || fallbackImage;
+  
+  // 使用 OG API 生成图片
+  const ogImageUrl = metadata?.name && metadata?.symbol && metadata?.image 
+    ? `/api/og?name=${encodeURIComponent(metadata.name)}&symbol=${encodeURIComponent(metadata.symbol)}&imgUrl=${encodeURIComponent(metadata.image)}`
+    : fallbackImage;
+    
   const url = `https://popme.fun/token/${addr}`;
 
   return (
@@ -107,7 +112,7 @@ export const TokenHead: React.FC<TokenHeadProps> = ({
       <meta property="og:type" content="website" />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
+      <meta property="og:image" content={ogImageUrl} />
       <meta property="og:url" content={url} />
       <meta property="og:site_name" content={siteConfig.name} />
 
@@ -115,7 +120,7 @@ export const TokenHead: React.FC<TokenHeadProps> = ({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
+      <meta name="twitter:image" content={ogImageUrl} />
       <meta name="twitter:site" content="@popmefun" />
       <meta name="twitter:creator" content="@popmefun" />
     </NextHead>

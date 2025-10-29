@@ -48,10 +48,10 @@ export default async function handler(request: NextRequest) {
             >
                 <div tw="flex w-full h-full">
                     <div tw="h-[630px] w-[1200px] flex flex-col relative">
-                        <img tw="absolute" src="https://newgame.mypinata.cloud/ipfs/bafkreihptlxdw3suqrdbbprhanm645z7p4u6pansso6en6xkyuvhgtklpu" width={1200} height={630} alt="bg" />
-                        <div tw="text-[88px] text-[#24232A] font-extrabold pt-[228px] pl-[96px] relative" style={{ fontFamily: 'HarmonyOS Sans SC' }}>{tokenSymbol}</div>
-                        <div tw="text-[44px] text-[#94989F] pt-[10px] pl-[96px] relative font-extralight" style={{ fontFamily: 'HarmonyOS Sans SC' }}>{tokenName}</div>
-                        <img tw="absolute top-[156px] right-[96px] rounded-[72px]" src={tokenImg as string} width={320} height={320} alt="logo" />
+                        <img tw="absolute" src="https://popme.mypinata.cloud/ipfs/QmPvMzwM3gj9wFmkyD9L4KTNQyT9MMiV5vcqs1VPrZ8sbt" width={1200} height={630} alt="bg" />
+                        <div tw="text-[88px] text-[#FFFFFF] font-extrabold pt-[208px] pl-[96px] relative" style={{ fontFamily: 'HarmonyOS Sans SC' }}>{tokenSymbol?.toUpperCase()}</div>
+                        <div tw="text-[44px] text-[#CCCCCC] pt-[10px] pl-[96px] relative font-extralight" style={{ fontFamily: 'HarmonyOS Sans SC' }}>{tokenName}</div>
+                        <img tw="absolute top-[156px] right-[96px] rounded-[40px]" src={tokenImg as string} width={320} height={320} alt="logo" />
                     </div>
                 </div>
             </div>
