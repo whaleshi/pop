@@ -61,7 +61,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
 	return (
 		<>
-			<Head />
+			<Head tokenMetadata={pageProps.tokenMetadata} />
 			{isMounted ? (
 				<WagmiProvider config={config}>
 					<QueryProvider>

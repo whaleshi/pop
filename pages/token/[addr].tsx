@@ -8,9 +8,21 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
+import { GetServerSideProps } from "next";
+import { ethers } from "ethers";
+import { CONTRACT_CONFIG, DEFAULT_CHAIN_CONFIG } from "@/config/chains";
+import contractABI from "@/constant/TokenFactory.abi.json";
 
 
-export default function TokenPage() {
+interface TokenPageProps {
+	tokenMetadata?: {
+		name?: string;
+		symbol?: string;
+		image?: string;
+	};
+}
+
+export default function TokenPage({ tokenMetadata }: TokenPageProps) {
 	const router = useRouter();
 	const { addr } = router.query;
 	const [isShareOpen, setIsShareOpen] = useState(false);
@@ -121,3 +133,47 @@ export default function TokenPage() {
 		</DefaultLayout>
 	);
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+	const { addr } = context.params!;
+	
+	if (!addr || typeof addr !== "string") {
+		return {
+			props: {},
+		};
+	}
+
+	try {
+		// 创建 provider
+		const provider = new ethers.JsonRpcProvider(DEFAULT_CHAIN_CONFIG.rpcUrl);
+		
+		// 创建合约实例
+		const contract = new ethers.Contract(CONTRACT_CONFIG.FACTORY_CONTRACT, contractABI, provider);
+		
+		// 获取 URI
+		const uri = await contract.uri(addr);
+		
+		if (uri && uri !== "") {
+			// 从 URI 获取 JSON 元数据
+			const response = await fetch(uri);
+			if (response.ok) {
+				const metadata = await response.json();
+				return {
+					props: {
+						tokenMetadata: {
+							name: metadata.name,
+							symbol: metadata.symbol,
+							image: metadata.image,
+						},
+					},
+				};
+			}
+		}
+	} catch (error) {
+		console.error("Error fetching token metadata in getServerSideProps:", error);
+	}
+
+	return {
+		props: {},
+	};
+};

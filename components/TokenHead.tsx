@@ -10,6 +10,11 @@ interface TokenHeadProps {
   fallbackTitle?: string;
   fallbackDescription?: string;
   fallbackImage?: string;
+  serverMetadata?: {
+    name?: string;
+    symbol?: string;
+    image?: string;
+  };
 }
 
 interface TokenMetadata {
@@ -21,13 +26,20 @@ interface TokenMetadata {
 export const TokenHead: React.FC<TokenHeadProps> = ({
   fallbackTitle = siteConfig.name,
   fallbackDescription = siteConfig.description,
-  fallbackImage = "https://popme.mypinata.cloud/ipfs/bafkreigpmkeqa6o4xcd4eiwewuceedfr55h7a5kpacy3bcyo6alaxpdm6a"
+  fallbackImage = "https://popme.mypinata.cloud/ipfs/bafkreigpmkeqa6o4xcd4eiwewuceedfr55h7a5kpacy3bcyo6alaxpdm6a",
+  serverMetadata
 }) => {
   const router = useRouter();
   const { addr } = router.query;
-  const [metadata, setMetadata] = useState<TokenMetadata | null>(null);
+  const [metadata, setMetadata] = useState<TokenMetadata | null>(serverMetadata || null);
 
   useEffect(() => {
+    // 如果已经有服务端数据，就必须使用服务端数据
+    if (serverMetadata) {
+      setMetadata(serverMetadata);
+      return;
+    }
+    
     if (!addr || typeof addr !== "string") {
       return;
     }
@@ -71,7 +83,7 @@ export const TokenHead: React.FC<TokenHeadProps> = ({
     };
 
     fetchTokenData();
-  }, [addr, fallbackImage]);
+  }, [addr, fallbackImage, serverMetadata]);
 
   // 构建动态 meta 数据
   const title = metadata?.name ? `${metadata.name} (${metadata.symbol}) - ${siteConfig.name}` : fallbackTitle;
