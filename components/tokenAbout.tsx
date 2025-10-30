@@ -9,6 +9,7 @@ import { formatBigNumber } from "@/utils/formatBigNumber";
 import { TRANSACTION_CONFIG } from "@/config/chains";
 import { useBalanceContext } from "@/providers/balanceProvider";
 import _bignumber from "bignumber.js";
+import { useTranslation } from 'react-i18next';
 
 interface TokenProps {
 	info?: any;
@@ -16,8 +17,12 @@ interface TokenProps {
 }
 
 export const TokenAbout = ({ info, metadata }: TokenProps) => {
+	const { t } = useTranslation('common');
 	const [isShareOpen, setIsShareOpen] = useState(false);
-	const { copy } = useClipboard();
+	const { copy } = useClipboard({
+		successMessage: t('messages.copySuccessful'),
+		errorMessage: t('messages.copyFailed')
+	});
 	const { price: popPrice } = useBalanceContext();
 
 
@@ -122,7 +127,7 @@ export const TokenAbout = ({ info, metadata }: TokenProps) => {
 			{/* Market cap progress bar */}
 			<div className="w-full mt-[20px] p-[16px] bg-[#1A1A1A] rounded-[16px] border border-[#333]">
 				<div className="flex justify-between items-center mb-[12px]">
-					<span className="text-[14px] text-[#AAAAAA] font-medium">Progress</span>
+					<span className="text-[14px] text-[#AAAAAA] font-medium">{t('token.progress')}</span>
 					<span className="text-[14px] text-[#9AED2D] font-bold">{info?.progress}%</span>
 				</div>
 				<div className="w-full h-[12px] bg-[#ffffff08] rounded-full overflow-hidden relative">
@@ -172,23 +177,23 @@ export const TokenAbout = ({ info, metadata }: TokenProps) => {
 			<div className="text-[13px] text-[#AAAAAA] text-center md:text-left mt-[16px] w-full">{metadata?.description}</div>
 			<div className="flex items-center gap-[12px] mt-[16px] w-full">
 				<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-					<div className="text-[13px] text-[#AAAAAA]">Price</div>
+					<div className="text-[13px] text-[#AAAAAA]">{t('token.price')}</div>
 					<div className="text-[20px] text-[#fff] font-semibold">${formatBigNumber(tokenPrice)}</div>
 				</div>
 				<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-					<div className="text-[13px] text-[#AAAAAA]">Market Cap</div>
+					<div className="text-[13px] text-[#AAAAAA]">{t('token.marketCap')}</div>
 					<div className="text-[20px] text-[#fff] font-semibold">${formatBigNumber(marketCap)}</div>
 				</div>
 			</div>
 			<div className="flex items-center gap-[12px] mt-[12px] w-full">
 				<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-					<div className="text-[13px] text-[#AAAAAA]">Change</div>
+					<div className="text-[13px] text-[#AAAAAA]">{t('token.change')}</div>
 					<div className={`text-[20px] font-semibold ${priceChangeDisplay.color}`}>
 						{priceChangeDisplay.text}
 					</div>
 				</div>
 				<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-					<div className="text-[13px] text-[#AAAAAA]">Holders</div>
+					<div className="text-[13px] text-[#AAAAAA]">{t('token.holders')}</div>
 					<div className="text-[20px] text-[#fff] font-semibold">--</div>
 				</div>
 			</div>

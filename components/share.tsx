@@ -2,6 +2,7 @@ import { Navbar as HeroUINavbar, NavbarContent, Modal, ModalContent, ModalHeader
 import { CloseIcon } from "@/components/icons";
 import MyAvatar from "@/components/avatarImage";
 import useClipboard from '@/hooks/useCopyToClipboard';
+import { useTranslation } from 'react-i18next';
 
 interface ShareProps {
 	isOpen: boolean;
@@ -11,7 +12,11 @@ interface ShareProps {
 }
 
 export default function Share({ isOpen, onClose, info, metadata }: ShareProps) {
-	const { copy } = useClipboard();
+	const { t } = useTranslation('common');
+	const { copy } = useClipboard({
+		successMessage: t('messages.copySuccessful'),
+		errorMessage: t('messages.copyFailed')
+	});
 	return (
 		<>
 			<Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()} hideCloseButton placement="center" size="sm"
@@ -25,7 +30,7 @@ export default function Share({ isOpen, onClose, info, metadata }: ShareProps) {
 					{() => (
 						<>
 							<ModalHeader className="text-center relative p-0 pt-[8px]">
-								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">Share Token</div>
+								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">{t('messages.shareToken')}</div>
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</ModalHeader>
 							<ModalBody className="px-[16px] pb-[16px] items-center gap-0">
@@ -33,11 +38,14 @@ export default function Share({ isOpen, onClose, info, metadata }: ShareProps) {
 								<div className="text-[17px] text-[#fff] mt-[10px]">{metadata?.symbol?.toUpperCase() || '--'}</div>
 								<div className="text-[13px] text-[#AAAAAA] mt-[4px]">{metadata?.name || '--'}</div>
 								<Button fullWidth className="h-[44px] bg-[#9AED2D] text-[15px] text-[#000] rounded-[16px] mt-[20px] hover:bg-[#7ED321] transition-colors" onPress={() => {
-									const text = `I found $${metadata?.symbol?.toUpperCase()} on PopMe! Come trade together 👉 https://popmefun.com/token/${info?.address}`;
+									const text = t('messages.shareText', { 
+										symbol: `$${metadata?.symbol?.toUpperCase()}`, 
+										address: info?.address 
+									});
 									const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 									window.open(url, "_blank");
-								}}>Share to X</Button>
-								<Button fullWidth className="h-[44px] bg-[#333] text-[15px] text-[#fff] rounded-[16px] mt-[12px] hover:bg-[#444] transition-colors" onPress={() => { copy(`https://popmefun.com/token/${info?.address}` || '') }}>Copy Link</Button>
+								}}>{t('messages.shareToX')}</Button>
+								<Button fullWidth className="h-[44px] bg-[#333] text-[15px] text-[#fff] rounded-[16px] mt-[12px] hover:bg-[#444] transition-colors" onPress={() => { copy(`https://popmefun.com/token/${info?.address}` || '') }}>{t('messages.copyLink')}</Button>
 							</ModalBody>
 						</>
 					)}

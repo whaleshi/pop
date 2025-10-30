@@ -3,7 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-export default function useClipboard(timeout = 1500) {
+interface ClipboardOptions {
+    timeout?: number;
+    successMessage?: string;
+    errorMessage?: string;
+}
+
+export default function useClipboard(options: ClipboardOptions = {}) {
+    const { timeout = 1500, successMessage = "Copy successful", errorMessage = "Copy failed" } = options;
     const [isCopied, setIsCopied] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const timerRef = useRef<number | null>(null);
@@ -38,18 +45,18 @@ export default function useClipboard(timeout = 1500) {
                     if (!successful) throw new Error("Copy command failed");
                 }
                 setIsCopied(true);
-                toast.success("Copy successful");
+                toast.success(successMessage);
                 clearTimer();
                 timerRef.current = window.setTimeout(() => setIsCopied(false), timeout);
                 return true;
             } catch (e: any) {
-                setError(e?.message || "Copy failed");
+                setError(e?.message || errorMessage);
                 setIsCopied(false);
-                toast.error("Copy failed");
+                toast.error(errorMessage);
                 return false;
             }
         },
-        [timeout]
+        [timeout, successMessage, errorMessage]
     );
 
     return { copy, isCopied, error } as const;

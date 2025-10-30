@@ -5,13 +5,18 @@ import { useAccount, useDisconnect } from 'wagmi';
 import { shortenAddress } from "@/utils";
 import useClipboard from '@/hooks/useCopyToClipboard';
 import router from "next/router";
+import { useTranslation } from "react-i18next";
 
 
 export const WalletBox = () => {
+	const { t } = useTranslation('common');
 	const { balance, symbol } = useBalanceContext();
 	const { address } = useAccount();
 	const { disconnect } = useDisconnect();
-	const { copy } = useClipboard();
+	const { copy } = useClipboard({
+		successMessage: t('messages.copySuccessful'),
+		errorMessage: t('messages.copyFailed')
+	});
 
 	const toLogout = async () => {
 		try {
@@ -45,13 +50,13 @@ export const WalletBox = () => {
 				<div className="w-full p-[16px]">
 					<div className="text-[13px] text-[#AAAAAA] flex items-center gap-[8px]">
 						<span className="text-[#9AED2D]">💰</span>
-						Balance
+						{t('wallet.balance')}
 					</div>
 					<div className="text-[24px] text-[#fff] mt-[6px]">{formatBigNumber(balance)} {symbol}</div>
 				</div>
 				<div className="h-[44px] flex items-center justify-between px-[16px] border-t border-[#333]">
 					<div className="text-[13px] text-[#AAAAAA] flex items-center gap-[4px]">
-						Wallet Address
+						{t('wallet.address')}
 						<span className="text-[#fff]">{shortenAddress(address!)}</span>
 						<CopyIcon className="cursor-pointer block md:hidden hover:text-[#fff] transition-colors" onClick={() => copy(address!)} />
 					</div>
@@ -65,7 +70,7 @@ export const WalletBox = () => {
 				<div className="w-full p-[16px]">
 					<div className="text-[13px] text-[#AAAAAA] flex items-center gap-[8px]">
 						<span className="text-[#9AED2D]">🔗</span>
-						Invite Link
+						{t('wallet.code')}
 					</div>
 					<div className="text-[16px] text-[#fff] mt-[6px] flex items-center justify-between">
 						<span>--</span>

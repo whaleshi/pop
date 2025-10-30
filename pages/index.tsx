@@ -7,8 +7,10 @@ import { useState, useEffect } from "react"
 import { siteConfig } from "@/config/site";
 import { useQuery } from "@tanstack/react-query";
 import RippleGrid from '@/components/rippleGrid';
+import { Trans, useTranslation } from 'react-i18next';
 
 export default function IndexPage() {
+	const { t } = useTranslation('common');
 	const router = useRouter();
 	// const [currentBanner, setCurrentBanner] = useState(0);
 
@@ -69,21 +71,26 @@ export default function IndexPage() {
 					</div>
 					<div className="w-full relative z-10 flex flex-col items-center justify-center max-w-[800px] px-[20px]">
 						<div className="text-[32px] md:text-[56px] text-[#fff] text-center font-bold leading-tight mb-[24px]">
-							An innovation launchpad<br />
-							built on <span className="text-[#ABF909]">Pop Chain</span>
+							<Trans
+								i18nKey="home.tagline"
+								components={{
+									br: <br />,
+									highlight: <span className="text-[#ABF909]" />
+								}}
+							/>
 						</div>
 						<div className="text-[18px] md:text-[24px] text-[#AAAAAA] text-center max-w-[600px] mb-[48px]">
-							Everyone can deploy a token with one click
+							{t('home.subtitle')}
 						</div>
 						<div className="flex flex-row gap-[12px] md:gap-[16px] items-center justify-center w-full max-w-[320px] md:max-w-none mx-auto">
 							<Button
 								className="bg-[#ABF909] hover:bg-[#C8FF1A] active:scale-[0.98] flex-1 md:flex-none md:w-[180px] h-[48px] rounded-[16px] text-[14px] md:text-[15px] font-semibold text-[#000000] transition-all duration-200 shadow-lg hover:shadow-xl"
 								onPress={() => router.push('/create')}
 							>
-								🚀 Launch Token
+								{t('home.launchToken')}
 							</Button>
 							<Button className="bg-[rgba(255,255,255,0.05)] backdrop-blur-md border-[1px] border-[rgba(171,249,9,0.2)] hover:border-[rgba(171,249,9,0.5)] hover:bg-[rgba(171,249,9,0.1)] flex-1 md:flex-none md:w-[180px] h-[48px] rounded-[16px] text-[14px] md:text-[15px] font-medium text-[#fff] transition-all duration-200">
-								Learn More
+								{t('home.learnMore')}
 							</Button>
 						</div>
 					</div>

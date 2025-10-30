@@ -13,6 +13,7 @@ import { formatBigNumber } from "@/utils/formatBigNumber";
 import { useBalanceContext } from "@/providers/balanceProvider";
 import _bignumber from "bignumber.js";
 import { useSlippageStore } from "@/stores/slippage";
+import { useTranslation } from 'react-i18next';
 
 type TradeType = 'buy' | 'sell';
 
@@ -24,6 +25,7 @@ interface TokenProps {
 }
 
 export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: TokenProps) => {
+	const { t } = useTranslation('common');
 	const [isBuy, setIsBuy] = useState(() => initialTab === 'buy');
 	const [selectedTab, setSelectedTab] = useState<TradeType>(() => initialTab);
 	const [isSlippageOpen, setIsSlippageOpen] = useState(false);
@@ -52,41 +54,46 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 	// Validate input
 	const validateInput = (): string | null => {
 		if (!isConnected) {
-			return 'Please connect wallet first';
+			return t('validation.pleaseConnectWallet');
 		}
 
 		if (!inputAmount || inputAmount.trim() === '') {
-			return 'Please enter trade amount';
+			return t('validation.enterTradeAmount');
 		}
 
 		const amount = parseFloat(inputAmount);
 		if (isNaN(amount) || amount <= 0) {
-			return 'Please enter a valid amount';
+			return t('validation.enterValidAmount');
 		}
 
 		if (selectedTab === 'buy') {
 			// Buy validation
 			if (!balance || balance === 0) {
-				return 'Insufficient POP balance';
+				return t('validation.insufficientPopBalance');
 			}
 
 			if (_bignumber(inputAmount).gt(balance)) {
-				return `Insufficient POP balance, current balance: ${formatBigNumber(balance)} POP`;
+				return t('validation.insufficientPopBalanceDetailed', { 
+					balance: formatBigNumber(balance) 
+				});
 			}
 
 			// Reserve gas fee check
 			const gasReserve = 0.001;
 			if (_bignumber(inputAmount).plus(gasReserve).gt(balance)) {
-				return 'Please reserve enough POP for gas fees';
+				return t('validation.reserveGasFees');
 			}
 		} else {
 			// Sell validation
 			if (!tokenBalance || parseFloat(tokenBalance) === 0) {
-				return 'Insufficient token balance';
+				return t('validation.insufficientTokenBalance');
 			}
 
 			if (_bignumber(inputAmount).gt(tokenBalance)) {
-				return `Insufficient token balance, current balance: ${formatBigNumber(tokenBalance)} ${metadata?.symbol?.toUpperCase() || 'Token'}`;
+				return t('validation.insufficientTokenBalanceDetailed', { 
+					balance: formatBigNumber(tokenBalance),
+					symbol: metadata?.symbol?.toUpperCase() || 'Token'
+				});
 			}
 		}
 
@@ -236,7 +243,7 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 		}
 
 		if (!signer || !provider) {
-			toast.error("Wallet not connected");
+			toast.error(t('trade.walletNotConnected'));
 			return;
 		}
 
@@ -289,8 +296,8 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 				const buyResult = await contract.buyToken(tokenAddress, ethers.parseEther(amount), minAmountOut, txOptions);
 				console.log("buyToken transaction sent:", buyResult.hash);
 
-				toast.success('Transaction submitted', {
-					description: `Transaction hash: ${buyResult.hash.slice(0, 10)}...${buyResult.hash.slice(-6)}`
+				toast.success(t('messages.transactionSubmitted'), {
+					description: `${t('messages.transactionHash')}: ${buyResult.hash.slice(0, 10)}...${buyResult.hash.slice(-6)}`
 				});
 
 				// Asynchronously wait for transaction confirmation in background (don't block execution)
@@ -300,10 +307,7 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 					console.error("Buy transaction confirmation failed:", error);
 				});
 
-				// Transaction success handling (immediate)
-				toast.success('Buy successful!', {
-					description: `Successfully bought ${outputAmount} ${metadata?.symbol?.toUpperCase()}`
-				});
+
 
 				// Clear input
 				setInputAmount('');
@@ -375,8 +379,8 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 				const sellResult = await contract.sellToken(tokenAddress, sellAmount, minEthOut, txOptions);
 				console.log("sellToken transaction sent:", sellResult.hash);
 
-				toast.success('Transaction submitted', {
-					description: `Transaction hash: ${sellResult.hash.slice(0, 10)}...${sellResult.hash.slice(-6)}`
+				toast.success(t('messages.transactionSubmitted'), {
+					description: `${t('messages.transactionHash')}: ${sellResult.hash.slice(0, 10)}...${sellResult.hash.slice(-6)}`
 				});
 
 				// Asynchronously wait for transaction confirmation in background (don't block execution)
@@ -386,10 +390,6 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 					console.error("Sell transaction confirmation failed:", error);
 				});
 
-				// Transaction success handling (immediate)
-				toast.success('Sell successful!', {
-					description: `Successfully sold ${formatBigNumber(amount)} ${metadata?.symbol?.toUpperCase()}, received ${outputAmount} POP`
-				});
 
 				// Clear input
 				setInputAmount('');
@@ -404,21 +404,21 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 			console.error('Transaction failed:', error);
 
 			// More detailed error handling
-			let errorMessage = 'Transaction failed, please try again';
+			let errorMessage = t('messages.transactionFailedRetry');
 			if (error.code === 'ACTION_REJECTED') {
-				errorMessage = 'User rejected the transaction';
+				errorMessage = t('messages.userRejectedTransaction');
 			} else if (error.code === 'INSUFFICIENT_FUNDS') {
-				errorMessage = 'Insufficient balance';
+				errorMessage = t('messages.insufficientBalance');
 			} else if (error.message?.includes('slippage')) {
-				errorMessage = 'Slippage too high, please adjust slippage settings';
+				errorMessage = t('messages.slippageTooHigh');
 			} else if (error.message?.includes('deadline')) {
-				errorMessage = 'Transaction timeout, please try again';
+				errorMessage = t('messages.transactionTimeout');
 			} else if (error.message) {
-				errorMessage = 'Transaction timeout, please try again';
+				errorMessage = t('messages.transactionTimeout');
 			}
 
 			setError(errorMessage);
-			toast.error('Transaction failed', {
+			toast.error(t('messages.transactionFailedGeneric'), {
 				description: errorMessage
 			});
 		} finally {
@@ -437,7 +437,7 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 							}`}
 						onClick={() => handleTabClick('buy')}
 					>
-						Buy
+						{t('trade.buy')}
 					</div>
 					<div
 						className={`flex-1 border-[3px] border-[#333] rounded-[16px] text-[14px] flex items-center justify-center cursor-pointer transition-all duration-200 ${selectedTab === 'sell'
@@ -446,7 +446,7 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 							}`}
 						onClick={() => handleTabClick('sell')}
 					>
-						Sell
+						{t('trade.sell')}
 					</div>
 				</div>
 				<Input
@@ -485,7 +485,7 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 					))}
 				</div>
 				<div className="text-[14px] text-[#fff] flex items-center justify-end gap-[3px] mt-[12px]">
-					<span className="text-[#AAAAAA]">Balance:</span>
+					<span className="text-[#AAAAAA]">{t('trade.balance')}:</span>
 					{
 						isBuy ? <>{formatBigNumber(balance)} POP</> : <>{formatBigNumber(tokenBalance!)} {metadata?.symbol?.toUpperCase() || '--'}</>
 					}
@@ -497,19 +497,19 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 								setInputAmount(maxAmount);
 								setSelectedAmount(null);
 							}
-						}}>Max</span>
+						}}>{t('trade.max')}</span>
 					}
 				</div>
 				<div className="border-dashed border-[1.5px] border-[#333] rounded-[16px] p-[16px] mt-[16px] text-[14px] text-[#fff] bg-[#1A1A1A]">
 					<div className="flex items-center justify-between">
-						<span className="text-[#AAAAAA]">Expected to receive</span>
+						<span className="text-[#AAAAAA]">{t('trade.total')}</span>
 						<div>
 							<span className="text-[#fff] mr-[4px] font-medium">{outputAmount || '0.0'}</span>
 							<span className="text-[#AAAAAA]">{selectedTab === 'buy' ? metadata?.symbol?.toUpperCase() : 'POP'}</span>
 						</div>
 					</div>
 					<div className="flex items-center justify-between mt-[12px]">
-						<span className="text-[#AAAAAA]">Slippage</span>
+						<span className="text-[#AAAAAA]">{t('trade.slippage')}</span>
 						<div className="flex items-center gap-[4px]">
 							<span className="text-[#fff] font-medium">{slippage}%</span>
 							<SetIcon className="mb-[2px] cursor-pointer hover:text-[#9AED2D] transition-colors" onClick={() => setIsSlippageOpen(true)} />
@@ -523,7 +523,7 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 					isLoading={isLoading}
 					isDisabled={isLoading || !inputAmount || parseFloat(inputAmount) <= 0}
 				>
-					{isLoading ? 'Processing...' : (selectedTab === 'buy' ? 'Buy' : 'Sell')}
+					{isLoading ? t('trade.processing') : (selectedTab === 'buy' ? t('trade.buy') : t('trade.sell'))}
 				</Button>
 			</div>
 			<Slippage isOpen={isSlippageOpen} onClose={() => setIsSlippageOpen(false)} />

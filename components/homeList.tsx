@@ -5,17 +5,19 @@ import { useRouter } from "next/router"
 import { useQuery } from "@tanstack/react-query";
 import { Image, Button } from "@heroui/react";
 import { TokenListSkeleton } from "./skeleton";
+import { useTranslation } from 'react-i18next';
 
 type TabType = '1' | '2' | '3';
 
 export const HomeList = () => {
 	const router = useRouter();
+	const { t } = useTranslation('common');
 	const [activeTab, setActiveTab] = useState<TabType>('1');
 
 	const tabs = [
-		{ key: '1' as TabType, label: 'New Created' },
-		{ key: '2' as TabType, label: 'Trending' },
-		{ key: '3' as TabType, label: 'Launched' }
+		{ key: '1' as TabType, label: t('home.newCreated') },
+		{ key: '2' as TabType, label: t('home.trending') },
+		{ key: '3' as TabType, label: t('home.launched') }
 	];
 
 	const handleSearchClick = () => {
@@ -120,7 +122,7 @@ export const HomeList = () => {
 							) : (
 								<div className="flex flex-col items-center mt-[120px]">
 									<Image src="/images/nothing.png" alt="nothing" className="w-[60px] h-auto" disableSkeleton />
-									<div className="text-[14px] text-[#AAAAAA] mt-[12px]">No results</div>
+									<div className="text-[14px] text-[#AAAAAA] mt-[12px]">{t('home.noResults')}</div>
 								</div>
 							)}
 						</div>

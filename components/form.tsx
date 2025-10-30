@@ -12,6 +12,7 @@ import { randomBytes } from "crypto";
 import { useIsMobile } from "@/utils/index";
 import CreateSuccess from "./createSuccess";
 import { FORM_STYLES, AVATAR_STYLES, ERROR_STYLES } from "@/constants/styles";
+import { useTranslation } from 'react-i18next';
 
 
 const MAX_AVATAR_MB = 5;
@@ -43,6 +44,7 @@ function AvatarField({
 	loading?: boolean;
 	clearInput?: React.Ref<{ clearFileInput: () => void }>;
 }) {
+	const { t } = useTranslation('common');
 	const inputId = "avatar-upload-input";
 	const labelId = "avatar-upload-label";
 	const wrapperRef = React.useRef<HTMLDivElement>(null);
@@ -107,7 +109,7 @@ function AvatarField({
 					htmlFor={inputId}
 					className={[`${FORM_STYLES.label.primary} font-bold`, errorText && AVATAR_STYLES.labelError].join(" ")}
 				>
-					Icon
+					{t('form.icon')}
 					{required ? <span className="text-[#f31260] ml-[2px]">*</span> : null}
 				</label>
 			</div>
@@ -150,6 +152,7 @@ function AvatarField({
 }
 
 export default function CreateForm() {
+	const { t } = useTranslation('common');
 
 	const [isSuccessOpen, setIsSuccessOpen] = useState(false);
 	const isMobile = useIsMobile();
@@ -234,14 +237,14 @@ export default function CreateForm() {
 			if (res) {
 				setIpfsHash(res);
 				setAvatarFile(file);
-				toast.success("Image uploaded successfully");
+				toast.success(t('messages.imageUploadSuccess'));
 			} else {
-				toast.error("Image upload failed, please try again");
+				toast.error(t('messages.imageUploadFailed'));
 				avatarFieldRef.current?.clearFileInput();
 			}
 		} catch (error) {
 			console.error("IPFS upload error:", error);
-			toast.error("Image upload failed, please try again");
+			toast.error(t('messages.imageUploadFailed'));
 			avatarFieldRef.current?.clearFileInput();
 		} finally {
 			setUploadLoading(false);
@@ -288,14 +291,14 @@ export default function CreateForm() {
 			};
 			const res = await pinFileToIPFS(params, "json");
 			if (!res) {
-				toast.error("Metadata upload failed");
+				toast.error(t('messages.metadataUploadFailed'));
 				setCreateLoading(false);
 				return false;
 			}
 			return res;
 		} catch (error) {
 			console.error("Upload file error:", error);
-			toast.error("Metadata upload failed");
+			toast.error(t('messages.metadataUploadFailed'));
 			setCreateLoading(false);
 			return false;
 		}
@@ -321,7 +324,10 @@ export default function CreateForm() {
 				const requiredAmount = preBuyAmount + gasReserve;
 
 				if (balance < requiredAmount) {
-					throw new Error(`Insufficient balance for pre-purchase. Required: ${ethers.formatEther(preBuyAmount)} POP + gas fees, Available: ${ethers.formatEther(balance)} POP`);
+					throw new Error(t('validation.insufficientBalanceForPrePurchase', {
+						required: ethers.formatEther(preBuyAmount),
+						available: ethers.formatEther(balance)
+					}));
 				}
 			}
 
@@ -393,8 +399,8 @@ export default function CreateForm() {
 					console.log("createToken transaction sent:", txResult.hash);
 				}
 
-				toast.success('Transaction submitted', {
-					description: `Transaction hash: ${txResult.hash.slice(0, 10)}...${txResult.hash.slice(-6)}`
+				toast.success(t('messages.transactionSubmitted'), {
+					description: `${t('messages.transactionHash')}: ${txResult.hash.slice(0, 10)}...${txResult.hash.slice(-6)}`
 				});
 			} catch (error: any) {
 				throw error;
@@ -425,13 +431,13 @@ export default function CreateForm() {
 
 		// Check wallet connection
 		if (!isConnected || !address) {
-			toast.error("Please connect wallet first");
+			toast.error(t('messages.pleaseConnectWallet'));
 			return;
 		}
 
 		// Check network connection
 		if (!isConnected) {
-			toast.error("Wallet connection error, please reconnect");
+			toast.error(t('messages.walletConnectionError'));
 			return;
 		}
 
@@ -441,7 +447,7 @@ export default function CreateForm() {
 			// 1. Upload final JSON metadata to IPFS
 			const metadataHash = await uploadFile();
 			if (!metadataHash) {
-				toast.error("Metadata upload failed, please try again");
+				toast.error(t('messages.metadataUploadRetry'));
 				return; // uploadFile has already handled the error internally
 			}
 
@@ -454,7 +460,7 @@ export default function CreateForm() {
 			// 3. Creation success handling
 			setCreatedTokenAddress(tokenAddress as string);
 			setIsSuccessOpen(true);
-			toast.success('Token created successfully!');
+			toast.success(t('messages.tokenCreatedSuccess'));
 
 			// 4. Invalidate related caches to ensure new token is displayed immediately
 			try {
@@ -476,15 +482,15 @@ export default function CreateForm() {
 
 			// More detailed error handling
 			if (error?.code === 4001 || error?.code === 'ACTION_REJECTED') {
-				toast.error("User cancelled the transaction");
+				toast.error(t('messages.userCancelledTransaction'));
 			} else if (error?.message?.includes("Insufficient balance for pre-purchase")) {
 				toast.error(error.message);
 			} else if (error?.message?.includes("insufficient funds")) {
-				toast.error("Insufficient balance, please check your account balance");
+				toast.error(t('messages.insufficientBalanceCheck'));
 			} else if (error?.message?.includes("network")) {
-				toast.error("Network connection error, please check network and try again");
+				toast.error(t('messages.networkConnectionError'));
 			} else {
-				toast.error("Creation failed, please try again later");
+				toast.error(t('messages.creationFailed'));
 			}
 		} finally {
 			setCreateLoading(false);
@@ -511,11 +517,11 @@ export default function CreateForm() {
 						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
 					isRequired
-					errorMessage="Please enter name"
-					label={<span className="text-[14px] text-[#AAAAAA]">Name</span>}
+					errorMessage={t('form.namePlaceholder')}
+					label={<span className="text-[14px] text-[#AAAAAA]">{t('form.tokenName')}</span>}
 					labelPlacement="outside-top"
 					name="name"
-					placeholder="Please enter name"
+					placeholder={t('form.namePlaceholder')}
 					variant="bordered"
 					value={nameVal}
 					onChange={(e) => setNameVal(e.target.value)}
@@ -529,11 +535,11 @@ export default function CreateForm() {
 						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666] uppercase tracking-[-0.07px]",
 					}}
 					isRequired
-					errorMessage="Please enter Ticker"
-					label={<span className="text-[14px] text-[#AAAAAA]">Ticker</span>}
+					errorMessage={t('form.tickerPlaceholder')}
+					label={<span className="text-[14px] text-[#AAAAAA]">{t('form.tokenSymbol')}</span>}
 					labelPlacement="outside-top"
 					name="ticker"
-					placeholder="Please enter Ticker"
+					placeholder={t('form.tickerPlaceholder')}
 					variant="bordered"
 					value={ticker}
 					onChange={(e) => setTicker(e.target.value)}
@@ -549,12 +555,12 @@ export default function CreateForm() {
 					}}
 					label={
 						<div className="flex items-center gap-2">
-							<span className="text-[14px] text-[#AAAAAA]">Description</span>
-							<span className="text-[#666]">(Optional)</span>
+							<span className="text-[14px] text-[#AAAAAA]">{t('form.description')}</span>
+							<span className="text-[#666]">{t('form.optional')}</span>
 						</div>
 					}
 					labelPlacement="outside"
-					placeholder="Please enter description"
+					placeholder={t('form.descriptionPlaceholder')}
 					variant="bordered"
 					name="description"
 					aria-label="Please enter description"
@@ -570,7 +576,7 @@ export default function CreateForm() {
 					label={
 						<div className="flex items-center gap-2">
 							<span className="text-[14px] text-[#AAAAAA]">Pre-purchase</span>
-							<span className="text-[#666]">(Optional)</span>
+							<span className="text-[#666]">{t('form.optional')}</span>
 						</div>
 					}
 					labelPlacement="outside-top"
@@ -595,16 +601,16 @@ export default function CreateForm() {
 						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
 						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
-					errorMessage="Please enter a valid URL"
+					errorMessage={t('validation.enterValidUrl')}
 					label={
 						<div className="flex items-center gap-2">
-							<span className="text-[14px] text-[#AAAAAA]">X</span>
-							<span className="text-[#666]">(Optional)</span>
+							<span className="text-[14px] text-[#AAAAAA]">{t('form.twitter')}</span>
+							<span className="text-[#666]">{t('form.optional')}</span>
 						</div>
 					}
 					labelPlacement="outside-top"
 					name="x"
-					placeholder="Please enter X link"
+					placeholder={t('form.xPlaceholder')}
 					variant="bordered"
 					type="url"
 					aria-label="X"
@@ -616,16 +622,16 @@ export default function CreateForm() {
 						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
 						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
-					errorMessage="Please enter a valid URL"
+					errorMessage={t('validation.enterValidUrl')}
 					label={
 						<div className="flex items-center gap-2">
-							<span className="text-[14px] text-[#AAAAAA]">Telegram</span>
-							<span className="text-[#666]">(Optional)</span>
+							<span className="text-[14px] text-[#AAAAAA]">{t('form.telegram')}</span>
+							<span className="text-[#666]">{t('form.optional')}</span>
 						</div>
 					}
 					labelPlacement="outside-top"
 					name="telegram"
-					placeholder='Please enter Telegram link'
+					placeholder={t('form.telegramPlaceholder')}
 					variant="bordered"
 					type="url"
 					aria-label='Telegram'
@@ -637,16 +643,16 @@ export default function CreateForm() {
 						inputWrapper: "h-[48px] border-[#333] bg-[#1A1A1A] border-1",
 						input: "f600 text-[15px] text-[#fff] placeholder:text-[#666]",
 					}}
-					errorMessage="Please enter a valid URL"
+					errorMessage={t('validation.enterValidUrl')}
 					label={
 						<div className="flex items-center gap-2">
-							<span className="text-[14px] text-[#AAAAAA]">Website</span>
-							<span className="text-[#666]">(Optional)</span>
+							<span className="text-[14px] text-[#AAAAAA]">{t('form.website')}</span>
+							<span className="text-[#666]">{t('form.optional')}</span>
 						</div>
 					}
 					labelPlacement="outside-top"
 					name="website"
-					placeholder="Please enter website link"
+					placeholder={t('form.websitePlaceholder')}
 					variant="bordered"
 					type="url"
 					aria-label="Please enter website link"
@@ -663,7 +669,7 @@ export default function CreateForm() {
 					isLoading={createLoading}
 					disabled={createLoading || !readyToSubmit}
 				>
-					{createLoading ? "Creating..." : "Create Now"}
+					{createLoading ? t('trade.creating') : t('trade.createNow')}
 				</Button>
 			</Form>
 			<CreateSuccess

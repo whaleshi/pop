@@ -13,6 +13,7 @@ import NProgress from 'nprogress';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
 import { config } from '@/config/wagmi';
+import '@/lib/i18n';
 
 import { fontSans } from "@/config/fonts";
 import "nprogress/nprogress.css";

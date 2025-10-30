@@ -2,6 +2,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, Button, Input } from "@her
 import { CloseIcon } from "@/components/icons";
 import { useSlippageStore } from "@/stores/slippage";
 import { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface SlippageProps {
 	isOpen: boolean;
@@ -9,6 +10,7 @@ interface SlippageProps {
 }
 
 export default function Slippage({ isOpen, onClose }: SlippageProps) {
+	const { t } = useTranslation('common');
 	const { slippage, setSlippage } = useSlippageStore();
 	const [customValue, setCustomValue] = useState('');
 	const [tempSlippage, setTempSlippage] = useState(slippage);
@@ -62,7 +64,7 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 					{() => (
 						<>
 							<ModalHeader className="text-center relative p-0 pt-[8px]">
-								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">Set Slippage</div>
+								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">{t('slippage.setSlippage')}</div>
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</ModalHeader>
 							<ModalBody className="px-[16px] pb-[16px]">
@@ -88,7 +90,7 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 										input: "text-[14px] text-[#fff] placeholder:text-[#666] tracking-[-0.07px] text-center",
 									}}
 									name="customSlippage"
-									placeholder="Custom (0.1-50)"
+									placeholder={t('slippage.customPlaceholder')}
 									variant="bordered"
 									value={customValue}
 									onChange={(e) => handleCustomInput(e.target.value)}
@@ -96,12 +98,12 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 								/>
 								{customValue && (parseFloat(customValue) < 0.1 || parseFloat(customValue) > 50) && (
 									<div className="text-[#FF4C4C] text-[12px] text-center">
-										Slippage should be between 0.1% - 50%
+										{t('slippage.warning')}
 									</div>
 								)}
 								{tempSlippage > 10 && (
 									<div className="text-[#FFA600] text-[12px] text-center">
-										Warning: High slippage may result in unfavorable trades
+										{t('slippage.highSlippageWarning')}
 									</div>
 								)}
 								<Button
@@ -110,7 +112,7 @@ export default function Slippage({ isOpen, onClose }: SlippageProps) {
 									onPress={handleConfirm}
 									isDisabled={customValue ? (parseFloat(customValue) < 0.1 || parseFloat(customValue) > 50) : false}
 								>
-									Confirm Settings {tempSlippage}%
+									{t('slippage.confirmSettings')} {tempSlippage}%
 								</Button>
 							</ModalBody>
 						</>

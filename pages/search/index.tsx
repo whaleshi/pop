@@ -5,11 +5,13 @@ import { Input, Image, Button } from "@heroui/react";
 import { useRouter } from "next/router"
 import { useQuery } from "@tanstack/react-query";
 import { TokenListSkeleton } from "@/components/skeleton";
+import { useTranslation } from 'react-i18next';
 
 import React, { useState, useEffect } from "react";
 
 export default function Search() {
 	const router = useRouter();
+	const { t } = useTranslation('common');
 	const [searchValue, setSearchValue] = useState("");
 	const [debouncedSearch, setDebouncedSearch] = useState("");
 	const [isMdOrLarger, setIsMdOrLarger] = useState(true);
@@ -78,7 +80,7 @@ export default function Search() {
 							input: "text-[13px] text-[#fff] placeholder:text-[#666] uppercase tracking-[-0.07px]",
 						}}
 						name="amount"
-						placeholder="Search for token addresses"
+						placeholder={t('pages.searchPlaceholder')}
 						variant="bordered"
 						value={searchValue}
 						onValueChange={(value) => setSearchValue(value)}
@@ -98,8 +100,8 @@ export default function Search() {
 					) : debouncedSearch && (
 						<div className="flex flex-col items-center mt-[120px]">
 							<Image src="/images/nothing.png" alt="nothing" className="w-[60px] h-auto" disableSkeleton />
-							<div className="text-[14px] text-[#AAAAAA] mt-[12px]">No search results</div>
-							<Button className="w-[100px] h-[36px] rounded-[18px] bg-[#ABF909] hover:bg-[#9AED2D] text-[13px] text-[#000] font-medium mt-[16px]" onPress={() => router.push("/create")}>Create Token</Button>
+							<div className="text-[14px] text-[#AAAAAA] mt-[12px]">{t('pages.noSearchResults')}</div>
+							<Button className="w-[100px] h-[36px] rounded-[18px] bg-[#ABF909] hover:bg-[#9AED2D] text-[13px] text-[#000] font-medium mt-[16px]" onPress={() => router.push("/create")}>{t('pages.createToken')}</Button>
 						</div>
 					)}
 				</div>

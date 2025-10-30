@@ -7,6 +7,7 @@ import { DEFAULT_CHAIN_CONFIG } from "@/config/chains";
 import { useAccount } from 'wagmi';
 import { useState } from "react";
 import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useTranslation } from 'react-i18next';
 
 interface TokenProps {
 	info?: any;
@@ -14,6 +15,7 @@ interface TokenProps {
 }
 
 export const TokenTradeBox = ({ info, metadata }: TokenProps) => {
+	const { t } = useTranslation('common');
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
 	const { address, isConnected } = useAccount();
 	const { openConnectModal } = useConnectModal();
@@ -64,13 +66,13 @@ export const TokenTradeBox = ({ info, metadata }: TokenProps) => {
 			<div className="w-full h-full flex items-end md:hidden">
 				<div className="flex gap-[12px] w-full">
 					{
-						parseFloat(tokenBalance!) > 0 && <Button fullWidth className="bg-[#FF4C4C] h-[48px] rounded-[16px] text-[15px] text-[#fff]" onPress={() => handleOpenTrade('sell')}>Sell</Button>
+						parseFloat(tokenBalance!) > 0 && <Button fullWidth className="bg-[#FF4C4C] h-[48px] rounded-[16px] text-[15px] text-[#fff]" onPress={() => handleOpenTrade('sell')}>{t('trade.sell')}</Button>
 					}
-					<Button fullWidth className="bg-[#9AED2D] h-[48px] rounded-[16px] text-[15px] text-[#000]" onPress={() => handleOpenTrade('buy')}>Buy</Button>
+					<Button fullWidth className="bg-[#9AED2D] h-[48px] rounded-[16px] text-[15px] text-[#000]" onPress={() => handleOpenTrade('buy')}>{t('trade.buy')}</Button>
 				</div>
 			</div>
 			<div className="hidden md:block border-[2px] border-[#333] p-[16px] pt-[8px] bg-[#1A1A1A] rounded-[24px]">
-				<div className="h-[48px] text-[17px] text-[#fff] flex items-center justify-center">Trade</div>
+				<div className="h-[48px] text-[17px] text-[#fff] flex items-center justify-center">{t('trade.trade')}</div>
 				<Trade info={info} metadata={metadata} tokenBalance={tokenBalance} initialTab={initialTab} />
 			</div>
 			<Drawer isOpen={isOpen} placement="bottom" onOpenChange={onOpenChange} hideCloseButton>
@@ -84,7 +86,7 @@ export const TokenTradeBox = ({ info, metadata }: TokenProps) => {
 					{(onClose) => (
 						<>
 							<DrawerHeader className="text-center relative p-0 pt-[8px]">
-								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">Trade</div>
+								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">{t('trade.trade')}</div>
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</DrawerHeader>
 							<DrawerBody className="px-[16px] pb-[30px]">

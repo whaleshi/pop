@@ -5,6 +5,7 @@ import { TRANSACTION_CONFIG } from "@/config/chains";
 import { useBalanceContext } from "@/providers/balanceProvider";
 import { useQuery } from "@tanstack/react-query";
 import _bignumber from "bignumber.js";
+import { useTranslation } from 'react-i18next';
 
 interface TokenItemProps {
 	border?: boolean;
@@ -12,6 +13,7 @@ interface TokenItemProps {
 }
 
 export const TokenItem = ({ border = false, item }: TokenItemProps) => {
+	const { t } = useTranslation('common');
 	const { price: popPrice } = useBalanceContext();
 
 	// 获取代币元数据
@@ -151,8 +153,8 @@ export const TokenItem = ({ border = false, item }: TokenItemProps) => {
 					<div className="text-[13px] text-[#8C8C8C]">{displayName}</div>
 				</div>
 				<div className="flex flex-col gap-[2px] text-right">
-					<div className="text-[15px] text-[#FFFFFF]"><span className="text-[#FFFFFF]">MC</span> ${formatBigNumber(marketCap)}</div>
-					<div className="text-[13px] text-[#8C8C8C]">Change <span className={`${priceChangeDisplay.color}`}>{priceChangeDisplay.text}</span></div>
+					<div className="text-[15px] text-[#FFFFFF]"><span className="text-[#FFFFFF]">{t('token.mc')}</span> ${formatBigNumber(marketCap)}</div>
+					<div className="text-[13px] text-[#8C8C8C]">{t('token.change')} <span className={`${priceChangeDisplay.color}`}>{priceChangeDisplay.text}</span></div>
 				</div>
 			</div>
 

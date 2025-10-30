@@ -6,9 +6,12 @@ import { useAccount } from 'wagmi';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useEffect, useState } from "react";
 import { siteConfig } from "@/config/site";
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from "@/components/languageSwitcher";
 
 export default function User() {
 	const router = useRouter();
+	const { t } = useTranslation('common');
 	const { address, isConnected } = useAccount();
 	const { openConnectModal } = useConnectModal();
 	const [isMdOrLarger, setIsMdOrLarger] = useState(true);
@@ -58,10 +61,14 @@ export default function User() {
 				{
 					address && <WalletBox />
 				}
-				<div className="border-[1.5px] border-[#333] rounded-[16px] h-[52px] w-full px-[16px] text-[16px] text-[#fff] mt-[16px] flex items-center cursor-pointer bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors" onClick={() => router.push("/create")}>Create Token</div>
-				<div className="border-[1.5px] border-[#333] rounded-[16px] h-[52px] w-full px-[16px] text-[16px] text-[#fff] mt-[12px] flex items-center cursor-pointer bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors" onClick={() => openExternalLink(siteConfig.links.work)}>How It Works</div>
+				<div className="border-[1.5px] border-[#333] rounded-[16px] h-[52px] w-full px-[16px] text-[16px] text-[#fff] mt-[16px] flex items-center cursor-pointer bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors" onClick={() => router.push("/create")}>{t('pages.createToken')}</div>
+				<div className="border-[1.5px] border-[#333] rounded-[16px] h-[52px] w-full px-[16px] text-[16px] text-[#fff] mt-[12px] flex items-center cursor-pointer bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors" onClick={() => openExternalLink(siteConfig.links.work)}>{t('pages.howItWorks')}</div>
 				<div className="border-[1.5px] border-[#333] rounded-[16px] h-[52px] w-full px-[16px] text-[16px] text-[#fff] mt-[12px] flex items-center justify-between cursor-pointer bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors">
-					Join the community
+					{t('common.language')}
+					<LanguageSwitcher />
+				</div>
+				<div className="border-[1.5px] border-[#333] rounded-[16px] h-[52px] w-full px-[16px] text-[16px] text-[#fff] mt-[12px] flex items-center justify-between cursor-pointer bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors">
+					{t('pages.joinCommunity')}
 					<div className="flex items-center gap-[8px]">
 						<Image
 							src="/images/joinX.png"
@@ -90,7 +97,7 @@ export default function User() {
 				<div className="flex-1"></div>
 				<div className="w-full">
 					{
-						!isConnected && <Button fullWidth className="h-[52px] w-full rounded-[16px] bg-[#abf909] text-[15px] text-[#000] hover:bg-[#9AED2D] transition-colors" onPress={handleConnect}>Connect wallet</Button>
+						!isConnected && <Button fullWidth className="h-[52px] w-full rounded-[16px] bg-[#abf909] text-[15px] text-[#000] hover:bg-[#9AED2D] transition-colors" onPress={handleConnect}>{t('pages.connectWallet')}</Button>
 					}
 				</div>
 			</section>

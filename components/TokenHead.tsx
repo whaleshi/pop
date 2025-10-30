@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import NextHead from "next/head";
 import { useRouter } from "next/router";
 import { ethers } from "ethers";
+import { useTranslation } from 'react-i18next';
 import { siteConfig } from "@/config/site";
 import { CONTRACT_CONFIG, DEFAULT_CHAIN_CONFIG } from "@/config/chains";
 import contractABI from "@/constant/TokenFactory.abi.json";
@@ -29,6 +30,7 @@ export const TokenHead: React.FC<TokenHeadProps> = ({
   fallbackImage = "https://popme.mypinata.cloud/ipfs/bafkreigpmkeqa6o4xcd4eiwewuceedfr55h7a5kpacy3bcyo6alaxpdm6a",
   serverMetadata
 }) => {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const { addr } = router.query;
   const [metadata, setMetadata] = useState<TokenMetadata | null>(serverMetadata || null);
@@ -87,7 +89,11 @@ export const TokenHead: React.FC<TokenHeadProps> = ({
 
   // 构建动态 meta 数据
   const title = metadata?.name ? `${metadata.name} (${metadata.symbol}) - ${siteConfig.name}` : fallbackTitle;
-  const description = `Trade ${metadata?.symbol?.toUpperCase() || 'token'} on ${siteConfig.name}. ${fallbackDescription}`;
+  const description = t('meta.tradeDescription', { 
+    symbol: metadata?.symbol?.toUpperCase() || 'token', 
+    siteName: siteConfig.name,
+    description: fallbackDescription
+  });
 
   // 使用 OG API 生成图片
   const ogImageUrl = metadata?.name && metadata?.symbol && metadata?.image

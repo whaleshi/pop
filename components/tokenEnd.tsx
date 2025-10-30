@@ -9,6 +9,7 @@ import { formatBigNumber } from "@/utils/formatBigNumber";
 import { TRANSACTION_CONFIG } from "@/config/chains";
 import { useBalanceContext } from "@/providers/balanceProvider";
 import _bignumber from "bignumber.js";
+import { useTranslation } from 'react-i18next';
 
 interface TokenProps {
 	info?: any;
@@ -16,9 +17,13 @@ interface TokenProps {
 }
 
 export const TokenEnd = ({ info, metadata }: TokenProps) => {
+	const { t } = useTranslation('common');
 	const [isShareOpen, setIsShareOpen] = useState(false);
 	const [isAuthOpen, setIsAuthOpen] = useState(false);
-	const { copy } = useClipboard();
+	const { copy } = useClipboard({
+		successMessage: t('messages.copySuccessful'),
+		errorMessage: t('messages.copyFailed')
+	});
 	const { price: popPrice } = useBalanceContext();
 
 	// Calculate token price
@@ -146,23 +151,23 @@ export const TokenEnd = ({ info, metadata }: TokenProps) => {
 			<div className="flex flex-col md:flex-row items-center gap-[12px] mt-[16px] w-full">
 				<div className="flex items-center gap-[12px] w-full">
 					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-						<div className="text-[13px] text-[#AAAAAA]">Price</div>
+						<div className="text-[13px] text-[#AAAAAA]">{t('token.price')}</div>
 						<div className="text-[20px] text-[#fff] font-semibold">${formatBigNumber(tokenPrice)}</div>
 					</div>
 					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-						<div className="text-[13px] text-[#AAAAAA]">Market Cap</div>
+						<div className="text-[13px] text-[#AAAAAA]">{t('token.marketCap')}</div>
 						<div className="text-[20px] text-[#fff] font-semibold">${formatBigNumber(marketCap)}</div>
 					</div>
 				</div>
 				<div className="flex items-center gap-[12px] w-full">
 					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-						<div className="text-[13px] text-[#AAAAAA]">Change</div>
+						<div className="text-[13px] text-[#AAAAAA]">{t('token.change')}</div>
 						<div className={`text-[20px] font-semibold ${priceChangeDisplay.color}`}>
 							{priceChangeDisplay.text}
 						</div>
 					</div>
 					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
-						<div className="text-[13px] text-[#AAAAAA]">Holders</div>
+						<div className="text-[13px] text-[#AAAAAA]">{t('token.holders')}</div>
 						<div className="text-[20px] text-[#fff] font-semibold">--</div>
 					</div>
 				</div>

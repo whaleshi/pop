@@ -15,10 +15,13 @@ import { WalletBox } from "./wallet";
 import { siteConfig } from "@/config/site";
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount, useDisconnect } from 'wagmi';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './languageSwitcher';
 
 
 export const Navbar = () => {
 	const router = useRouter();
+	const { t } = useTranslation('common');
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
 	const { isOpen: isSecondModalOpen, onOpen: onSecondModalOpen, onOpenChange: onSecondModalOpenChange } = useDisclosure();
 
@@ -159,16 +162,19 @@ export const Navbar = () => {
 					<LogoIcon className="w-[97] h-[28px]" />
 				</NextLink>
 				<div className="text-[14px] text-[#fff] hidden md:flex items-center gap-[16px] pl-[24px]">
-					<NextLink href="/" className="hover:opacity-80 transition-opacity">Home</NextLink>
+					<NextLink href="/" className="hover:opacity-80 transition-opacity">{t('nav.home')}</NextLink>
 					<NextLink href="/create" className="hover:opacity-80 transition-opacity">
-						Create Token
+						{t('nav.create')}
 					</NextLink>
-					<NextLink href={siteConfig.links.work} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">How It Works</NextLink>
+					<NextLink href={siteConfig.links.work} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">{t('nav.work')}</NextLink>
 					<NextLink href={siteConfig.links.x} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">X</NextLink>
 					<NextLink href={siteConfig.links.tg} className="hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">Telegram</NextLink>
 				</div>
 
 				<NavbarContent justify="end" className="gap-[12px]">
+					<div className="hidden md:block">
+						<LanguageSwitcher />
+					</div>
 					<div className="hidden md:block relative" ref={searchRef}>
 						<Input
 							classNames={{
@@ -176,7 +182,7 @@ export const Navbar = () => {
 								input: "text-[13px] text-[#fff] placeholder:text-[#666] tracking-[-0.07px]",
 							}}
 							name="amount"
-							placeholder="Search for token addresses"
+							placeholder={t('nav.search')}
 							variant="bordered"
 							value={searchValue}
 							onValueChange={handleSearchChange}
@@ -200,7 +206,7 @@ export const Navbar = () => {
 								) : debouncedSearch && (
 									<div className="h-full flex flex-col items-center justify-center">
 										<Image src="/images/nothing.png" alt="nothing" className="w-[60px] h-auto" disableSkeleton />
-										<div className="text-[14px] text-[#AAAAAA] mt-[12px]">No search results</div>
+										<div className="text-[14px] text-[#AAAAAA] mt-[12px]">{t('nav.searchResults')}</div>
 									</div>
 								)}
 							</div>
@@ -224,7 +230,7 @@ export const Navbar = () => {
 							className="w-[96px] h-[36px] rounded-[12px] bg-[#abf909] active:scale-[0.97] text-[13px] font-medium text-[#000] hover:bg-[#9AED2D] flex items-center justify-center transition-colors"
 							onClick={() => openConnectModal && openConnectModal()}
 						>
-							Connect
+							{t('nav.connect')}
 						</button>
 					)}
 
@@ -240,7 +246,7 @@ export const Navbar = () => {
 					{(onClose) => (
 						<>
 							<ModalHeader className="text-center relative p-0 pt-[8px]">
-								<div className="h-[48px] flex items-center justify-center w-full">Create Now</div>
+								<div className="h-[48px] flex items-center justify-center w-full">{t('nav.creates')}</div>
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</ModalHeader>
 							<ModalBody className="px-[0px] pb-[0px]">
@@ -261,12 +267,12 @@ export const Navbar = () => {
 					{(onClose) => (
 						<>
 							<ModalHeader className="text-center relative p-0 pt-[8px]">
-								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">My Wallet</div>
+								<div className="h-[48px] flex items-center justify-center w-full text-[#fff]">{t('wallet.my')}</div>
 								<CloseIcon className="absolute right-[16px] top-[20px] cursor-pointer" onClick={onClose} />
 							</ModalHeader>
 							<ModalBody className="px-[16px] pb-[20px]">
 								<WalletBox />
-								<Button fullWidth className="h-[44px] bg-[#333] text-[15px] text-[#fff] rounded-[16px] mt-[6px] hover:bg-[#444] transition-colors" onPress={toLogout}>Disconnect</Button>
+								<Button fullWidth className="h-[44px] bg-[#333] text-[15px] text-[#fff] rounded-[16px] mt-[6px] hover:bg-[#444] transition-colors" onPress={toLogout}>{t('wallet.disconnect')}</Button>
 							</ModalBody>
 						</>
 					)}

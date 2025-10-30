@@ -3,9 +3,11 @@ import { BackIcon } from "@/components/icons";
 import DefaultLayout from "@/layouts/default";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 export default function CreatePage() {
 	const router = useRouter();
+	const { t } = useTranslation('common');
 
 	const [isMdOrLarger, setIsMdOrLarger] = useState(true);
 
@@ -42,7 +44,7 @@ export default function CreatePage() {
 			<section className="flex flex-col items-center justify-center w-full px-[16px]">
 				<div className="h-[48px] w-full flex items-center relative max-w-[450px] mx-auto">
 					<BackIcon className="cursor-pointer relative z-1" onClick={() => router.push('/')} />
-					<div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-[17px] text-[#fff]">Create now</div>
+					<div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-[17px] text-[#fff]">{t('pages.createNow')}</div>
 				</div>
 			</section>
 			<div className="max-w-[450px] mx-auto"><CreateForm /></div>
