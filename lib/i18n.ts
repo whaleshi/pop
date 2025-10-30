@@ -41,6 +41,10 @@ i18n
       caches: ['localStorage'],
       lookupLocalStorage: 'i18nextLng',
     },
+    // Add language mapping to handle browser locale codes
+    load: 'languageOnly', // Use only language part, ignore region (e.g., 'zh' instead of 'zh-CN')
+    supportedLngs: ['en', 'zh', 'ko', 'ja', 'vi'],
+    nonExplicitSupportedLngs: true, // Allow fallback to supported languages
     interpolation: {
       escapeValue: false,
     },

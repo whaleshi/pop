@@ -172,9 +172,6 @@ export const Navbar = () => {
 				</div>
 
 				<NavbarContent justify="end" className="gap-[12px]">
-					<div className="hidden md:block">
-						<LanguageSwitcher />
-					</div>
 					<div className="hidden md:block relative" ref={searchRef}>
 						<Input
 							classNames={{
@@ -233,6 +230,9 @@ export const Navbar = () => {
 							{t('nav.connect')}
 						</button>
 					)}
+					<div className="hidden md:block">
+						<LanguageSwitcher />
+					</div>
 
 					{router.pathname === '/user' ? (
 						<MenuCloseIcon className="cursor-pointer block md:hidden" onClick={() => { router.back(); }} />

@@ -16,7 +16,20 @@ export default function LanguageSwitcher() {
   const { t, i18n } = useTranslation('common');
   const [isOpen, setIsOpen] = useState(false);
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+  // Handle cases where i18n.language might be 'zh-CN' instead of 'zh'
+  const getCurrentLanguage = () => {
+    const currentLang = i18n.language;
+    // First try exact match
+    let found = languages.find(lang => lang.code === currentLang);
+    // If not found, try matching the first part (e.g., 'zh' from 'zh-CN')
+    if (!found && currentLang.includes('-')) {
+      const langCode = currentLang.split('-')[0];
+      found = languages.find(lang => lang.code === langCode);
+    }
+    return found || languages[0];
+  };
+
+  const currentLanguage = getCurrentLanguage();
 
   const handleLanguageChange = (langCode: string) => {
     i18n.changeLanguage(langCode);
