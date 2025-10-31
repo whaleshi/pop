@@ -10,7 +10,7 @@ import QueryProvider from '@/providers/queryProvider'
 import { BalanceProvider } from '@/providers/balanceProvider'
 import { Toaster } from 'sonner';
 import NProgress from 'nprogress';
-import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider, darkTheme, Locale } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
 import { config } from '@/config/wagmi';
 import '@/lib/i18n';
@@ -27,8 +27,8 @@ export default function App({ Component, pageProps }: AppProps) {
 	const { i18n } = useTranslation();
 
 	// Map i18n language codes to RainbowKit locales
-	const getRainbowKitLocale = (lang: string) => {
-		const localeMap: Record<string, string> = {
+	const getRainbowKitLocale = (lang: string): Locale => {
+		const localeMap: Record<string, Locale> = {
 			'en': 'en-US',
 			'zh': 'zh-CN',
 			'ko': 'ko-KR',
