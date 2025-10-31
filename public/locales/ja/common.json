@@ -147,7 +147,7 @@
     "network": {
         "error": "ネットワークエラー",
         "currentNetwork": "現在のネットワーク",
-        "switchTo": "続行するには{networkName}ネットワークに切り替えてください",
+        "switchTo": "続行するには{{networkName}}ネットワークに切り替えてください",
         "switchNetwork": "正しいネットワークに切り替え",
         "switching": "切り替え中...",
         "modalNote": "このモーダルは正しいネットワークに切り替えた後に自動的に閉じます"

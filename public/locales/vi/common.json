@@ -147,7 +147,7 @@
     "network": {
         "error": "Lỗi mạng",
         "currentNetwork": "Mạng hiện tại",
-        "switchTo": "Vui lòng chuyển sang mạng {networkName} để tiếp tục",
+        "switchTo": "Vui lòng chuyển sang mạng {{networkName}} để tiếp tục",
         "switchNetwork": "Chuyển sang mạng chính xác",
         "switching": "Đang chuyển...",
         "modalNote": "Modal này sẽ tự động đóng sau khi chuyển sang mạng chính xác"

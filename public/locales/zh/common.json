@@ -147,7 +147,7 @@
     "network": {
         "error": "网络错误",
         "currentNetwork": "当前网络",
-        "switchTo": "请切换到 {networkName} 网络以继续使用",
+        "switchTo": "请切换到 {{networkName}} 网络以继续使用",
         "switchNetwork": "切换到正确网络",
         "switching": "切换中...",
         "modalNote": "此弹窗将在切换到正确网络后自动关闭"

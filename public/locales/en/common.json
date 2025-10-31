@@ -147,7 +147,7 @@
     "network": {
         "error": "Network Error",
         "currentNetwork": "Current Network",
-        "switchTo": "Please switch to {networkName} network to continue",
+        "switchTo": "Please switch to {{networkName}} network to continue",
         "switchNetwork": "Switch to Correct Network",
         "switching": "Switching...",
         "modalNote": "This modal will automatically close after switching to the correct network"
