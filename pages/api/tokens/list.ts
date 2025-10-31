@@ -513,25 +513,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         }
         console.log(filteredTokens);
         // 5. 排序
-        switch (sort) {
-            case "newest":
-                // 新创建 - 倒序，过滤掉100%进度的
-                filteredTokens = filteredTokens.filter((token) => parseFloat(token.progress) < 100).reverse();
-                break;
-            case "trending":
-                // 飙升 - 按进度最高排序，过滤掉100%进度的
-                filteredTokens = filteredTokens
-                    .filter((token) => parseFloat(token.progress) < 100)
-                    .sort((a, b) => parseFloat(b.progress) - parseFloat(a.progress));
-                break;
-            case "launched":
-                // 新开盘 - 只显示launched=true的token
-                filteredTokens = filteredTokens
-                    .filter((token) => token.launched === true)
-                    .sort((a, b) => parseFloat(b.progress) - parseFloat(a.progress));
-                break;
-            default:
-                break;
+        // 注意：如果是查询用户持仓(hasBalance=true)，不应用sort的过滤逻辑，显示所有持仓
+        if (hasBalance === "true") {
+            // 用户持仓：按余额从大到小排序，显示所有代币（包括已发射的）
+            filteredTokens = filteredTokens.sort((a, b) => {
+                const balanceA = _bignumber(a.balance || "0");
+                const balanceB = _bignumber(b.balance || "0");
+                return balanceB.minus(balanceA).toNumber();
+            });
+        } else {
+            // 其他tab：应用原有的排序和过滤逻辑
+            switch (sort) {
+                case "newest":
+                    // 新创建 - 倒序，过滤掉100%进度的
+                    filteredTokens = filteredTokens.filter((token) => parseFloat(token.progress) < 100).reverse();
+                    break;
+                case "trending":
+                    // 飙升 - 按进度最高排序，过滤掉100%进度的
+                    filteredTokens = filteredTokens
+                        .filter((token) => parseFloat(token.progress) < 100)
+                        .sort((a, b) => parseFloat(b.progress) - parseFloat(a.progress));
+                    break;
+                case "launched":
+                    // 新开盘 - 只显示launched=true的token
+                    filteredTokens = filteredTokens
+                        .filter((token) => token.launched === true)
+                        .sort((a, b) => parseFloat(b.progress) - parseFloat(a.progress));
+                    break;
+                default:
+                    break;
+            }
         }
 
         // 6. 分页
