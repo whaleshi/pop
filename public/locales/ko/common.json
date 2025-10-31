@@ -19,7 +19,7 @@
     "home": {
         "tagline": "<highlight>Pop Chain</highlight>에서<br />구축된 혁신적인 런치패드",
         "subtitle": "누구나 원클릭으로 토큰을 배포할 수 있습니다",
-        "launchToken": "🚀 토큰 출시",
+        "launchToken": "토큰 출시",
         "learnMore": "더 알아보기",
         "newCreated": "새로 생성됨",
         "trending": "트렌딩",
@@ -106,7 +106,7 @@
         "transactionSuccess": "거래 성공",
         "copySuccess": "클립보드에 복사됨",
         "networkError": "네트워크 오류, 다시 시도하세요",
-        "shareText": "PopMe에서 ${symbol}을(를) 발견했습니다! 함께 거래해요 👉 https://popmefun.com/token/${address}",
+        "shareText": ".@Popmefun 에서 ${symbol}을(를) 발견했습니다! 함께 거래해요 👉 https://popmefun.com/token/${address}",
         "imageUploadSuccess": "이미지 업로드 성공",
         "imageUploadFailed": "이미지 업로드 실패, 다시 시도하세요",
         "metadataUploadFailed": "메타데이터 업로드 실패",

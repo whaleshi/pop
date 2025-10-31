@@ -19,7 +19,7 @@
     "home": {
         "tagline": "An innovation launchpad<br />built on <highlight>Pop Chain</highlight>",
         "subtitle": "Everyone can deploy a token with one click",
-        "launchToken": "🚀 Launch Token",
+        "launchToken": "Launch Token",
         "learnMore": "Learn More",
         "newCreated": "New Created",
         "trending": "Trending",
@@ -106,7 +106,7 @@
         "transactionSuccess": "Transaction successful",
         "copySuccess": "Copied to clipboard",
         "networkError": "Network error, please try again",
-        "shareText": "I found ${symbol} on PopMe! Come trade together 👉 https://popmefun.com/token/${address}",
+        "shareText": "I found ${symbol} on @Popmefun! Come trade together 👉 https://popmefun.com/token/${address}",
         "imageUploadSuccess": "Image uploaded successfully",
         "imageUploadFailed": "Image upload failed, please try again",
         "metadataUploadFailed": "Metadata upload failed",

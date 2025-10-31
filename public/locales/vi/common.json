@@ -19,7 +19,7 @@
     "home": {
         "tagline": "Nền tảng khởi chạy đổi mới<br />được xây dựng trên <highlight>Pop Chain</highlight>",
         "subtitle": "Mọi người đều có thể triển khai token chỉ với một cú nhấp chuột",
-        "launchToken": "🚀 Khởi chạy Token",
+        "launchToken": "Khởi chạy Token",
         "learnMore": "Tìm hiểu thêm",
         "newCreated": "Mới tạo",
         "trending": "Xu hướng",
@@ -106,7 +106,7 @@
         "transactionSuccess": "Giao dịch thành công",
         "copySuccess": "Đã sao chép vào clipboard",
         "networkError": "Lỗi mạng, vui lòng thử lại",
-        "shareText": "Tôi đã tìm thấy ${symbol} trên PopMe! Hãy cùng giao dịch 👉 https://popmefun.com/token/${address}",
+        "shareText": "Tôi đã tìm thấy ${symbol} trên @Popmefun! Hãy cùng giao dịch 👉 https://popmefun.com/token/${address}",
         "imageUploadSuccess": "Tải lên hình ảnh thành công",
         "imageUploadFailed": "Tải lên hình ảnh thất bại, vui lòng thử lại",
         "metadataUploadFailed": "Tải lên metadata thất bại",
