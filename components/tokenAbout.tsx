@@ -128,7 +128,7 @@ export const TokenAbout = ({ info, metadata }: TokenProps) => {
 			<div className="w-full mt-[20px] p-[16px] bg-[#1A1A1A] rounded-[16px] border border-[#333]">
 				<div className="flex justify-between items-center mb-[12px]">
 					<span className="text-[14px] text-[#AAAAAA] font-medium">{t('token.progress')}</span>
-					<span className="text-[14px] text-[#9AED2D] font-bold">{info?.progress}%</span>
+					<span className="text-[14px] text-[#9AED2D] font-bold">{(Math.floor((info?.progressPercent || 0) * 100) / 100).toFixed(2)}%</span>
 				</div>
 				<div className="w-full h-[12px] bg-[#ffffff08] rounded-full overflow-hidden relative">
 					<div

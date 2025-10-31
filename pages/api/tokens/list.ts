@@ -55,7 +55,6 @@ type ErrorResponse = {
     code?: number;
 };
 
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse<TokenListResponse | ErrorResponse>) {
     if (req.method !== "GET") {
         res.setHeader("Allow", ["GET"]);
@@ -258,7 +257,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     target: address,
                     allowFailure: true,
                     callData: encodeFunctionData({
-                        abi: [{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}],
+                        abi: [
+                            {
+                                inputs: [],
+                                name: "name",
+                                outputs: [{ internalType: "string", name: "", type: "string" }],
+                                stateMutability: "view",
+                                type: "function",
+                            },
+                        ],
                         functionName: "name",
                         args: [],
                     }),
@@ -268,7 +275,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     target: address,
                     allowFailure: true,
                     callData: encodeFunctionData({
-                        abi: [{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}],
+                        abi: [
+                            {
+                                inputs: [],
+                                name: "symbol",
+                                outputs: [{ internalType: "string", name: "", type: "string" }],
+                                stateMutability: "view",
+                                type: "function",
+                            },
+                        ],
                         functionName: "symbol",
                         args: [],
                     }),
@@ -313,6 +328,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                             functionName: "tokensInfo",
                             data: dataResults[infoIndex].returnData,
                         }) as any[];
+                        console.log(tokenInfoResult);
                         tokenInfo = {
                             base: tokenInfoResult[0],
                             quote: tokenInfoResult[1],
@@ -337,7 +353,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 if (dataResults[nameIndex]?.success) {
                     try {
                         name = decodeFunctionResult({
-                            abi: [{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}],
+                            abi: [
+                                {
+                                    inputs: [],
+                                    name: "name",
+                                    outputs: [{ internalType: "string", name: "", type: "string" }],
+                                    stateMutability: "view",
+                                    type: "function",
+                                },
+                            ],
                             functionName: "name",
                             data: dataResults[nameIndex].returnData,
                         }) as string;
@@ -351,7 +375,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 if (dataResults[symbolIndex]?.success) {
                     try {
                         symbol = decodeFunctionResult({
-                            abi: [{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}],
+                            abi: [
+                                {
+                                    inputs: [],
+                                    name: "symbol",
+                                    outputs: [{ internalType: "string", name: "", type: "string" }],
+                                    stateMutability: "view",
+                                    type: "function",
+                                },
+                            ],
                             functionName: "symbol",
                             data: dataResults[symbolIndex].returnData,
                         }) as string;
@@ -365,8 +397,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 if (tokenInfo && tokenInfo.reserve1 && tokenInfo.target) {
                     const reserve = _bignumber(tokenInfo.reserve1);
                     const target = _bignumber(tokenInfo.target);
+                    console.log(reserve.div(target).times(100).toString());
                     if (!target.isZero()) {
-                        progress = reserve.div(target).times(100).dp(2).toNumber();
+                        progress = reserve.div(target).times(100).dp(18).toNumber();
                         progress = Math.min(progress, 100);
                     }
                 }
@@ -377,7 +410,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     uri: uri,
                     info: tokenInfo,
                     launched: tokenInfo?.launched || false,
-                    progress: progress.toFixed(2),
+                    progress: progress.toString(),
                     progressPercent: progress,
                     name: name || undefined,
                     symbol: symbol || undefined,
@@ -403,7 +436,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             const isLaunched = launched === "true";
             filteredTokens = filteredTokens.filter((token) => token.launched === isLaunched);
         }
-
+        console.log(filteredTokens);
         // 5. 排序
         switch (sort) {
             case "newest":

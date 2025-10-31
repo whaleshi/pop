@@ -116,7 +116,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 target: address,
                 allowFailure: true,
                 callData: encodeFunctionData({
-                    abi: [{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}],
+                    abi: [
+                        {
+                            inputs: [],
+                            name: "name",
+                            outputs: [{ internalType: "string", name: "", type: "string" }],
+                            stateMutability: "view",
+                            type: "function",
+                        },
+                    ],
                     functionName: "name",
                     args: [],
                 }),
@@ -126,7 +134,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 target: address,
                 allowFailure: true,
                 callData: encodeFunctionData({
-                    abi: [{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}],
+                    abi: [
+                        {
+                            inputs: [],
+                            name: "symbol",
+                            outputs: [{ internalType: "string", name: "", type: "string" }],
+                            stateMutability: "view",
+                            type: "function",
+                        },
+                    ],
                     functionName: "symbol",
                     args: [],
                 }),
@@ -194,7 +210,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         if (results[2]?.success) {
             try {
                 name = decodeFunctionResult({
-                    abi: [{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}],
+                    abi: [
+                        {
+                            inputs: [],
+                            name: "name",
+                            outputs: [{ internalType: "string", name: "", type: "string" }],
+                            stateMutability: "view",
+                            type: "function",
+                        },
+                    ],
                     functionName: "name",
                     data: results[2].returnData,
                 }) as string;
@@ -209,7 +233,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         if (results[3]?.success) {
             try {
                 symbol = decodeFunctionResult({
-                    abi: [{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}],
+                    abi: [
+                        {
+                            inputs: [],
+                            name: "symbol",
+                            outputs: [{ internalType: "string", name: "", type: "string" }],
+                            stateMutability: "view",
+                            type: "function",
+                        },
+                    ],
                     functionName: "symbol",
                     data: results[3].returnData,
                 }) as string;
@@ -233,7 +265,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             const reserve = _bignumber(tokenInfo.reserve1);
             const target = _bignumber(tokenInfo.target);
             if (!target.isZero()) {
-                progress = reserve.div(target).times(100).dp(2).toNumber();
+                progress = reserve.div(target).times(100).dp(18).toNumber();
                 progress = Math.min(progress, 100);
             }
         }
@@ -245,7 +277,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             uri: uri,
             info: tokenInfo,
             launched: tokenInfo?.launched || false,
-            progress: progress.toFixed(2),
+            progress: progress.toString(),
             progressPercent: progress,
             name: name || undefined,
             symbol: symbol || undefined,
