@@ -6,7 +6,7 @@ import Share from "./share";
 import { shortenAddress } from "@/utils";
 import useClipboard from '@/hooks/useCopyToClipboard';
 import { formatBigNumber } from "@/utils/formatBigNumber";
-import { TRANSACTION_CONFIG } from "@/config/chains";
+import { TRANSACTION_CONFIG, DEFAULT_CHAIN_ID } from "@/config/chains";
 import { useBalanceContext } from "@/providers/balanceProvider";
 import _bignumber from "bignumber.js";
 import { useTranslation } from 'react-i18next';
@@ -174,7 +174,7 @@ export const TokenEnd = ({ info, metadata }: TokenProps) => {
 			</div>
 			<div className="w-full mt-[16px] md:mt-[24px] flex flex-col md:grid md:grid-cols-2 gap-[12px]">
 				<Button fullWidth className="h-[48px] rounded-[16px] bg-[#5A4CF3] text-[14px] text-[#fff]"
-					onPress={() => { window.open(`https://swap.popchain.ai/swap?chainId=7257&inputCurrency=${info?.address}&outputCurrency=POP`, "_blank"); }}
+					onPress={() => { window.open(`https://swap.popchain.ai/swap?chainId=${DEFAULT_CHAIN_ID}&outputCurrency=${info?.address}`, "_blank"); }}
 				>
 					<Image src="/images/popSwap.png" alt="pop" width={16} height={18} disableSkeleton radius='none' />Pop Swap
 				</Button>
