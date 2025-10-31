@@ -6,6 +6,6 @@ export const siteConfig = {
     links: {
         x: "https://x.com/popmefun",
         tg: "https://t.me/popmefun",
-        work: "",
+        work: "https://x.com/popmefun/status/1981386783158894929?s=46&t=sKCMgE2u8cDlKJdlNM2zWQ",
     },
 };

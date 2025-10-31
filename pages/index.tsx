@@ -12,39 +12,11 @@ import { Trans, useTranslation } from 'react-i18next';
 export default function IndexPage() {
 	const { t } = useTranslation('common');
 	const router = useRouter();
-	// const [currentBanner, setCurrentBanner] = useState(0);
-
-	// // 获取缓存状态
-	// const { data: cacheStats } = useQuery({
-	// 	queryKey: ["cache-stats"],
-	// 	queryFn: async () => {
-	// 		const response = await fetch('/api/cache/stats');
-	// 		const result = await response.json();
-	// 		return result.success ? result.data : null;
-	// 	},
-	// 	refetchInterval: 10000, // 每10秒刷新一次
-	// 	staleTime: 5000, // 5秒内认为数据是新鲜的
-	// });
-
-	// // 3秒切换banner图片
-	// useEffect(() => {
-	// 	const interval = setInterval(() => {
-	// 		setCurrentBanner(prev => prev === 0 ? 1 : 0);
-	// 	}, 3000);
-	// 	return () => clearInterval(interval);
-	// }, []);
-
-	// // 开发环境下显示缓存状态
-	// useEffect(() => {
-	// 	if (process.env.NODE_ENV === 'development' && cacheStats) {
-	// 		console.log('=== 缓存状态 ===');
-	// 		console.log('缓存项数量:', cacheStats.totalItems);
-	// 		console.log('过期项数量:', cacheStats.expiredItems);
-	// 		console.log('内存使用:', cacheStats.memoryUsage);
-	// 		console.log('运行时间:', cacheStats.uptime);
-	// 		console.log('================');
-	// 	}
-	// }, [cacheStats]);
+	const openExternalLink = (url: string) => {
+		if (url) {
+			window.open(url, '_blank', 'noopener,noreferrer');
+		}
+	};
 
 
 	return (
@@ -89,7 +61,8 @@ export default function IndexPage() {
 							>
 								{t('home.launchToken')}
 							</Button>
-							<Button className="bg-[rgba(255,255,255,0.05)] backdrop-blur-md border-[1px] border-[rgba(171,249,9,0.2)] hover:border-[rgba(171,249,9,0.5)] hover:bg-[rgba(171,249,9,0.1)] flex-1 md:flex-none md:w-[180px] h-[48px] rounded-[16px] text-[14px] md:text-[15px] font-medium text-[#fff] transition-all duration-200">
+							<Button className="bg-[rgba(255,255,255,0.05)] backdrop-blur-md border-[1px] border-[rgba(171,249,9,0.2)] hover:border-[rgba(171,249,9,0.5)] hover:bg-[rgba(171,249,9,0.1)] flex-1 md:flex-none md:w-[180px] h-[48px] rounded-[16px] text-[14px] md:text-[15px] font-medium text-[#fff] transition-all duration-200"
+								onPress={() => openExternalLink(siteConfig.links.work)}>
 								{t('home.learnMore')}
 							</Button>
 						</div>
