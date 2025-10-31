@@ -133,11 +133,11 @@
         "enterTradeAmount": "거래 수량을 입력하세요",
         "enterValidAmount": "유효한 수량을 입력하세요",
         "insufficientPopBalance": "POP 잔액 부족",
-        "insufficientPopBalanceDetailed": "POP 잔액 부족, 현재 잔액: {balance} POP",
+        "insufficientPopBalanceDetailed": "POP 잔액 부족, 현재 잔액: {{balance}} POP",
         "reserveGasFees": "가스 수수료를 위해 충분한 POP을 예약하세요",
         "insufficientTokenBalance": "토큰 잔액 부족",
-        "insufficientTokenBalanceDetailed": "토큰 잔액 부족, 현재 잔액: {balance} {symbol}",
-        "insufficientBalanceForPrePurchase": "사전 구매를 위한 잔액 부족. 필요: {required} POP + 가스 수수료, 사용 가능: {available} POP",
+        "insufficientTokenBalanceDetailed": "토큰 잔액 부족, 현재 잔액: {{balance}} {{symbol}}",
+        "insufficientBalanceForPrePurchase": "사전 구매를 위한 잔액 부족. 필요: {{required}} POP + 가스 수수료, 사용 가능: {{available}} POP",
         "enterValidUrl": "유효한 URL을 입력하세요",
         "wrongNetwork": "올바른 네트워크로 전환하세요"
     },
@@ -153,6 +153,6 @@
         "modalNote": "이 모달은 올바른 네트워크로 전환 후 자동으로 닫힙니다"
     },
     "meta": {
-        "tradeDescription": "{siteName}에서 {symbol} 거래하세요. {description}"
+        "tradeDescription": "{{siteName}}에서 {{symbol}} 거래하세요. {{description}}"
     }
 }

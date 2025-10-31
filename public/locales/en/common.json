@@ -133,11 +133,11 @@
         "enterTradeAmount": "Please enter trade amount",
         "enterValidAmount": "Please enter a valid amount",
         "insufficientPopBalance": "Insufficient POP balance",
-        "insufficientPopBalanceDetailed": "Insufficient POP balance, current balance: {balance} POP",
+        "insufficientPopBalanceDetailed": "Insufficient POP balance, current balance: {{balance}} POP",
         "reserveGasFees": "Please reserve enough POP for gas fees",
         "insufficientTokenBalance": "Insufficient token balance",
-        "insufficientTokenBalanceDetailed": "Insufficient token balance, current balance: {balance} {symbol}",
-        "insufficientBalanceForPrePurchase": "Insufficient balance for pre-purchase. Required: {required} POP + gas fees, Available: {available} POP",
+        "insufficientTokenBalanceDetailed": "Insufficient token balance, current balance: {{balance}} {{symbol}}",
+        "insufficientBalanceForPrePurchase": "Insufficient balance for pre-purchase. Required: {{required}} POP + gas fees, Available: {{available}} POP",
         "enterValidUrl": "Please enter a valid URL",
         "wrongNetwork": "Please switch to the correct network"
     },
@@ -153,6 +153,6 @@
         "modalNote": "This modal will automatically close after switching to the correct network"
     },
     "meta": {
-        "tradeDescription": "Trade {symbol} on {siteName}. {description}"
+        "tradeDescription": "Trade {{symbol}} on {{siteName}}. {{description}}"
     }
 }

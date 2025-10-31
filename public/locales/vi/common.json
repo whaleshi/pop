@@ -133,11 +133,11 @@
         "enterTradeAmount": "Vui lòng nhập số lượng giao dịch",
         "enterValidAmount": "Vui lòng nhập số lượng hợp lệ",
         "insufficientPopBalance": "Số dư POP không đủ",
-        "insufficientPopBalanceDetailed": "Số dư POP không đủ, số dư hiện tại: {balance} POP",
+        "insufficientPopBalanceDetailed": "Số dư POP không đủ, số dư hiện tại: {{balance}} POP",
         "reserveGasFees": "Vui lòng dự trữ đủ POP cho phí gas",
         "insufficientTokenBalance": "Số dư token không đủ",
-        "insufficientTokenBalanceDetailed": "Số dư token không đủ, số dư hiện tại: {balance} {symbol}",
-        "insufficientBalanceForPrePurchase": "Số dư không đủ cho việc mua trước. Cần: {required} POP + phí gas, Có sẵn: {available} POP",
+        "insufficientTokenBalanceDetailed": "Số dư token không đủ, số dư hiện tại: {{balance}} {{symbol}}",
+        "insufficientBalanceForPrePurchase": "Số dư không đủ cho việc mua trước. Cần: {{required}} POP + phí gas, Có sẵn: {{available}} POP",
         "enterValidUrl": "Vui lòng nhập URL hợp lệ",
         "wrongNetwork": "Vui lòng chuyển sang mạng chính xác"
     },
@@ -153,6 +153,6 @@
         "modalNote": "Modal này sẽ tự động đóng sau khi chuyển sang mạng chính xác"
     },
     "meta": {
-        "tradeDescription": "Giao dịch {symbol} trên {siteName}. {description}"
+        "tradeDescription": "Giao dịch {{symbol}} trên {{siteName}}. {{description}}"
     }
 }

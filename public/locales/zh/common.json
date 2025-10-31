@@ -133,11 +133,11 @@
         "enterTradeAmount": "请输入交易数量",
         "enterValidAmount": "请输入有效数量",
         "insufficientPopBalance": "POP 余额不足",
-        "insufficientPopBalanceDetailed": "POP 余额不足，当前余额：{balance} POP",
+        "insufficientPopBalanceDetailed": "POP 余额不足，当前余额：{{balance}} POP",
         "reserveGasFees": "请为 Gas 费预留足够的 POP",
         "insufficientTokenBalance": "代币余额不足",
-        "insufficientTokenBalanceDetailed": "代币余额不足，当前余额：{balance} {symbol}",
-        "insufficientBalanceForPrePurchase": "预购余额不足。需要：{required} POP + Gas费，可用：{available} POP",
+        "insufficientTokenBalanceDetailed": "代币余额不足，当前余额：{{balance}} {{symbol}}",
+        "insufficientBalanceForPrePurchase": "预购余额不足。需要：{{required}} POP + Gas费，可用：{{available}} POP",
         "enterValidUrl": "请输入有效的URL",
         "wrongNetwork": "请切换到正确的网络"
     },
@@ -153,6 +153,6 @@
         "modalNote": "此弹窗将在切换到正确网络后自动关闭"
     },
     "meta": {
-        "tradeDescription": "在{siteName}上交易{symbol}。{description}"
+        "tradeDescription": "在{{siteName}}上交易{{symbol}}。{{description}}"
     }
 }
