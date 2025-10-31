@@ -32,6 +32,7 @@ interface TokenData {
     progressPercent: number;
     name?: string;
     symbol?: string;
+    balance?: string;
 }
 
 type TokenListResponse = {
@@ -65,13 +66,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     }
 
     try {
-        const { page = 1, limit = 20, sort = "newest", launched, search } = req.query;
+        const { page = 1, limit = 20, sort = "newest", launched, search, hasBalance, userAddress } = req.query;
 
         const pageNum = Math.max(1, parseInt(page as string) || 1);
         const limitNum = Math.min(100, Math.max(1, parseInt(limit as string) || 20));
 
-        // 生成缓存键
-        const cacheKey = CacheKeys.TOKEN_LIST(pageNum, limitNum, sort as string, launched as string, search as string);
+        // 生成缓存键（包含hasBalance和userAddress参数）
+        const cacheKey = `${CacheKeys.TOKEN_LIST(pageNum, limitNum, sort as string, launched as string, search as string)}_hasBalance:${hasBalance || 'all'}_user:${userAddress || 'none'}`;
 
         // 尝试从缓存获取
         const cachedResult = globalCache.get<TokenListResponse["data"]>(cacheKey);
@@ -221,16 +222,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         }
 
         // 3. 批量获取代币信息和URI (使用合约数据缓存)
+        // 注意：如果查询用户余额，不使用缓存，因为余额是用户特定的
         let allTokens: TokenData[];
-        const contractDataCacheKey = CacheKeys.TOKEN_CONTRACT_DATA;
+        const contractDataCacheKey = userAddress
+            ? `${CacheKeys.TOKEN_CONTRACT_DATA}:user:${userAddress}`
+            : CacheKeys.TOKEN_CONTRACT_DATA;
         const cachedContractData = globalCache.get<TokenData[]>(contractDataCacheKey);
 
-        if (cachedContractData !== null && cachedContractData.length >= validAddresses.length) {
-            allTokens = cachedContractData;
+        // 如果是查询用户余额，跳过缓存直接查询最新数据
+        const shouldUseCache = !userAddress && cachedContractData !== null && cachedContractData.length >= validAddresses.length;
+
+        if (shouldUseCache) {
+            allTokens = cachedContractData!;
             console.log(`Using cached contract data: ${allTokens.length} tokens`);
         } else {
             console.log(`Fetching data for ${validAddresses.length} tokens from contract...`);
             const dataCalls = [];
+            const hasUserAddress = userAddress && typeof userAddress === "string";
+            const callsPerToken = hasUserAddress ? 5 : 4; // 根据是否查询用户余额决定调用数量
+
             for (const address of validAddresses) {
                 // URI 调用
                 dataCalls.push({
@@ -288,6 +298,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                         args: [],
                     }),
                 });
+                // balanceOf 调用 - 只有提供userAddress时才查询用户余额
+                if (hasUserAddress) {
+                    dataCalls.push({
+                        target: address,
+                        allowFailure: true,
+                        callData: encodeFunctionData({
+                            abi: [
+                                {
+                                    inputs: [{ internalType: "address", name: "account", type: "address" }],
+                                    name: "balanceOf",
+                                    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+                                    stateMutability: "view",
+                                    type: "function",
+                                },
+                            ],
+                            functionName: "balanceOf",
+                            args: [userAddress as `0x${string}`],
+                        }),
+                    });
+                }
             }
 
             const dataResults = (await readContract(config, {
@@ -300,10 +330,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
             // 4. 组装代币数据
             allTokens = validAddresses.map((address, index) => {
-                const uriIndex = index * 4;
-                const infoIndex = index * 4 + 1;
-                const nameIndex = index * 4 + 2;
-                const symbolIndex = index * 4 + 3;
+                const uriIndex = index * callsPerToken;
+                const infoIndex = index * callsPerToken + 1;
+                const nameIndex = index * callsPerToken + 2;
+                const symbolIndex = index * callsPerToken + 3;
+                const balanceIndex = hasUserAddress ? index * callsPerToken + 4 : -1;
 
                 // 解析 URI
                 let uri = "";
@@ -392,6 +423,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     }
                 }
 
+                // 解析 balance - 只有提供了userAddress时才解析
+                let balance: string | undefined = undefined;
+                if (hasUserAddress && balanceIndex >= 0 && dataResults[balanceIndex]?.success) {
+                    try {
+                        const balanceResult = decodeFunctionResult({
+                            abi: [
+                                {
+                                    inputs: [{ internalType: "address", name: "account", type: "address" }],
+                                    name: "balanceOf",
+                                    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+                                    stateMutability: "view",
+                                    type: "function",
+                                },
+                            ],
+                            functionName: "balanceOf",
+                            data: dataResults[balanceIndex].returnData,
+                        }) as bigint;
+                        balance = balanceResult.toString();
+                    } catch (error) {
+                        console.warn(`Failed to decode balance for token ${address}:`, error);
+                    }
+                }
+
                 // 计算进度
                 let progress = 0;
                 if (tokenInfo && tokenInfo.reserve1 && tokenInfo.target) {
@@ -404,7 +458,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     }
                 }
 
-                return {
+                const tokenData: TokenData = {
                     id: address,
                     address: address,
                     uri: uri,
@@ -415,11 +469,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     name: name || undefined,
                     symbol: symbol || undefined,
                 };
+
+                // 只有查询了用户余额时才包含balance字段
+                if (hasUserAddress && balance !== undefined) {
+                    tokenData.balance = balance;
+                }
+
+                return tokenData;
             });
 
             // 缓存合约数据（不包含元数据）
-            globalCache.set(contractDataCacheKey, allTokens, CacheTTL.CONTRACT_DATA);
-            console.log(`Cached contract data for ${allTokens.length} tokens`);
+            // 如果是用户特定查询，使用更短的TTL（1秒）或不缓存
+            const cacheTTL = userAddress ? 1 : CacheTTL.CONTRACT_DATA;
+            globalCache.set(contractDataCacheKey, allTokens, cacheTTL);
+            console.log(`Cached contract data for ${allTokens.length} tokens with TTL: ${cacheTTL}s`);
         }
 
         // 4. 应用过滤器
@@ -435,6 +498,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         if (launched !== undefined) {
             const isLaunched = launched === "true";
             filteredTokens = filteredTokens.filter((token) => token.launched === isLaunched);
+        }
+
+        // 按余额过滤 - 只显示余额大于0的代币
+        if (hasBalance === "true") {
+            filteredTokens = filteredTokens.filter((token) => {
+                try {
+                    return token.balance && _bignumber(token.balance).isGreaterThan(0);
+                } catch (error) {
+                    console.warn(`Failed to parse balance for token ${token.address}:`, error);
+                    return false;
+                }
+            });
         }
         console.log(filteredTokens);
         // 5. 排序

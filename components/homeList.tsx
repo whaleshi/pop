@@ -6,18 +6,21 @@ import { useQuery } from "@tanstack/react-query";
 import { Image, Button } from "@heroui/react";
 import { TokenListSkeleton } from "./skeleton";
 import { useTranslation } from 'react-i18next';
+import { useAccount } from 'wagmi';
 
-type TabType = '1' | '2' | '3';
+type TabType = '1' | '2' | '3' | '4';
 
 export const HomeList = () => {
 	const router = useRouter();
 	const { t } = useTranslation('common');
+	const { address } = useAccount();
 	const [activeTab, setActiveTab] = useState<TabType>('1');
 
 	const tabs = [
 		{ key: '1' as TabType, label: t('home.newCreated') },
 		{ key: '2' as TabType, label: t('home.trending') },
-		{ key: '3' as TabType, label: t('home.launched') }
+		{ key: '3' as TabType, label: t('home.launched') },
+		{ key: '4' as TabType, label: t('home.hasBalance') }
 	];
 
 	const handleSearchClick = () => {
@@ -71,12 +74,31 @@ export const HomeList = () => {
 		refetchOnMount: false,
 	});
 
+	// Has Balance data - 获取余额大于0的代币
+	const { data: balanceData, isLoading: balanceLoading, isFetching: balanceFetching } = useQuery({
+		queryKey: ["tokenList", "hasBalance", address],
+		queryFn: async () => {
+			if (!address) return [];
+			const response = await fetch(`/api/tokens/list?hasBalance=true&sort=newest&limit=50&userAddress=${address}`);
+			const data = await response.json();
+			return data.success ? data.data.tokens : [];
+		},
+		enabled: !!address, // 只有在有地址时才执行查询
+		placeholderData: (prev) => prev,
+		staleTime: 5000,
+		gcTime: 300000,
+		refetchInterval: 3000,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+	});
+
 	// Get corresponding data based on currently selected tab
 	const getCurrentData = () => {
 		switch (activeTab) {
 			case '1': return { data: newData, isLoading: newLoading, isFetching: newFetching };
 			case '2': return { data: trendingData, isLoading: trendingLoading, isFetching: trendingFetching };
 			case '3': return { data: listedData, isLoading: listedLoading, isFetching: listedFetching };
+			case '4': return { data: balanceData, isLoading: balanceLoading, isFetching: balanceFetching };
 			default: return { data: newData, isLoading: newLoading, isFetching: newFetching };
 		}
 	};

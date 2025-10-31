@@ -142,6 +142,25 @@ export const TokenItem = ({ border = false, item }: TokenItemProps) => {
 	const priceChangeDisplay = formatPriceChange(priceChangePercent);
 	const marketCap = calculateMarketCap();
 
+	// 格式化余额显示
+	const formatBalance = (balance?: string) => {
+		if (!balance || balance === "0") return null;
+		try {
+			const balanceBN = _bignumber(balance).div(1e18);
+			if (balanceBN.isLessThan(0.01)) {
+				return balanceBN.toFixed(6);
+			} else if (balanceBN.isLessThan(1000)) {
+				return balanceBN.toFixed(2);
+			} else {
+				return formatBigNumber(balanceBN.toNumber());
+			}
+		} catch (error) {
+			return null;
+		}
+	};
+
+	const formattedBalance = formatBalance(item?.balance);
+
 	return (
 		<div className={`w-full rounded-[10px] px-[12px] py-[12px] cursor-pointer bg-[#0E0E0E] relative overflow-hidden`}
 			onClick={() => router.push(`/token/${item?.address}`)}
@@ -153,18 +172,29 @@ export const TokenItem = ({ border = false, item }: TokenItemProps) => {
 					<div className="text-[13px] text-[#8C8C8C]">{displayName}</div>
 				</div>
 				<div className="flex flex-col gap-[2px] text-right">
-					<div className="text-[15px] text-[#FFFFFF]"><span className="text-[#FFFFFF]">{t('token.mc')}</span> ${formatBigNumber(marketCap)}</div>
-					<div className="text-[13px] text-[#8C8C8C]">{t('token.change')} <span className={`${priceChangeDisplay.color}`}>{priceChangeDisplay.text}</span></div>
+					{formattedBalance ? (
+						<>
+							<div className="text-[15px] text-[#FFFFFF]"><span className="text-[#9AED2D]">{t('wallet.balance')}</span> {formattedBalance}</div>
+							<div className="text-[13px] text-[#8C8C8C]">{t('token.mc')} ${formatBigNumber(marketCap)}</div>
+						</>
+					) : (
+						<>
+							<div className="text-[15px] text-[#FFFFFF]"><span className="text-[#FFFFFF]">{t('token.mc')}</span> ${formatBigNumber(marketCap)}</div>
+							<div className="text-[13px] text-[#8C8C8C]">{t('token.change')} <span className={`${priceChangeDisplay.color}`}>{priceChangeDisplay.text}</span></div>
+						</>
+					)}
 				</div>
 			</div>
 
-			{/* Bottom progress bar */}
-			<div className="absolute bottom-0 left-0 w-full h-[3px] bg-[#ffffff08]">
-				<div
-					className="h-full bg-gradient-to-r from-[#9AED2D] to-[#7ED321] transition-all duration-1000 ease-out"
-					style={{ width: `${item?.progress}%` }}
-				/>
-			</div>
+			{/* Bottom progress bar - 只在没有余额显示时才显示进度条 */}
+			{!formattedBalance && (
+				<div className="absolute bottom-0 left-0 w-full h-[3px] bg-[#ffffff08]">
+					<div
+						className="h-full bg-gradient-to-r from-[#9AED2D] to-[#7ED321] transition-all duration-1000 ease-out"
+						style={{ width: `${item?.progress}%` }}
+					/>
+				</div>
+			)}
 		</div>
 	)
 }
