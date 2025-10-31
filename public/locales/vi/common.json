@@ -138,10 +138,19 @@
         "insufficientTokenBalance": "Số dư token không đủ",
         "insufficientTokenBalanceDetailed": "Số dư token không đủ, số dư hiện tại: {balance} {symbol}",
         "insufficientBalanceForPrePurchase": "Số dư không đủ cho việc mua trước. Cần: {required} POP + phí gas, Có sẵn: {available} POP",
-        "enterValidUrl": "Vui lòng nhập URL hợp lệ"
+        "enterValidUrl": "Vui lòng nhập URL hợp lệ",
+        "wrongNetwork": "Vui lòng chuyển sang mạng chính xác"
     },
     "common": {
         "language": "Ngôn ngữ"
+    },
+    "network": {
+        "error": "Lỗi mạng",
+        "currentNetwork": "Mạng hiện tại",
+        "switchTo": "Vui lòng chuyển sang mạng {networkName} để tiếp tục",
+        "switchNetwork": "Chuyển sang mạng chính xác",
+        "switching": "Đang chuyển...",
+        "modalNote": "Modal này sẽ tự động đóng sau khi chuyển sang mạng chính xác"
     },
     "meta": {
         "tradeDescription": "Giao dịch {symbol} trên {siteName}. {description}"

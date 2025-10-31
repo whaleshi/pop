@@ -2,7 +2,7 @@ import { defineChain } from "viem";
 
 // Popchain 测试网配置
 export const popchainTestnet = defineChain({
-    id: 7257,
+    id: 725700,
     name: "Popchain Testnet",
     nativeCurrency: {
         decimals: 18,
@@ -17,7 +17,7 @@ export const popchainTestnet = defineChain({
     blockExplorers: {
         default: {
             name: "Popchain Testnet Explorer",
-            url: "https://popchaintest.cloud.blockscout.com/",
+            url: "https://testnetpop.cloud.blockscout.com/",
         },
     },
     testnet: true,

@@ -138,10 +138,19 @@
         "insufficientTokenBalance": "代币余额不足",
         "insufficientTokenBalanceDetailed": "代币余额不足，当前余额：{balance} {symbol}",
         "insufficientBalanceForPrePurchase": "预购余额不足。需要：{required} POP + Gas费，可用：{available} POP",
-        "enterValidUrl": "请输入有效的URL"
+        "enterValidUrl": "请输入有效的URL",
+        "wrongNetwork": "请切换到正确的网络"
     },
     "common": {
         "language": "语言"
+    },
+    "network": {
+        "error": "网络错误",
+        "currentNetwork": "当前网络",
+        "switchTo": "请切换到 {networkName} 网络以继续使用",
+        "switchNetwork": "切换到正确网络",
+        "switching": "切换中...",
+        "modalNote": "此弹窗将在切换到正确网络后自动关闭"
     },
     "meta": {
         "tradeDescription": "在{siteName}上交易{symbol}。{description}"

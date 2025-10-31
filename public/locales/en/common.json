@@ -138,10 +138,19 @@
         "insufficientTokenBalance": "Insufficient token balance",
         "insufficientTokenBalanceDetailed": "Insufficient token balance, current balance: {balance} {symbol}",
         "insufficientBalanceForPrePurchase": "Insufficient balance for pre-purchase. Required: {required} POP + gas fees, Available: {available} POP",
-        "enterValidUrl": "Please enter a valid URL"
+        "enterValidUrl": "Please enter a valid URL",
+        "wrongNetwork": "Please switch to the correct network"
     },
     "common": {
         "language": "Language"
+    },
+    "network": {
+        "error": "Network Error",
+        "currentNetwork": "Current Network",
+        "switchTo": "Please switch to {networkName} network to continue",
+        "switchNetwork": "Switch to Correct Network",
+        "switching": "Switching...",
+        "modalNote": "This modal will automatically close after switching to the correct network"
     },
     "meta": {
         "tradeDescription": "Trade {symbol} on {siteName}. {description}"

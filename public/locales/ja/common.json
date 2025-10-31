@@ -138,10 +138,19 @@
         "insufficientTokenBalance": "トークン残高不足",
         "insufficientTokenBalanceDetailed": "トークン残高不足、現在の残高：{balance} {symbol}",
         "insufficientBalanceForPrePurchase": "事前購入のための残高不足。必要：{required} POP + ガス料金、利用可能：{available} POP",
-        "enterValidUrl": "有効なURLを入力してください"
+        "enterValidUrl": "有効なURLを入力してください",
+        "wrongNetwork": "正しいネットワークに切り替えてください"
     },
     "common": {
         "language": "言語"
+    },
+    "network": {
+        "error": "ネットワークエラー",
+        "currentNetwork": "現在のネットワーク",
+        "switchTo": "続行するには{networkName}ネットワークに切り替えてください",
+        "switchNetwork": "正しいネットワークに切り替え",
+        "switching": "切り替え中...",
+        "modalNote": "このモーダルは正しいネットワークに切り替えた後に自動的に閉じます"
     },
     "meta": {
         "tradeDescription": "{siteName}で{symbol}を取引してください。{description}"

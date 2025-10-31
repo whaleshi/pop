@@ -14,6 +14,8 @@ import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
 import { config } from '@/config/wagmi';
 import '@/lib/i18n';
+import { NetworkSwitcher } from '@/components/NetworkSwitcher';
+import { useTranslation } from 'react-i18next';
 
 import { fontSans } from "@/config/fonts";
 import "nprogress/nprogress.css";
@@ -22,6 +24,19 @@ import "@/styles/globals.css";
 export default function App({ Component, pageProps }: AppProps) {
 	const router = useRouter();
 	const [isMounted, setIsMounted] = useState(false);
+	const { i18n } = useTranslation();
+
+	// Map i18n language codes to RainbowKit locales
+	const getRainbowKitLocale = (lang: string) => {
+		const localeMap: Record<string, string> = {
+			'en': 'en-US',
+			'zh': 'zh-CN',
+			'ko': 'ko-KR',
+			'ja': 'ja-JP',
+			'vi': 'vi-VN'
+		};
+		return localeMap[lang] || 'en-US';
+	};
 
 	// 客户端挂载检查
 	useEffect(() => {
@@ -74,11 +89,12 @@ export default function App({ Component, pageProps }: AppProps) {
 								fontStack: 'system',
 								overlayBlur: 'small',
 							})}
-							locale="en-US"
+							locale={getRainbowKitLocale(i18n.language)}
 						>
 							<BalanceProvider>
 								<HeroUIProvider navigate={router.push}>
 									<Toaster richColors position="top-center" />
+									<NetworkSwitcher />
 									<NextThemesProvider attribute="class" defaultTheme="dark">
 										<div className="page-transition bg-[#000000] min-h-screen">
 											<Component {...pageProps} />

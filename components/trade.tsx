@@ -14,6 +14,7 @@ import { useBalanceContext } from "@/providers/balanceProvider";
 import _bignumber from "bignumber.js";
 import { useSlippageStore } from "@/stores/slippage";
 import { useTranslation } from 'react-i18next';
+import { useNetworkSwitcher } from '@/hooks/useNetworkSwitcher';
 
 type TradeType = 'buy' | 'sell';
 
@@ -42,6 +43,7 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 	const { address, isConnected } = useAccount();
 	const { data: walletClient } = useWalletClient();
 	const publicClient = usePublicClient();
+	const { isCorrectNetwork } = useNetworkSwitcher();
 
 	const handleTabClick = (tab: TradeType) => {
 		setSelectedTab(tab);
@@ -55,6 +57,10 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 	const validateInput = (): string | null => {
 		if (!isConnected) {
 			return t('validation.pleaseConnectWallet');
+		}
+
+		if (!isCorrectNetwork) {
+			return t('validation.wrongNetwork');
 		}
 
 		if (!inputAmount || inputAmount.trim() === '') {
