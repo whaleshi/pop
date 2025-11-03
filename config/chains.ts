@@ -14,7 +14,7 @@ export const CHAINS_CONFIG = {
             symbol: "POP",
             explorerUrl: "https://scan.popchain.ai/",
             rpcUrl: "https://rpc.popchain.ai",
-            factoryContract: "0x86c64DA12DA5C7d1C4Ccd484A833ac32E675B2c2",
+            factoryContract: "0x198C8099E0c2CE323a5513769e294f349B015cEE",
             multicall3: "0xbd64A7c53c825655e83718805e8b747B3387ee95",
         },
         [725700]: {
