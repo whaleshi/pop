@@ -230,12 +230,12 @@ export const CacheKeys = {
 
 // 缓存TTL配置（秒）
 export const CacheTTL = {
-    TOKEN_COUNT: 3, // 代币总数：10秒（缩短以快速响应新代币）
-    TOKEN_LIST: 3, // 代币列表：30秒（缩短以显示新代币）
-    TOKEN_DETAIL: 3, // 代币详情：10秒
+    TOKEN_COUNT: 2, // 代币总数：10秒（缩短以快速响应新代币）
+    TOKEN_LIST: 2, // 代币列表：30秒（缩短以显示新代币）
+    TOKEN_DETAIL: 2, // 代币详情：10秒
     TOKEN_METADATA: 86400 * 365, // 代币元数据：1年（永久）
     CONTRACT_DATA: 10, // 合约原始数据：10秒（缩短以快速更新）
-    TOKEN_ADDRESSES: 3, // 代币地址列表：30秒（缩短以包含新代币）
+    TOKEN_ADDRESSES: 2, // 代币地址列表：30秒（缩短以包含新代币）
 };
 
 // 缓存工具函数
