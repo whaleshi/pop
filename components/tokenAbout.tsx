@@ -197,7 +197,7 @@ export const TokenAbout = ({ info, metadata }: TokenProps) => {
 					<div className="text-[20px] text-[#fff] font-semibold">--</div>
 				</div>
 			</div>
-			<Share isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} info={info} />
+			<Share isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} info={info} metadata={metadata} />
 		</div>
 	)
 }

@@ -107,7 +107,7 @@
         "transactionSuccess": "交易成功",
         "copySuccess": "已复制到剪贴板",
         "networkError": "网络错误，请重试",
-        "shareText": "我在 @Popmefun 发现了${symbol}！快来一起交易吧 👉 https://popmefun.com/token/${address}",
+        "shareText": "我在 @Popmefun 发现了{{symbol}}！快来一起交易吧 👉 https://popme.fun/token/{{address}}",
         "imageUploadSuccess": "图片上传成功",
         "imageUploadFailed": "图片上传失败，请重试",
         "metadataUploadFailed": "元数据上传失败",

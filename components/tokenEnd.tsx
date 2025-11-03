@@ -184,7 +184,7 @@ export const TokenEnd = ({ info, metadata }: TokenProps) => {
 					<Image src="/images/ave.png" alt="ave" width={16} height={16} disableSkeleton radius='none' />Ave
 				</Button>
 			</div>
-			<Share isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} info={info} />
+			<Share isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} info={info} metadata={metadata} />
 		</div>
 	)
 }

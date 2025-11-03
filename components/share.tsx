@@ -38,14 +38,14 @@ export default function Share({ isOpen, onClose, info, metadata }: ShareProps) {
 								<div className="text-[17px] text-[#fff] mt-[10px]">{metadata?.symbol?.toUpperCase() || '--'}</div>
 								<div className="text-[13px] text-[#AAAAAA] mt-[4px]">{metadata?.name || '--'}</div>
 								<Button fullWidth className="h-[44px] bg-[#9AED2D] text-[15px] text-[#000] rounded-[16px] mt-[20px] hover:bg-[#7ED321] transition-colors" onPress={() => {
-									const text = t('messages.shareText', { 
-										symbol: `$${metadata?.symbol?.toUpperCase()}`, 
-										address: info?.address 
+									const text = t('messages.shareText', {
+										symbol: `${metadata?.symbol?.toUpperCase()}`,
+										address: info?.address
 									});
 									const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 									window.open(url, "_blank");
 								}}>{t('messages.shareToX')}</Button>
-								<Button fullWidth className="h-[44px] bg-[#333] text-[15px] text-[#fff] rounded-[16px] mt-[12px] hover:bg-[#444] transition-colors" onPress={() => { copy(`https://popmefun.com/token/${info?.address}` || '') }}>{t('messages.copyLink')}</Button>
+								<Button fullWidth className="h-[44px] bg-[#333] text-[15px] text-[#fff] rounded-[16px] mt-[12px] hover:bg-[#444] transition-colors" onPress={() => { copy(`https://popme.fun/token/${info?.address}` || '') }}>{t('messages.copyLink')}</Button>
 							</ModalBody>
 						</>
 					)}

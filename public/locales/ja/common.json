@@ -107,7 +107,7 @@
         "transactionSuccess": "取引成功",
         "copySuccess": "クリップボードにコピーされました",
         "networkError": "ネットワークエラー、もう一度お試しください",
-        "shareText": ".@Popmefun で${symbol}を発見しました！一緒に取引しましょう 👉 https://popmefun.com/token/${address}",
+        "shareText": ".@Popmefun で{{symbol}}を発見しました！一緒に取引しましょう 👉 https://popme.fun/token/{{address}}",
         "imageUploadSuccess": "画像アップロード成功",
         "imageUploadFailed": "画像アップロード失敗、もう一度お試しください",
         "metadataUploadFailed": "メタデータアップロード失敗",

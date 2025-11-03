@@ -107,7 +107,7 @@
         "transactionSuccess": "Transaction successful",
         "copySuccess": "Copied to clipboard",
         "networkError": "Network error, please try again",
-        "shareText": "I found ${symbol} on @Popmefun! Come trade together 👉 https://popmefun.com/token/${address}",
+        "shareText": "I found {{symbol}} on @Popmefun! Come trade together 👉 https://popme.fun/token/{{address}}",
         "imageUploadSuccess": "Image uploaded successfully",
         "imageUploadFailed": "Image upload failed, please try again",
         "metadataUploadFailed": "Metadata upload failed",

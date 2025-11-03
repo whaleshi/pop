@@ -107,7 +107,7 @@
         "transactionSuccess": "거래 성공",
         "copySuccess": "클립보드에 복사됨",
         "networkError": "네트워크 오류, 다시 시도하세요",
-        "shareText": ".@Popmefun 에서 ${symbol}을(를) 발견했습니다! 함께 거래해요 👉 https://popmefun.com/token/${address}",
+        "shareText": "@Popmefun 에서 {{symbol}}을(를) 발견했습니다! 함께 거래해요 👉 https://popme.fun/token/{{address}}",
         "imageUploadSuccess": "이미지 업로드 성공",
         "imageUploadFailed": "이미지 업로드 실패, 다시 시도하세요",
         "metadataUploadFailed": "메타데이터 업로드 실패",
