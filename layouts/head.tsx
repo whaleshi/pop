@@ -28,6 +28,28 @@ export const Head = ({ tokenMetadata }: HeadProps = {}) => {
 					name="viewport"
 				/>
 				<link href="/favicon.ico" rel="icon" />
+
+				{/* Open Graph / Facebook */}
+				<meta property="og:type" content="website" />
+				<meta property="og:title" content={siteConfig.name} />
+				<meta property="og:description" content={siteConfig.description} />
+				<meta
+					property="og:image"
+					content="https://popme.mypinata.cloud/ipfs/bafkreigpmkeqa6o4xcd4eiwewuceedfr55h7a5kpacy3bcyo6alaxpdm6a"
+				/>
+				<meta property="og:url" content="https://popme.fun" />
+				<meta property="og:site_name" content={siteConfig.name} />
+
+				{/* Twitter */}
+				<meta name="twitter:card" content="summary_large_image" />
+				<meta name="twitter:title" content={siteConfig.name} />
+				<meta name="twitter:description" content={siteConfig.description} />
+				<meta
+					name="twitter:image"
+					content="https://popme.mypinata.cloud/ipfs/bafkreigpmkeqa6o4xcd4eiwewuceedfr55h7a5kpacy3bcyo6alaxpdm6a"
+				/>
+				<meta name="twitter:site" content="@popmefun" />
+				<meta name="twitter:creator" content="@popmefun" />
 			</NextHead>
 		);
 	}
