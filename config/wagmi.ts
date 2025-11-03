@@ -1,5 +1,5 @@
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
-import { metaMaskWallet, okxWallet } from "@rainbow-me/rainbowkit/wallets";
+import { metaMaskWallet, okxWallet, injectedWallet } from "@rainbow-me/rainbowkit/wallets";
 import { createConfig, http } from "wagmi";
 import { CHAINS_CONFIG } from "./chains";
 
@@ -7,7 +7,7 @@ const connectors = connectorsForWallets(
     [
         {
             groupName: "Recommended",
-            wallets: [metaMaskWallet, okxWallet],
+            wallets: [metaMaskWallet, okxWallet, injectedWallet],
         },
     ],
     {
