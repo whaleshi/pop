@@ -70,6 +70,22 @@ export const TokenAbout = ({ info, metadata }: TokenProps) => {
 		}
 	};
 
+	const calculateEndPop = () => {
+		try {
+			const target = info?.info?.target || 0;
+			const reserve1 = info?.info?.reserve1 || 0;
+			// .times(1.05)
+			const endNum = _bignumber(target)
+				.div(1e18).minus(_bignumber(reserve1).div(1e18)).dp(2)
+				.toString();
+
+			return parseFloat(endNum);
+		} catch (error) {
+			console.error('error:', error);
+			return 0;
+		}
+	};
+
 	// Calculate price change percentage
 	const calculatePriceChange = () => {
 		const currentPrice = info?.info?.lastPrice;
@@ -127,8 +143,15 @@ export const TokenAbout = ({ info, metadata }: TokenProps) => {
 			{/* Market cap progress bar */}
 			<div className="w-full mt-[20px] p-[16px] bg-[#1A1A1A] rounded-[16px] border border-[#333]">
 				<div className="flex justify-between items-center mb-[12px]">
-					<span className="text-[14px] text-[#AAAAAA] font-medium">{t('token.progress')}</span>
-					<span className="text-[14px] text-[#9AED2D] font-bold">{(Math.floor((info?.progressPercent || 0) * 100) / 100).toFixed(2)}%</span>
+					<div className="flex items-center gap-[4px]">
+						<span className="text-[14px] text-[#AAAAAA] font-medium">{t('token.progress')}</span>
+						<span className="text-[14px] text-[#9AED2D] font-bold">{(Math.floor((info?.progressPercent || 0) * 100) / 100).toFixed(2)}%</span>
+					</div>
+					<div className="flex items-center gap-[4px]">
+						<span className="text-[14px] text-[#AAAAAA] font-medium">{t('token.remainingAmount')}</span>
+						<span className="text-[14px] text-[#9AED2D] font-bold">{calculateEndPop()}</span>
+						<span className="text-[14px] text-[#AAAAAA] font-medium">POP</span>
+					</div>
 				</div>
 				<div className="w-full h-[12px] bg-[#ffffff08] rounded-full overflow-hidden relative">
 					<div

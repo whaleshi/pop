@@ -88,6 +88,7 @@
         "price": "가격",
         "supply": "공급량",
         "progress": "진행률",
+        "remainingAmount": "잔여",
         "launched": "출시됨",
         "copy": "복사",
         "copied": "복사됨",

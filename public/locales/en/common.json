@@ -88,6 +88,7 @@
         "price": "Price",
         "supply": "Supply",
         "progress": "Progress",
+        "remainingAmount": "Remaining",
         "launched": "Launched",
         "copy": "Copy",
         "copied": "Copied",
