@@ -588,15 +588,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             }
         }
 
-        // 5.1 对于launched状态的token，获取Ave API数据
-        if (sort === 'launched' && filteredTokens.length > 0) {
+        // 5.1 对于launched状态的token或持仓列表中的launched token，获取Ave API数据
+        const needsAveData = (sort === 'launched') || (hasBalance === "true");
+        if (needsAveData && filteredTokens.length > 0) {
             console.log('Fetching Ave data for launched tokens...');
             const aveDataPromises = filteredTokens.map(async (token) => {
-                const aveData = await fetchAveTokenData(token.address);
-                return {
-                    ...token,
-                    aveData: aveData
-                };
+                // 只为已发射的代币请求 AVE 数据
+                if (token.launched) {
+                    const aveData = await fetchAveTokenData(token.address);
+                    return {
+                        ...token,
+                        aveData: aveData
+                    };
+                }
+                return token;
             });
             
             filteredTokens = await Promise.all(aveDataPromises);
