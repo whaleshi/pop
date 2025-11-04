@@ -17,6 +17,7 @@ interface TokenProps {
 }
 
 export const TokenEnd = ({ info, metadata }: TokenProps) => {
+	console.log(info?.aveData?.current_price_usd);
 	const { t } = useTranslation('common');
 	const [isShareOpen, setIsShareOpen] = useState(false);
 	const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -31,13 +32,13 @@ export const TokenEnd = ({ info, metadata }: TokenProps) => {
 		try {
 			// Calculate token USD price: BigNumber(lastPrice).div(1e18).times(popPrice)
 			const lastPrice = info?.info?.lastPrice || 0;
-			
+
 			const tokenPrice = _bignumber(lastPrice)
 				.div(1e18)
 				.times(popPrice || 0)
 				.toString();
-			
-			return parseFloat(tokenPrice);
+
+			return parseFloat(info?.aveData?.current_price_usd || tokenPrice);
 		} catch (error) {
 			console.error('Token price calculation error:', error);
 			return 0;
@@ -50,15 +51,15 @@ export const TokenEnd = ({ info, metadata }: TokenProps) => {
 			// Use formula: BigNumber(lastPrice).div(1e18).times(1000000000).times(popPrice).dp(2)
 			const lastPrice = info?.info?.lastPrice || 0;
 			const tokenSupply = 1000000000; // 1 billion total token supply
-			
+
 			const marketCap = _bignumber(lastPrice)
 				.div(1e18)
 				.times(tokenSupply)
 				.times(popPrice || 0)
 				.dp(2)
 				.toString();
-			
-			return parseFloat(marketCap);
+
+			return parseFloat(info?.aveData?.market_cap || marketCap);
 		} catch (error) {
 			console.error('Market cap calculation error:', error);
 			return 0;
@@ -85,6 +86,23 @@ export const TokenEnd = ({ info, metadata }: TokenProps) => {
 		} catch (error) {
 			console.error('Price change calculation error:', error);
 			return null;
+		}
+	};
+
+	// Format 24h price change from Ave API
+	const format24hPriceChange = () => {
+		const priceChange24h = info?.aveData?.price_change_24h;
+		if (!priceChange24h) {
+			return { text: '--', color: 'text-[#fff]' };
+		}
+
+		const change = parseFloat(priceChange24h);
+		if (change > 0) {
+			return { text: `+${change.toFixed(2)}%`, color: 'text-[#00D935]' };
+		} else if (change < 0) {
+			return { text: `${change.toFixed(2)}%`, color: 'text-[#FF4C4C]' };
+		} else {
+			return { text: '0.00%', color: 'text-[#fff]' };
 		}
 	};
 
@@ -162,8 +180,8 @@ export const TokenEnd = ({ info, metadata }: TokenProps) => {
 				<div className="flex items-center gap-[12px] w-full">
 					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
 						<div className="text-[13px] text-[#AAAAAA]">{t('token.change')}</div>
-						<div className={`text-[20px] font-semibold ${priceChangeDisplay.color}`}>
-							{priceChangeDisplay.text}
+						<div className={`text-[20px] font-semibold ${format24hPriceChange().color}`}>
+							{format24hPriceChange().text}
 						</div>
 					</div>
 					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">

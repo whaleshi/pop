@@ -124,6 +124,23 @@ export const TokenItem = ({ border = false, item }: TokenItemProps) => {
 		}
 	};
 
+	// Format 24h price change from Ave API
+	const format24hPriceChange = () => {
+		const priceChange24h = item?.aveData?.price_change_24h;
+		if (!priceChange24h) {
+			return { text: '--', color: 'text-[#94989F]' };
+		}
+		
+		const change = parseFloat(priceChange24h);
+		if (change > 0) {
+			return { text: `+${change.toFixed(2)}%`, color: 'text-[#9AED2D]' };
+		} else if (change < 0) {
+			return { text: `${change.toFixed(2)}%`, color: 'text-[#ED2D2D]' };
+		} else {
+			return { text: '0.00%', color: 'text-[#94989F]' };
+		}
+	};
+
 	const formatPriceChange = (change: number | null) => {
 		if (change === undefined || change === null) {
 			return { text: '--', color: 'text-[#94989F]' };
@@ -140,7 +157,9 @@ export const TokenItem = ({ border = false, item }: TokenItemProps) => {
 
 	const priceChangePercent = calculatePriceChange();
 	const priceChangeDisplay = formatPriceChange(priceChangePercent);
-	const marketCap = calculateMarketCap();
+	const marketCap = item?.launched && item?.aveData?.market_cap 
+		? parseFloat(item.aveData.market_cap) 
+		: calculateMarketCap();
 
 	// 格式化余额显示
 	const formatBalance = (balance?: string) => {
@@ -180,14 +199,14 @@ export const TokenItem = ({ border = false, item }: TokenItemProps) => {
 					) : (
 						<>
 							<div className="text-[15px] text-[#FFFFFF]"><span className="text-[#FFFFFF]">{t('token.mc')}</span> ${formatBigNumber(marketCap)}</div>
-							<div className="text-[13px] text-[#8C8C8C]">{t('token.change')} <span className={`${priceChangeDisplay.color}`}>{priceChangeDisplay.text}</span></div>
+							<div className="text-[13px] text-[#8C8C8C]">{t('token.change')} <span className={`${item?.launched ? format24hPriceChange().color : priceChangeDisplay.color}`}>{item?.launched ? format24hPriceChange().text : priceChangeDisplay.text}</span></div>
 						</>
 					)}
 				</div>
 			</div>
 
-			{/* Bottom progress bar - 只在没有余额显示时才显示进度条 */}
-			{!formattedBalance && (
+			{/* Bottom progress bar - 只在没有余额显示且未launched时才显示进度条 */}
+			{!formattedBalance && !item?.launched && (
 				<div className="absolute bottom-0 left-0 w-full h-[3px] bg-[#ffffff08]">
 					<div
 						className="h-full bg-gradient-to-r from-[#9AED2D] to-[#7ED321] transition-all duration-1000 ease-out"

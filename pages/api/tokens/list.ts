@@ -7,6 +7,51 @@ import { config } from "@/config/wagmi";
 import contractABI from "@/constant/TokenFactory.abi.json";
 import { globalCache, CacheKeys, CacheTTL } from "@/utils/cache";
 
+async function fetchAveTokenData(tokenAddress: string): Promise<any | null> {
+    try {
+        const apiKey = process.env.NEXT_PUBLIC_AVE_KEY;
+        if (!apiKey) {
+            console.warn("AVE_API_KEY not found in environment variables");
+            return null;
+        }
+
+        const url = "https://prod.ave-api.com/v2/tokens/price";
+        const requestBody = {
+            token_ids: [`${tokenAddress.toLowerCase()}-popchain`],
+            tvl_min: 1000,
+            tx_24h_volume_min: 0,
+        };
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "X-API-KEY": apiKey,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+            return null;
+        }
+
+        const data = await response.json();
+        
+        // 检查返回数据格式和成功状态
+        if (data.msg === 'SUCCESS' && data.data) {
+            const tokenKey = `${tokenAddress.toLowerCase()}-popchain`;
+            if (data.data[tokenKey]) {
+                return data.data[tokenKey];
+            }
+        }
+        
+        return null;
+    } catch (error) {
+        console.error("Error fetching Ave token data:", error);
+        return null;
+    }
+}
+
 interface TokenInfo {
     base: string;
     quote: string;
@@ -33,6 +78,7 @@ interface TokenData {
     name?: string;
     symbol?: string;
     balance?: string;
+    aveData?: any;
 }
 
 type TokenListResponse = {
@@ -72,7 +118,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         const limitNum = Math.min(100, Math.max(1, parseInt(limit as string) || 20));
 
         // 生成缓存键（包含hasBalance和userAddress参数）
-        const cacheKey = `${CacheKeys.TOKEN_LIST(pageNum, limitNum, sort as string, launched as string, search as string)}_hasBalance:${hasBalance || 'all'}_user:${userAddress || 'none'}`;
+        const cacheKey = `${CacheKeys.TOKEN_LIST(pageNum, limitNum, sort as string, launched as string, search as string)}_hasBalance:${hasBalance || "all"}_user:${userAddress || "none"}`;
 
         // 尝试从缓存获取
         const cachedResult = globalCache.get<TokenListResponse["data"]>(cacheKey);
@@ -359,7 +405,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                             functionName: "tokensInfo",
                             data: dataResults[infoIndex].returnData,
                         }) as any[];
-                        console.log(tokenInfoResult);
                         tokenInfo = {
                             base: tokenInfoResult[0],
                             quote: tokenInfoResult[1],
@@ -451,7 +496,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 if (tokenInfo && tokenInfo.reserve1 && tokenInfo.target) {
                     const reserve = _bignumber(tokenInfo.reserve1);
                     const target = _bignumber(tokenInfo.target);
-                    console.log(reserve.div(target).times(100).toString());
                     if (!target.isZero()) {
                         progress = reserve.div(target).times(100).dp(18).toNumber();
                         progress = Math.min(progress, 100);
@@ -511,7 +555,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 }
             });
         }
-        console.log(filteredTokens);
         // 5. 排序
         // 注意：如果是查询用户持仓(hasBalance=true)，不应用sort的过滤逻辑，显示所有持仓
         if (hasBalance === "true") {
@@ -543,6 +586,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 default:
                     break;
             }
+        }
+
+        // 5.1 对于launched状态的token，获取Ave API数据
+        if (sort === 'launched' && filteredTokens.length > 0) {
+            console.log('Fetching Ave data for launched tokens...');
+            const aveDataPromises = filteredTokens.map(async (token) => {
+                const aveData = await fetchAveTokenData(token.address);
+                return {
+                    ...token,
+                    aveData: aveData
+                };
+            });
+            
+            filteredTokens = await Promise.all(aveDataPromises);
         }
 
         // 6. 分页

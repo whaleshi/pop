@@ -7,6 +7,60 @@ import { config } from "@/config/wagmi";
 import contractABI from "@/constant/TokenFactory.abi.json";
 import { globalCache, CacheKeys, CacheTTL } from "@/utils/cache";
 
+async function fetchAveTokenData(tokenAddress: string): Promise<any | null> {
+    try {
+        const apiKey = process.env.NEXT_PUBLIC_AVE_KEY;
+        if (!apiKey) {
+            console.warn("AVE_API_KEY not found in environment variables");
+            return null;
+        }
+
+        const url = "https://prod.ave-api.com/v2/tokens/price";
+        const requestBody = {
+            token_ids: [`${tokenAddress.toLowerCase()}-popchain`],
+            tvl_min: 1000,
+            tx_24h_volume_min: 0,
+        };
+
+        console.log(`Requesting Ave API for token: ${tokenAddress}`);
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "X-API-KEY": apiKey,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.warn(`Ave API request failed with status: ${response.status}`);
+            console.warn(`Error response: ${errorText}`);
+            console.warn(`Request URL: ${url.toString()}`);
+            return null;
+        }
+
+        const data = await response.json();
+        console.log('Ave API response:', data);
+        
+        // 检查返回数据格式和成功状态
+        if (data.msg === 'SUCCESS' && data.data) {
+            const tokenKey = `${tokenAddress.toLowerCase()}-popchain`;
+            if (data.data[tokenKey]) {
+                console.log('Found token data in Ave API:', data.data[tokenKey]);
+                return data.data[tokenKey];
+            }
+        }
+        
+        console.log('No valid token data found in Ave API response');
+        return null;
+    } catch (error) {
+        console.error("Error fetching Ave token data:", error);
+        return null;
+    }
+}
+
 interface TokenInfo {
     base: string;
     quote: string;
@@ -32,6 +86,7 @@ interface TokenData {
     progressPercent: number;
     name?: string;
     symbol?: string;
+    aveData?: any;
 }
 
 type TokenDetailResponse = {
@@ -270,6 +325,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             }
         }
 
+        // 获取Ave API数据
+        const aveData = await fetchAveTokenData(address);
+
         // 构建基础token数据（不包含元数据）
         const tokenData: TokenData = {
             id: address,
@@ -281,6 +339,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             progressPercent: progress,
             name: name || undefined,
             symbol: symbol || undefined,
+            aveData: aveData,
         };
 
         // 缓存结果
