@@ -52,6 +52,62 @@ async function fetchAveTokenData(tokenAddress: string): Promise<any | null> {
     }
 }
 
+// 批量获取多个 token 的 AVE 数据
+async function fetchBatchAveTokenData(tokenAddresses: string[]): Promise<Record<string, any>> {
+    try {
+        const apiKey = process.env.NEXT_PUBLIC_AVE_KEY;
+        if (!apiKey) {
+            console.warn("AVE_API_KEY not found in environment variables");
+            return {};
+        }
+
+        if (tokenAddresses.length === 0) {
+            return {};
+        }
+
+        const url = "https://prod.ave-api.com/v2/tokens/price";
+        const token_ids = tokenAddresses.map(address => `${address.toLowerCase()}-popchain`);
+        const requestBody = {
+            token_ids,
+            tvl_min: 1000,
+            tx_24h_volume_min: 0,
+        };
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "X-API-KEY": apiKey,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+            return {};
+        }
+
+        const data = await response.json();
+        
+        // 检查返回数据格式和成功状态
+        if (data.msg === 'SUCCESS' && data.data) {
+            // 将结果转换为以原始地址为键的格式
+            const result: Record<string, any> = {};
+            tokenAddresses.forEach(address => {
+                const tokenKey = `${address.toLowerCase()}-popchain`;
+                if (data.data[tokenKey]) {
+                    result[address.toLowerCase()] = data.data[tokenKey];
+                }
+            });
+            return result;
+        }
+        
+        return {};
+    } catch (error) {
+        console.error("Error fetching batch Ave token data:", error);
+        return {};
+    }
+}
+
 interface TokenInfo {
     base: string;
     quote: string;
@@ -592,19 +648,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         const needsAveData = (sort === 'launched') || (hasBalance === "true");
         if (needsAveData && filteredTokens.length > 0) {
             console.log('Fetching Ave data for launched tokens...');
-            const aveDataPromises = filteredTokens.map(async (token) => {
-                // 只为已发射的代币请求 AVE 数据
-                if (token.launched) {
-                    const aveData = await fetchAveTokenData(token.address);
+            
+            // 收集所有需要获取 AVE 数据的已发射代币地址
+            const launchedTokens = filteredTokens.filter(token => token.launched);
+            const launchedTokenAddresses = launchedTokens.map(token => token.address);
+            
+            // 批量请求 AVE 数据
+            const aveDataMap = await fetchBatchAveTokenData(launchedTokenAddresses);
+            
+            // 将 AVE 数据合并到对应的 token 中
+            filteredTokens = filteredTokens.map(token => {
+                if (token.launched && aveDataMap[token.address.toLowerCase()]) {
                     return {
                         ...token,
-                        aveData: aveData
+                        aveData: aveDataMap[token.address.toLowerCase()]
                     };
                 }
                 return token;
             });
-            
-            filteredTokens = await Promise.all(aveDataPromises);
         }
 
         // 6. 分页
