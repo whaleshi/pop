@@ -12,6 +12,8 @@ import { GetServerSideProps } from "next";
 import { ethers } from "ethers";
 import { CONTRACT_CONFIG, DEFAULT_CHAIN_CONFIG } from "@/config/chains";
 import contractABI from "@/constant/TokenFactory.abi.json";
+import { useAveData } from "@/hooks/useAveData";
+import { useTokenHolders } from "@/hooks/useTokenHolders";
 
 
 interface TokenPageProps {
@@ -103,6 +105,21 @@ export default function TokenPage({ tokenMetadata }: TokenPageProps) {
 		refetchOnReconnect: false,
 	});
 
+	// 获取 AVE 数据 - 只有当 token 已 launched 时才获取
+	const shouldFetchAve = data?.launched && !!data?.address;
+	const { data: aveData } = useAveData(shouldFetchAve ? [data.address] : [], shouldFetchAve);
+
+	// 获取 holders 数据 - 只有当 token 已 launched 且有 address 时才获取
+	const shouldFetchHolders = data?.launched && !!data?.address;
+	const { data: holdersData } = useTokenHolders(data?.address || "", shouldFetchHolders);
+
+	// 合并 AVE 数据和 holders 数据到 token 中
+	const tokenWithAllData = data ? {
+		...data,
+		aveData: shouldFetchAve && aveData ? aveData[data.address.toLowerCase()] : undefined,
+		holdersData: shouldFetchHolders ? holdersData : undefined
+	} : data;
+
 	if (isLoading || !data) {
 		return (
 			<DefaultLayout>
@@ -122,14 +139,14 @@ export default function TokenPage({ tokenMetadata }: TokenPageProps) {
 				</div>
 				<div className="w-full flex-1 flex flex-col md:flex-row md:max-w-[800px] md:gap-[24px] relative md:pt-[80px]">
 					{
-						data?.progressPercent === 100 ? <TokenEnd info={data} metadata={metadata} /> : <>
-							<TokenAbout info={data} metadata={metadata} />
-							<TokenTradeBox info={data} metadata={metadata} />
+						tokenWithAllData?.progressPercent === 100 ? <TokenEnd info={tokenWithAllData} metadata={metadata} /> : <>
+							<TokenAbout info={tokenWithAllData} metadata={metadata} />
+							<TokenTradeBox info={tokenWithAllData} metadata={metadata} />
 						</>
 					}
 				</div>
 			</section>
-			<Share isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} info={data} metadata={metadata} />
+			<Share isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} info={tokenWithAllData} metadata={metadata} />
 		</DefaultLayout>
 	);
 }

@@ -325,8 +325,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             }
         }
 
-        // 获取Ave API数据
-        const aveData = await fetchAveTokenData(address);
+        // AVE 数据现在在前端单独请求
 
         // 构建基础token数据（不包含元数据）
         const tokenData: TokenData = {
@@ -339,7 +338,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             progressPercent: progress,
             name: name || undefined,
             symbol: symbol || undefined,
-            aveData: aveData,
+            aveData: undefined,
         };
 
         // 缓存结果

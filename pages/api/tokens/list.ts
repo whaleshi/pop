@@ -644,29 +644,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             }
         }
 
-        // 5.1 对于launched状态的token或持仓列表中的launched token，获取Ave API数据
-        const needsAveData = (sort === 'launched') || (hasBalance === "true");
-        if (needsAveData && filteredTokens.length > 0) {
-            console.log('Fetching Ave data for launched tokens...');
-            
-            // 收集所有需要获取 AVE 数据的已发射代币地址
-            const launchedTokens = filteredTokens.filter(token => token.launched);
-            const launchedTokenAddresses = launchedTokens.map(token => token.address);
-            
-            // 批量请求 AVE 数据
-            const aveDataMap = await fetchBatchAveTokenData(launchedTokenAddresses);
-            
-            // 将 AVE 数据合并到对应的 token 中
-            filteredTokens = filteredTokens.map(token => {
-                if (token.launched && aveDataMap[token.address.toLowerCase()]) {
-                    return {
-                        ...token,
-                        aveData: aveDataMap[token.address.toLowerCase()]
-                    };
-                }
-                return token;
-            });
-        }
+        // AVE 数据现在在前端单独请求，不在这里获取
 
         // 6. 分页
         const total = filteredTokens.length;

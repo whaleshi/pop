@@ -7,6 +7,7 @@ import { Image, Button } from "@heroui/react";
 import { TokenListSkeleton } from "./skeleton";
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
+import { useAveData } from "@/hooks/useAveData";
 
 type TabType = '1' | '2' | '3' | '4';
 
@@ -105,6 +106,24 @@ export const HomeList = () => {
 
 	const { data: currentData, isLoading: currentLoading } = getCurrentData();
 
+	// 获取当前标签页需要 AVE 数据的 launched tokens
+	const launchedTokens = currentData?.filter((token: any) => token.launched) || [];
+	const launchedAddresses = launchedTokens.map((token: any) => token.address);
+	
+	// 进页面就直接获取 AVE 数据，不需要等切换标签页
+	const { data: aveData } = useAveData(launchedAddresses, launchedAddresses.length > 0);
+
+	// 合并 AVE 数据到 token 中
+	const tokensWithAveData = currentData?.map((token: any) => {
+		if (token.launched && aveData?.[token.address.toLowerCase()]) {
+			return {
+				...token,
+				aveData: aveData[token.address.toLowerCase()]
+			};
+		}
+		return token;
+	}) || [];
+
 	// Optimize skeleton screen display logic - only show when actually loading and no data
 	const showSkeleton = currentLoading && !currentData;
 
@@ -135,9 +154,9 @@ export const HomeList = () => {
 						<TokenListSkeleton count={20} />
 					) : (
 						<div className="">
-							{currentData && currentData.length > 0 ? (
+							{tokensWithAveData && tokensWithAveData.length > 0 ? (
 								<div className="flex flex-col gap-[12px] md:grid md:grid-cols-3 md:gap-[12px]">
-									{currentData.map((item: any, index: number) => (
+									{tokensWithAveData.map((item: any, index: number) => (
 										<TokenItem key={index} item={item} />
 									))}
 								</div>

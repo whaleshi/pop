@@ -125,7 +125,7 @@ export const TokenEnd = ({ info, metadata }: TokenProps) => {
 	const priceChangeDisplay = formatPriceChange(priceChangePercent);
 	const tokenPrice = calculateTokenPrice();
 	const marketCap = calculateMarketCap();
-
+	console.log(info)
 	return (
 		<div className="flex-1 w-full px-[16px] md:px-[0px] flex flex-col items-center pt-[8px] relative">
 			<div className="flex flex-col items-center w-full md:gap-[12px]">
@@ -186,7 +186,9 @@ export const TokenEnd = ({ info, metadata }: TokenProps) => {
 					</div>
 					<div className="w-full py-[12px] px-[16px] border-[#333] border-[1px] rounded-[16px] bg-[#1A1A1A]">
 						<div className="text-[13px] text-[#AAAAAA]">{t('token.holders')}</div>
-						<div className="text-[20px] text-[#fff] font-semibold">--</div>
+						<div className="text-[20px] text-[#fff] font-semibold">
+							{info?.holdersData?.holders ? info.holdersData.holders.toLocaleString() : '--'}
+						</div>
 					</div>
 				</div>
 			</div>
