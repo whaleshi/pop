@@ -10,12 +10,25 @@ import RippleGrid from '@/components/rippleGrid';
 import { Trans, useTranslation } from 'react-i18next';
 
 export default function IndexPage() {
-	const { t } = useTranslation('common');
+	const { t, i18n } = useTranslation('common');
 	const router = useRouter();
 	const openExternalLink = (url: string) => {
 		if (url) {
 			window.open(url, '_blank', 'noopener,noreferrer');
 		}
+	};
+
+	const openWorkLink = () => {
+		const currentLang = i18n.language;
+		let targetUrl;
+		
+		if (currentLang === 'zh' || currentLang === 'zh-CN' || currentLang === 'zh-TW') {
+			targetUrl = 'https://delicate-fig-5e1.notion.site/Popme-29b73380ed548022b5eecc4732aaec18';
+		} else {
+			targetUrl = 'https://delicate-fig-5e1.notion.site/Popme-fun-Usage-and-Trading-Tutorial-29f73380ed54802f9829eed20ab1d9d4';
+		}
+		
+		window.open(targetUrl, '_blank', 'noopener,noreferrer');
 	};
 
 
@@ -62,7 +75,7 @@ export default function IndexPage() {
 								{t('home.launchToken')}
 							</Button>
 							<Button className="bg-[rgba(255,255,255,0.05)] backdrop-blur-md border-[1px] border-[rgba(171,249,9,0.2)] hover:border-[rgba(171,249,9,0.5)] hover:bg-[rgba(171,249,9,0.1)] flex-1 md:flex-none md:w-[180px] h-[48px] rounded-[16px] text-[14px] md:text-[15px] font-medium text-[#fff] transition-all duration-200"
-								onPress={() => openExternalLink(siteConfig.links.work)}>
+								onPress={openWorkLink}>
 								{t('home.learnMore')}
 							</Button>
 						</div>
