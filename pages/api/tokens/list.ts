@@ -216,7 +216,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 console.log("Total tokens from contract:", totalTokens);
                 
                 // 缓存成功获取的 token count
-                await globalCache.set(tokenCountCacheKey, totalTokens, CacheTTL.LONG);
+                await globalCache.set(tokenCountCacheKey, totalTokens, CacheTTL.TOKEN_COUNT);
             } catch (error) {
                 console.error("Contract call failed:", {
                     error: error,
