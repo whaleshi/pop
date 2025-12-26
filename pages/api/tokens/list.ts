@@ -201,25 +201,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             console.log("Fetching token count from contract...");
 
             try {
-                const tokenCount = (await readContract(config, {
-                    address: CONTRACT_CONFIG.FACTORY_CONTRACT as `0x${string}`,
-                    abi: contractABI,
-                    functionName: "allTokens",
-                })) as bigint;
+                const tokenCount = (await Promise.race([
+                    readContract(config, {
+                        address: CONTRACT_CONFIG.FACTORY_CONTRACT as `0x${string}`,
+                        abi: contractABI,
+                        functionName: "allTokens",
+                    }),
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Contract call timeout')), 60000)
+                    )
+                ])) as bigint;
                 console.log("Raw token count from contract:", tokenCount.toString());
                 totalTokens = Number(tokenCount);
                 console.log("Total tokens from contract:", totalTokens);
+                
+                // 缓存成功获取的 token count
+                await globalCache.set(tokenCountCacheKey, totalTokens, CacheTTL.LONG);
             } catch (error) {
-                console.error("Detailed readContract error:", {
+                console.error("Contract call failed:", {
                     error: error,
                     message: error instanceof Error ? error.message : "Unknown error",
-                    stack: error instanceof Error ? error.stack : "No stack trace",
                 });
-                throw error;
+                
+                // 降级处理：使用默认值0，让后续逻辑继续执行
+                console.warn("Using fallback: totalTokens = 0");
+                totalTokens = 0;
             }
-
-            // 缓存代币总数
-            globalCache.set(tokenCountCacheKey, totalTokens, CacheTTL.TOKEN_COUNT);
         }
 
         if (totalTokens === 0) {

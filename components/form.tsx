@@ -7,12 +7,13 @@ import { toast } from "sonner";
 import { useAccount, useWalletClient, usePublicClient } from 'wagmi';
 import { ethers } from "ethers";
 import FactoryABI from "@/constant/TokenFactory.abi.json";
-import { CONTRACT_CONFIG, DEFAULT_CHAIN_ID } from "@/config/chains";
+import { CONTRACT_CONFIG, DEFAULT_CHAIN_ID, DEFAULT_CHAIN_CONFIG } from "@/config/chains";
 import { randomBytes } from "crypto";
 import { useIsMobile } from "@/utils/index";
 import CreateSuccess from "./createSuccess";
 import { FORM_STYLES, AVATAR_STYLES, ERROR_STYLES } from "@/constants/styles";
 import { useTranslation } from 'react-i18next';
+import { useReferral } from '@/providers/referralProvider';
 
 
 const MAX_AVATAR_MB = 5;
@@ -175,8 +176,8 @@ export default function CreateForm() {
 	const [createdTokenAddress, setCreatedTokenAddress] = useState<string | null>(null);
 	const factoryAddr = CONTRACT_CONFIG.FACTORY_CONTRACT;
 
-
-
+	// Referral hook
+	const { referralInviter, referralSignature, consumeReferralCode } = useReferral();
 
 	// Wagmi hooks
 	const { address, isConnected } = useAccount();
@@ -337,12 +338,17 @@ export default function CreateForm() {
 			let gasLimit;
 			try {
 				if (hasPreBuy) {
-					const estimatedGas = await contract.createTokenAndBuy.estimateGas(
+					const tempInviter = referralInviter || ethers.ZeroAddress;
+					const tempSignature = referralSignature || '0x';
+					const tempInvite = { inviter: tempInviter };
+					const estimatedGas = await contract.createTokenAndBuyWithReferral.estimateGas(
 						nameVal,
 						ticker,
 						metadataHash,
 						salt,
 						preBuyAmount,
+						tempInvite,
+						tempSignature,
 						{ value: preBuyAmount }
 					);
 					gasLimit = estimatedGas + (estimatedGas * BigInt(50)) / BigInt(100); // +50% buffer
@@ -376,17 +382,42 @@ export default function CreateForm() {
 			let txResult;
 			try {
 				if (hasPreBuy) {
-					// Call createTokenAndBuy
+					// Get referral data
+					const referral = consumeReferralCode();
+					let inviterAddress = ethers.ZeroAddress;
+					let finalSignature = '0x';
+					
+					if (referral) {
+						inviterAddress = referral.inviter;
+						finalSignature = referral.signature;
+						console.log("Using referral inviter:", inviterAddress);
+					}
+					
+					const invite = { inviter: inviterAddress };
+					console.log("createTokenAndBuyWithReferral params:", {
+						nameVal,
+						ticker,
+						metadataHash,
+						salt,
+						preBuyAmount: preBuyAmount.toString(),
+						invite,
+						signature: finalSignature,
+						txOptions
+					});
+					
+					// Call createTokenAndBuyWithReferral
 					txOptions.value = preBuyAmount;
-					txResult = await contract.createTokenAndBuy(
+					txResult = await contract.createTokenAndBuyWithReferral(
 						nameVal,
 						ticker,
 						metadataHash,
 						salt,
 						preBuyAmount,
+						invite,
+						finalSignature,
 						txOptions
 					);
-					console.log("createTokenAndBuy transaction sent:", txResult.hash);
+					console.log("createTokenAndBuyWithReferral transaction sent:", txResult.hash);
 				} else {
 					// Call createToken
 					txResult = await contract.createToken(

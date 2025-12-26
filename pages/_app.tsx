@@ -8,6 +8,7 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { useRouter } from "next/router";
 import QueryProvider from '@/providers/queryProvider'
 import { BalanceProvider } from '@/providers/balanceProvider'
+import { ReferralProvider } from '@/providers/referralProvider'
 import { Toaster } from 'sonner';
 import NProgress from 'nprogress';
 import { RainbowKitProvider, darkTheme, Locale } from '@rainbow-me/rainbowkit';
@@ -92,15 +93,17 @@ export default function App({ Component, pageProps }: AppProps) {
 							locale={getRainbowKitLocale(i18n.language)}
 						>
 							<BalanceProvider>
-								<HeroUIProvider navigate={router.push}>
-									<Toaster richColors position="top-center" />
-									<NetworkSwitcher />
-									<NextThemesProvider attribute="class" defaultTheme="dark">
-										<div className="page-transition bg-[#000000] min-h-screen">
-											<Component {...pageProps} />
-										</div>
-									</NextThemesProvider>
-								</HeroUIProvider>
+								<ReferralProvider>
+									<HeroUIProvider navigate={router.push}>
+										<Toaster richColors position="top-center" />
+										<NetworkSwitcher />
+										<NextThemesProvider attribute="class" defaultTheme="dark">
+											<div className="page-transition bg-[#000000] min-h-screen">
+												<Component {...pageProps} />
+											</div>
+										</NextThemesProvider>
+									</HeroUIProvider>
+								</ReferralProvider>
 							</BalanceProvider>
 						</RainbowKitProvider>
 					</QueryProvider>

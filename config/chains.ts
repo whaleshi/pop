@@ -1,4 +1,4 @@
-import { popchainTestnet, popchainMainnet } from "./net";
+import { popchainTestnet, popchainMainnet, localNetwork } from "./net";
 const isProd = process.env.NEXT_PUBLIC_APP_ENV === "production";
 export const CHAINS_CONFIG = {
     // 默认链 - 修改这里即可切换整个应用的默认网络
@@ -9,20 +9,34 @@ export const CHAINS_CONFIG = {
 
     // 链相关配置
     CHAIN_CONFIG: {
+        [31337]: {
+            chainId: 31337,
+            name: "Popchain",
+            symbol: "POP",
+            explorerUrl: "https://scan.popchain.ai/",
+            rpcUrl: "http://192.168.2.112:8545",
+            factoryContract: "0x198C8099E0c2CE323a5513769e294f349B015cEE",
+            ReferralContract: "0xd37f15F90F5480751bcE183B76D57D4B6d1852e3",
+            multicall3: "0xbd64A7c53c825655e83718805e8b747B3387ee95",
+        },
         [7257]: {
+            chainId: 7257,
             name: "Popchain",
             symbol: "POP",
             explorerUrl: "https://scan.popchain.ai/",
             rpcUrl: "https://rpc.popchain.ai",
-            factoryContract: "0x198C8099E0c2CE323a5513769e294f349B015cEE",
+            factoryContract: "0xDaa54fbc3B9Cc08CcD10ff415207B2fef3E33df7", //0x198C8099E0c2CE323a5513769e294f349B015cEE
+            ReferralContract: "0xa9d64DebC6ff3a733F80e346df73847678C0da10",
             multicall3: "0xbd64A7c53c825655e83718805e8b747B3387ee95",
         },
         [725700]: {
+            chainId: 725700,
             name: "Popchain Testnet",
             symbol: "POP",
             explorerUrl: "https://testnetpop.cloud.blockscout.com/",
             rpcUrl: "https://testnet.popchain.ai",
             factoryContract: "0xe1058f76F658086BF0562320e6Bd94228AC1f681",
+            ReferralContract: "0xbd64A7c53c825655e83718805e8b747B3387ee95",
             multicall3: "0x540098C1adDBcEABD6Bf052652e37ecC0575d79A",
         },
     },
@@ -36,6 +50,7 @@ export const DEFAULT_CHAIN_CONFIG = CHAINS_CONFIG.CHAIN_CONFIG[DEFAULT_CHAIN_ID 
 export const CONTRACT_CONFIG = {
     // 工厂合约地址 - 用于创建新代币
     FACTORY_CONTRACT: CHAINS_CONFIG.CHAIN_CONFIG[DEFAULT_CHAIN_ID as keyof typeof CHAINS_CONFIG.CHAIN_CONFIG].factoryContract,
+    REFERRAL_CONTRACT: CHAINS_CONFIG.CHAIN_CONFIG[DEFAULT_CHAIN_ID as keyof typeof CHAINS_CONFIG.CHAIN_CONFIG].ReferralContract,
 } as const;
 
 // Mint 相关配置

@@ -15,6 +15,7 @@ import _bignumber from "bignumber.js";
 import { useSlippageStore } from "@/stores/slippage";
 import { useTranslation } from 'react-i18next';
 import { useNetworkSwitcher } from '@/hooks/useNetworkSwitcher';
+import { useReferral } from '@/providers/referralProvider';
 
 type TradeType = 'buy' | 'sell';
 
@@ -39,6 +40,7 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 	const { slippage } = useSlippageStore();
 	const queryClient = useQueryClient();
 	const mountedRef = useRef(false);
+	const { referralInviter, referralSignature, consumeReferralCode } = useReferral();
 
 	const { address, isConnected } = useAccount();
 	const { data: walletClient } = useWalletClient();
@@ -79,8 +81,8 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 			}
 
 			if (_bignumber(inputAmount).gt(balance)) {
-				return t('validation.insufficientPopBalanceDetailed', { 
-					balance: formatBigNumber(balance) 
+				return t('validation.insufficientPopBalanceDetailed', {
+					balance: formatBigNumber(balance)
 				});
 			}
 
@@ -96,7 +98,7 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 			}
 
 			if (_bignumber(inputAmount).gt(tokenBalance)) {
-				return t('validation.insufficientTokenBalanceDetailed', { 
+				return t('validation.insufficientTokenBalanceDetailed', {
 					balance: formatBigNumber(tokenBalance),
 					symbol: metadata?.symbol?.toUpperCase() || 'Token'
 				});
@@ -268,6 +270,7 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 				console.log("Amount:", ethers.parseEther(amount));
 
 				// 1. Call tryBuy to get expected output
+				console.log(111)
 				const result = await readOnlyContract.tryBuy(tokenAddress, ethers.parseEther(amount));
 				console.log("tryBuy result:", result);
 
@@ -281,11 +284,17 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 				// 3. Estimate gas and execute buy transaction
 				let gasLimit;
 				try {
-					const estimatedGas = await contract.buyToken.estimateGas(tokenAddress, ethers.parseEther(amount), minAmountOut, {
+					const tempInviter = referralInviter || ethers.ZeroAddress;
+					const tempSignature = referralSignature || '0x';
+					const tempInvite = { inviter: tempInviter };
+					console.log(tokenAddress, ethers.parseEther(amount), minAmountOut, tempInvite, tempSignature)
+					const estimatedGas = await contract.buyTokenWithReferral.estimateGas(tokenAddress, ethers.parseEther(amount), minAmountOut, tempInvite, tempSignature, {
 						value: ethers.parseEther(amount),
 					});
+					console.log(2)
 					gasLimit = estimatedGas + (estimatedGas * BigInt(20)) / BigInt(100);
 				} catch (e) {
+					console.log(1)
 					console.warn("Gas estimation failed:", e);
 				}
 
@@ -299,8 +308,29 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 				if (gasLimit) txOptions.gasLimit = gasLimit;
 				if (newGasPrice) txOptions.gasPrice = newGasPrice;
 
-				const buyResult = await contract.buyToken(tokenAddress, ethers.parseEther(amount), minAmountOut, txOptions);
-				console.log("buyToken transaction sent:", buyResult.hash);
+				let buyResult;
+				const referral = consumeReferralCode();
+
+				let inviterAddress = ethers.ZeroAddress;
+				let finalSignature = '0x';
+
+				if (referral) {
+					inviterAddress = referral.inviter;
+					finalSignature = referral.signature;
+					console.log("Using referral inviter:", inviterAddress);
+				}
+
+				const invite = { inviter: inviterAddress };
+				console.log("buyTokenWithReferral params:", {
+					tokenAddress,
+					amount: ethers.parseEther(amount).toString(),
+					minAmountOut: minAmountOut.toString(),
+					invite,
+					signature: finalSignature,
+					txOptions
+				});
+				buyResult = await contract.buyTokenWithReferral(tokenAddress, ethers.parseEther(amount), minAmountOut, invite, finalSignature, txOptions);
+				console.log("buyTokenWithReferral transaction sent:", buyResult.hash, "inviter:", inviterAddress);
 
 				toast.success(t('messages.transactionSubmitted'), {
 					description: `${t('messages.transactionHash')}: ${buyResult.hash.slice(0, 10)}...${buyResult.hash.slice(-6)}`
@@ -369,7 +399,10 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 				// 5. Estimate gas and execute sell transaction
 				let gasLimit;
 				try {
-					const estimatedGas = await contract.sellToken.estimateGas(tokenAddress, sellAmount, minEthOut);
+					const tempInviter = referralInviter || ethers.ZeroAddress;
+					const tempSignature = referralSignature || '0x';
+					const tempInvite = { inviter: tempInviter };
+					const estimatedGas = await contract.sellTokenWithReferral.estimateGas(tokenAddress, sellAmount, minEthOut, tempInvite, tempSignature);
 					gasLimit = estimatedGas + (estimatedGas * BigInt(20)) / BigInt(100);
 				} catch (e) {
 					console.warn("Gas estimation failed:", e);
@@ -382,8 +415,29 @@ export const Trade = ({ info, metadata, tokenBalance, initialTab = 'buy' }: Toke
 				if (gasLimit) txOptions.gasLimit = gasLimit;
 				if (newGasPrice) txOptions.gasPrice = newGasPrice;
 
-				const sellResult = await contract.sellToken(tokenAddress, sellAmount, minEthOut, txOptions);
-				console.log("sellToken transaction sent:", sellResult.hash);
+				let sellResult;
+				const referral = consumeReferralCode();
+
+				let inviterAddress = ethers.ZeroAddress;
+				let finalSignature = '0x';
+
+				if (referral) {
+					inviterAddress = referral.inviter;
+					finalSignature = referral.signature;
+					console.log("Using referral inviter:", inviterAddress);
+				}
+
+				const invite = { inviter: inviterAddress };
+				console.log("sellTokenWithReferral params:", {
+					tokenAddress,
+					sellAmount: sellAmount.toString(),
+					minEthOut: minEthOut.toString(),
+					invite,
+					signature: finalSignature,
+					txOptions
+				});
+				sellResult = await contract.sellTokenWithReferral(tokenAddress, sellAmount, minEthOut, invite, finalSignature, txOptions);
+				console.log("sellTokenWithReferral transaction sent:", sellResult.hash, "inviter:", inviterAddress);
 
 				toast.success(t('messages.transactionSubmitted'), {
 					description: `${t('messages.transactionHash')}: ${sellResult.hash.slice(0, 10)}...${sellResult.hash.slice(-6)}`

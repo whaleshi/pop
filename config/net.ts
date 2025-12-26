@@ -57,7 +57,7 @@ export const localNetwork = defineChain({
     },
     rpcUrls: {
         default: {
-            http: ["https://testnet.popchain.ai/"],
+            http: ["http://192.168.2.112:8545"],
         },
     },
     testnet: true,

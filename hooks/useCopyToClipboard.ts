@@ -50,6 +50,7 @@ export default function useClipboard(options: ClipboardOptions = {}) {
                 timerRef.current = window.setTimeout(() => setIsCopied(false), timeout);
                 return true;
             } catch (e: any) {
+                console.error('Copy error:', e);
                 setError(e?.message || errorMessage);
                 setIsCopied(false);
                 toast.error(errorMessage);

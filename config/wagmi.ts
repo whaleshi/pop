@@ -19,7 +19,11 @@ const connectors = connectorsForWallets(
 // 动态构建 transports 对象
 const transports = CHAINS_CONFIG.SUPPORTED_CHAINS.reduce((acc, chain) => {
     const chainConfig = CHAINS_CONFIG.CHAIN_CONFIG[chain.id as keyof typeof CHAINS_CONFIG.CHAIN_CONFIG];
-    acc[chain.id] = http(chainConfig?.rpcUrl);
+    acc[chain.id] = http(chainConfig?.rpcUrl, {
+        timeout: 60000,
+        retryCount: 3,
+        retryDelay: 1000,
+    });
     return acc;
 }, {} as Record<number, ReturnType<typeof http>>);
 
